@@ -1,0 +1,55 @@
+body {
+  font-family: 'Comic Sans MS', cursive;
+  background: #f5f7fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background: #ffd166;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+h1 {
+  margin: 0;
+}
+
+section {
+  padding: 1rem;
+}
+
+.category {
+  margin-bottom: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.task {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.task.completed span {
+  text-decoration: line-through;
+  color: gray;
+}
+
+button {
+  background: #06d6a0;
+  border: none;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #05b38a;
+}
