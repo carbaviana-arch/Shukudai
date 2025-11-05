@@ -4,16 +4,17 @@ const minutosTotalesEl = document.getElementById('minutosTotales');
 
 const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
-let progreso = {};
+// ✅ Día actual corregido: lunes = 0 ... domingo = 6
 let diaActual = diasSemana[(new Date().getDay() + 6) % 7];
 
-// Cargar progreso desde localStorage
+let progreso = {};
+
+// Cargar progreso guardado
 function cargarProgreso() {
   const data = localStorage.getItem('progresoShukudai');
   if (data) progreso = JSON.parse(data);
   else progreso = {};
 
-  // Inicializar días que no existan
   diasSemana.forEach((dia) => {
     if (!progreso[dia]) {
       progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
@@ -35,7 +36,7 @@ function calcularTotalSemanal() {
   return total;
 }
 
-// Renderizar todos los días con su progreso diario
+// Renderizar los días de la semana con su progreso
 function renderDias() {
   categoriasContainer.innerHTML = '';
 
@@ -63,7 +64,7 @@ function renderDias() {
   actualizarMarcador();
 }
 
-// Calcular total máximo posible de un día (sumando puntos de todas las tareas)
+// Calcular total posible de un día
 function calcularTotalDia() {
   let total = 0;
   for (let categoria in tareas) {
@@ -72,7 +73,7 @@ function calcularTotalDia() {
   return total;
 }
 
-// Renderizar todas las categorías y tareas dentro de un día
+// Renderizar tareas dentro de cada día
 function renderTareas(container, dia) {
   for (let categoria in tareas) {
     const catDiv = document.createElement('div');
@@ -120,12 +121,12 @@ function renderTareas(container, dia) {
   }
 }
 
-// Cambiar estado de tarea (cumplida / no cumplida / ninguna)
+// Cambiar estado de una tarea
 function marcarEstado(taskDiv, tarea, estado, dia) {
   const id = taskDiv.dataset.id;
   if (!progreso[dia]) progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
 
-  // Revertir si estaba completada
+  // Revertir si estaba marcada cumplida
   if (taskDiv.dataset.estado === 'cumplida') {
     progreso[dia].puntosTotales -= tarea.puntos;
     progreso[dia].minutosTotales -= tarea.puntos;
@@ -146,18 +147,16 @@ function marcarEstado(taskDiv, tarea, estado, dia) {
     delete taskDiv.dataset.estado;
   }
 
-  // Guardar estado individual
   progreso[dia].tareas[id] = { estado: taskDiv.dataset.estado };
   guardarProgreso();
-  renderDias(); // refrescar para actualizar contadores
+  renderDias();
 }
 
-// Actualizar marcador general (total semanal)
+// Actualizar marcador general
 function actualizarMarcador() {
   const totalSemana = calcularTotalSemanal();
-  const minutosSemana = totalSemana; // 1 punto = 1 minuto
   puntosTotalesEl.textContent = totalSemana;
-  minutosTotalesEl.textContent = minutosSemana;
+  minutosTotalesEl.textContent = totalSemana; // 1 punto = 1 minuto
 }
 
 // Iniciar app
