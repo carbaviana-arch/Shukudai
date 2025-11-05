@@ -5,7 +5,7 @@ const minutosTotalesEl = document.getElementById('minutosTotales');
 const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 let progreso = {};
-let diaActual = diasSemana[new Date().getDay() - 1] || 'Domingo';
+let diaActual = diasSemana[(new Date().getDay() + 6) % 7];
 
 // Cargar progreso desde localStorage
 function cargarProgreso() {
