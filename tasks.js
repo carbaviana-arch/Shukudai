@@ -7,7 +7,7 @@ const tareas = {
   "Académico": [
     { nombre: "Hacer deberes", puntos: 10 },
     { nombre: "Estudiar para controles", puntos: 10 }
-    { nombre: "Repasar lo visto en la semana", puntos: 10 }
+    { nombre: "Repaso de Contenidos", puntos: 10 }
   ],
   "Hogar": [
     { nombre: "Ordenar habitación", puntos: 8 },
