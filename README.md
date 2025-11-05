@@ -1,17 +1,27 @@
-# 🧩 Shukudai 2.0
+# 🧩 Shukudai 2.1
 
 **Shukudai** es una aplicación web pensada para ayudar a los niños a organizar sus tareas diarias y ganar recompensas por su esfuerzo.
-Esta versión **2.0** introduce el registro por días de la semana, un marcador semanal acumulativo y guardado automático en el navegador.
+Esta versión **2.1** se centra en **correcciones y mejoras de estabilidad**, optimizando la carga de datos, la visualización de los días de la semana y la compatibilidad con dispositivos móviles.
 
 ---
 
-## 🚀 Novedades de la versión 2.0
+## 🔧 Cambios en la versión 2.1
 
-* 📅 **Registro diario:** cada día de la semana tiene su propio panel desplegable.
-* ✅ **Marcar tareas cumplidas o no cumplidas.**
-* 🧮 **Marcador semanal:** suma automáticamente los puntos obtenidos cada día.
-* 💾 **Guardado local:** el progreso se almacena en `localStorage`, incluso sin conexión.
-* 🎯 **1 punto = 1 minuto de recompensa.**
+* ✅ Corrección del cálculo del día actual (`getDay()` ajustado para todos los navegadores).
+* ⚙️ Verificación del orden de carga de scripts (`tasks.js` antes de `app.js`).
+* 🧩 Se aseguran los IDs y contenedores para evitar errores de renderizado.
+* 📱 Mejor compatibilidad en móviles y tablets.
+* 🔒 Estructura de datos más estable en `localStorage`.
+
+---
+
+## 🚀 Funcionalidades actuales
+
+* 📅 Registro diario: cada día de la semana tiene su panel desplegable.
+* ✅ Marcar tareas como cumplidas o no cumplidas.
+* 🧮 Marcador semanal: suma automáticamente los puntos obtenidos cada día.
+* 💾 Guardado local: el progreso se almacena en `localStorage`.
+* 🎯 1 punto = 1 minuto de recompensa.
 
 ---
 
@@ -19,11 +29,11 @@ Esta versión **2.0** introduce el registro por días de la semana, un marcador 
 
 ```
 Shukudai/
-│── index.html      → Página principal y estructura del marcador
-│── style.css       → Estilos visuales y diseño responsivo
-│── tasks.js        → Listado de tareas por categoría
-│── app.js          → Lógica principal (días, puntos, progreso)
-│── README.md       → Información del proyecto
+│── index.html      → Estructura de la aplicación
+│── style.css       → Estilos visuales y diseño
+│── tasks.js        → Listado de tareas
+│── app.js          → Lógica principal
+│── README.md       → Descripción del proyecto
 ```
 
 ---
@@ -31,23 +41,23 @@ Shukudai/
 ## 🕹️ Cómo usar
 
 1. Abre `index.html` en tu navegador o visita tu enlace de GitHub Pages.
-2. Abre el panel del día actual (por ejemplo, “Lunes”).
-3. Marca las tareas que se completen con **✅** o **❌**.
-4. Observa cómo el **marcador semanal** suma tus puntos y minutos.
+2. Despliega el día actual (por ejemplo, “Lunes”).
+3. Marca las tareas completadas con **✅** o **❌**.
+4. Observa cómo el marcador semanal suma tus puntos.
 5. Cierra la página: el progreso se guarda automáticamente.
 
 ---
 
-## 💡 Próximos pasos
+## 💡 Próximos pasos (versión 2.2 y futuras)
 
-* 🌟 Barra de progreso semanal con emojis y niveles de motivación.
+* 🌟 Barra de progreso semanal con emojis y niveles.
 * 👨‍👩‍👧 Múltiples usuarios (padres/hijos).
-* ☁️ Sincronización en la nube con Firebase.
+* ☁️ Sincronización en la nube (Firebase).
 * 🏅 Sistema de recompensas visuales desbloqueables.
 
 ---
 
 ## ❤️ Créditos
 
-Desarrollado con cariño para ayudar a los pequeños a adquirir hábitos positivos.
+Desarrollado con cariño para fomentar la responsabilidad y el hábito en los más pequeños.
 © 2025 — Proyecto educativo **Shukudai**.
