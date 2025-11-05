@@ -41,6 +41,11 @@ section {
   color: gray;
 }
 
+.task.failed span {
+  text-decoration: line-through;
+  color: crimson;
+}
+
 button {
   background: #06d6a0;
   border: none;
@@ -48,8 +53,52 @@ button {
   padding: 0.3rem 0.6rem;
   border-radius: 6px;
   cursor: pointer;
+  margin-left: 0.3rem;
 }
 
 button:hover {
   background: #05b38a;
+}
+
+#marcador {
+  background: #ef476f;
+  color: white;
+  text-align: center;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+summary small {
+  font-weight: normal;
+  font-size: 0.9rem;
+  color: #fdfdfd;
+  margin-left: 0.5rem;
+}
+
+.dia {
+  margin-bottom: 1rem;
+  background: #fff3;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+summary {
+  background: #06d6a0;
+  color: white;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+summary:hover {
+  background: #05b38a;
+}
+
+.dayContainer {
+  background: #fff;
+  padding: 0.8rem;
+  border-radius: 0 0 12px 12px;
 }
