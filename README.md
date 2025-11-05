@@ -1,30 +1,53 @@
-# 🧩 Shukudai
+# 🧩 Shukudai 2.0
 
-**Shukudai** es una aplicación sencilla para ayudar a los niños a gestionar sus tareas y deberes semanales, con un sistema de puntos y recompensas.
+**Shukudai** es una aplicación web pensada para ayudar a los niños a organizar sus tareas diarias y ganar recompensas por su esfuerzo.
+Esta versión **2.0** introduce el registro por días de la semana, un marcador semanal acumulativo y guardado automático en el navegador.
 
-## 🚀 Características iniciales
-- Listado de tareas organizado por categorías (Aseo, Hogar, etc.)
-- Posibilidad de marcar tareas completadas
-- Sistema de puntos configurable (versión futura)
-- Estilo visual infantil y amigable
+---
 
-## 📂 Estructura de archivos
+## 🚀 Novedades de la versión 2.0
+
+* 📅 **Registro diario:** cada día de la semana tiene su propio panel desplegable.
+* ✅ **Marcar tareas cumplidas o no cumplidas.**
+* 🧮 **Marcador semanal:** suma automáticamente los puntos obtenidos cada día.
+* 💾 **Guardado local:** el progreso se almacena en `localStorage`, incluso sin conexión.
+* 🎯 **1 punto = 1 minuto de recompensa.**
+
+---
+
+## 📂 Estructura del proyecto
+
 ```
 Shukudai/
-│── index.html      → Página principal
-│── style.css       → Estilos visuales
-│── tasks.js        → Datos de las tareas
-│── app.js          → Lógica básica
-│── README.md       → Guía del proyecto
+│── index.html      → Página principal y estructura del marcador
+│── style.css       → Estilos visuales y diseño responsivo
+│── tasks.js        → Listado de tareas por categoría
+│── app.js          → Lógica principal (días, puntos, progreso)
+│── README.md       → Información del proyecto
 ```
 
-## 🛠️ Próximos pasos
-- Añadir usuarios (padres/hijo)
-- Guardar progreso en el navegador (localStorage)
-- Sistema de recompensas con minutos de consola
-- Sincronización en la nube (GitHub Pages o Firebase)
+---
 
-## 💡 Uso
-1. Abre `index.html` en tu navegador.
-2. Marca las tareas que tu hijo complete.
-3. Guarda el progreso manualmente o usa futuras funciones automáticas.
+## 🕹️ Cómo usar
+
+1. Abre `index.html` en tu navegador o visita tu enlace de GitHub Pages.
+2. Abre el panel del día actual (por ejemplo, “Lunes”).
+3. Marca las tareas que se completen con **✅** o **❌**.
+4. Observa cómo el **marcador semanal** suma tus puntos y minutos.
+5. Cierra la página: el progreso se guarda automáticamente.
+
+---
+
+## 💡 Próximos pasos
+
+* 🌟 Barra de progreso semanal con emojis y niveles de motivación.
+* 👨‍👩‍👧 Múltiples usuarios (padres/hijos).
+* ☁️ Sincronización en la nube con Firebase.
+* 🏅 Sistema de recompensas visuales desbloqueables.
+
+---
+
+## ❤️ Créditos
+
+Desarrollado con cariño para ayudar a los pequeños a adquirir hábitos positivos.
+© 2025 — Proyecto educativo **Shukudai**.
