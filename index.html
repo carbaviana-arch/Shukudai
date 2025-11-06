@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shukudai 2.1</title>
+  <title>Shukudai 2.1.3</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🧩 Shukudai 2.1</h1>
+    <h1>🧩 Shukudai 2.1.3</h1>
     <p>Control de tareas y recompensas diarias</p>
   </header>
 
@@ -19,7 +19,11 @@
       <p>Minutos totales: <span id="minutosTotales">0</span></p>
     </section>
 
-    <!-- Contenedor de los días y tareas -->
+    <section id="acciones">
+      <button id="btnRecompensa" class="gold">🏅 Recompensa Extra (+15)</button>
+      <button id="btnReset" class="danger">❌ Reiniciar Marcador</button>
+    </section>
+
     <section id="categorias"></section>
   </main>
 
@@ -27,7 +31,6 @@
     <p>Hecho con ❤️ para ayudar a los pequeños a cumplir sus tareas</p>
   </footer>
 
-  <!-- Orden correcto: primero las tareas, luego la lógica -->
   <script src="app.js"></script>
 </body>
 </html>
