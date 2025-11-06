@@ -37,12 +37,6 @@ function calcularTotalSemanal() {
 }
 
 // Renderizar los días de la semana con su progreso
-const tareas = {
-  "Prueba": [
-    { nombre: "Tarea de ejemplo", puntos: 5 },
-    { nombre: "Otra tarea", puntos: 3 }
-  ]
-};
 
 function renderDias() {
   categoriasContainer.innerHTML = '';
