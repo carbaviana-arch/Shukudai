@@ -8,18 +8,25 @@
 const tareas = {
   "Aseo e higiene personal": [
     { nombre: "Lavarse bien los dientes", puntos: 2 },
-    { nombre: "Ducharse bien", puntos: 3 },
+    { nombre: "Ducharse bien", puntos: 2 },
     { nombre: "Usar desodorante", puntos: 1 }
   ],
   "Académico": [
-    { nombre: "Hacer deberes", puntos: 5 },
-    { nombre: "Estudiar para controles", puntos: 4 }
+    { nombre: "Hacer deberes", puntos: 1 },
+    { nombre: "Estudiar para controles", puntos: 2 },
+    { nombre: "Leer 15 Min", puntos: 5 },
+    { nombre: "Repaso Contenidos", puntos: 3 }
   ],
   "Hogar": [
-    { nombre: "Ordenar habitación", puntos: 3 },
-    { nombre: "Limpiar habitación", puntos: 3 },
-    { nombre: "Sacar lavavajillas", puntos: 2 },
-    { nombre: "Limpiar baño", puntos: 3 }
+    { nombre: "Ordenar habitación", puntos: 1 },
+    { nombre: "Limpiar habitación", puntos: 2 },
+    { nombre: "Sacar lavavajillas", puntos: 1 },
+    { nombre: "Limpiar baño", puntos: 2 }
+  ],
+  "General": [
+    { nombre: "Lenguaje", puntos: 1 },
+    { nombre: "Buena Actitud", puntos: 1 },
+    { nombre: "Colabora en Labores Hogar", puntos: 1 }
   ]
 };
 
