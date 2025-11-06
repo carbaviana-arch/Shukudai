@@ -1,10 +1,8 @@
 /* =======================================================
-   SHUKUDAI 2.1 - Versión con tareas integradas en app.js
+   SHUKUDAI 2.1.3 - Con tareas integradas y botones extra
    ======================================================= */
 
-// ===============================
 // 📋 TAREAS BASE
-// ===============================
 const tareas = {
   "Aseo e higiene personal": [
     { nombre: "Lavarse bien los dientes", puntos: 2 },
@@ -30,42 +28,22 @@ const tareas = {
   ]
 };
 
-// ===============================
-// ⚙️ ELEMENTOS BASE DEL DOM
-// ===============================
+// ⚙️ ELEMENTOS DEL DOM
 const categoriasContainer = document.getElementById('categorias');
 const puntosTotalesEl = document.getElementById('puntosTotales');
 const minutosTotalesEl = document.getElementById('minutosTotales');
 
-// ===============================
 // 📅 CONFIGURACIÓN DE DÍAS
-// ===============================
 const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-
-// Día actual corregido (lunes = 0 ... domingo = 6)
 let diaActual = diasSemana[(new Date().getDay() + 6) % 7];
-
 let progreso = {};
 
-// ===============================
 // 💾 GESTIÓN DE PROGRESO
-// ===============================
 function cargarProgreso() {
   const data = localStorage.getItem('progresoShukudai');
-  if (data) {
-    try {
-      progreso = JSON.parse(data);
-    } catch {
-      progreso = {};
-    }
-  } else {
-    progreso = {};
-  }
-
+  progreso = data ? JSON.parse(data) : {};
   diasSemana.forEach((dia) => {
-    if (!progreso[dia]) {
-      progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
-    }
+    if (!progreso[dia]) progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
   });
 }
 
@@ -74,24 +52,14 @@ function guardarProgreso() {
 }
 
 function calcularTotalSemanal() {
-  let total = 0;
-  diasSemana.forEach((dia) => {
-    total += progreso[dia].puntosTotales || 0;
-  });
-  return total;
+  return diasSemana.reduce((total, dia) => total + (progreso[dia]?.puntosTotales || 0), 0);
 }
 
 function calcularTotalDia() {
-  let total = 0;
-  for (let categoria in tareas) {
-    tareas[categoria].forEach((t) => (total += t.puntos));
-  }
-  return total;
+  return Object.values(tareas).flat().reduce((sum, t) => sum + t.puntos, 0);
 }
 
-// ===============================
-// 🧩 RENDERIZADO DE DÍAS Y TAREAS
-// ===============================
+// 🧩 RENDERIZADO
 function renderDias() {
   categoriasContainer.innerHTML = '';
 
@@ -148,15 +116,9 @@ function renderTareas(container, dia) {
       btnNoCumplida.onclick = () => marcarEstado(taskDiv, tarea, 'noCumplida', dia);
       taskDiv.appendChild(btnNoCumplida);
 
-      // Restaurar estado guardado
       const estado = progreso[dia]?.tareas?.[id]?.estado;
-      if (estado === 'cumplida') {
-        taskDiv.classList.add('completed');
-        taskDiv.dataset.estado = 'cumplida';
-      } else if (estado === 'noCumplida') {
-        taskDiv.classList.add('failed');
-        taskDiv.dataset.estado = 'noCumplida';
-      }
+      if (estado === 'cumplida') taskDiv.classList.add('completed');
+      else if (estado === 'noCumplida') taskDiv.classList.add('failed');
 
       catDiv.appendChild(taskDiv);
     });
@@ -165,14 +127,11 @@ function renderTareas(container, dia) {
   }
 }
 
-// ===============================
-// 🧠 LÓGICA DE ESTADO Y MARCADORES
-// ===============================
+// 🧠 ESTADO Y MARCADOR
 function marcarEstado(taskDiv, tarea, estado, dia) {
   const id = taskDiv.dataset.id;
   if (!progreso[dia]) progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
 
-  // Revertir si ya estaba cumplida
   if (taskDiv.dataset.estado === 'cumplida') {
     progreso[dia].puntosTotales -= tarea.puntos;
     progreso[dia].minutosTotales -= tarea.puntos;
@@ -201,11 +160,36 @@ function marcarEstado(taskDiv, tarea, estado, dia) {
 function actualizarMarcador() {
   const totalSemana = calcularTotalSemanal();
   puntosTotalesEl.textContent = totalSemana;
-  minutosTotalesEl.textContent = totalSemana; // 1 punto = 1 minuto
+  minutosTotalesEl.textContent = totalSemana;
 }
 
-// ===============================
-// 🚀 INICIO DE LA APLICACIÓN
-// ===============================
+// 🟡 BOTÓN DE RECOMPENSA EXTRA
+const btnRecompensa = document.getElementById('btnRecompensa');
+const btnReset = document.getElementById('btnReset');
+
+btnRecompensa.addEventListener('click', () => {
+  diasSemana.forEach((dia) => {
+    progreso[dia].puntosTotales += 15;
+    progreso[dia].minutosTotales += 15;
+  });
+  guardarProgreso();
+  renderDias();
+  alert('🏅 ¡Recompensa otorgada! +15 puntos por buena conducta o excelente desempeño.');
+});
+
+// 🔴 BOTÓN DE REINICIO
+btnReset.addEventListener('click', () => {
+  if (confirm('¿Seguro que quieres reiniciar el marcador semanal? Esta acción no se puede deshacer.')) {
+    diasSemana.forEach((dia) => {
+      progreso[dia].puntosTotales = 0;
+      progreso[dia].minutosTotales = 0;
+    });
+    guardarProgreso();
+    renderDias();
+    alert('❌ Marcador reiniciado por mal comportamiento o control reprobado.');
+  }
+});
+
+// 🚀 INICIO
 cargarProgreso();
 renderDias();
