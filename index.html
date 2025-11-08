@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shukudai 2.1.3</title>
+  <title>Shukudai 2.2</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🧩 Shukudai 2.1.3</h1>
-    <p>Control de tareas y recompensas diarias</p>
+    <h1>🧩 Shukudai 2.2</h1>
+    <p>Control de tareas, recompensas y progreso semanal</p>
   </header>
 
   <main id="app">
@@ -20,8 +20,17 @@
     </section>
 
     <section id="acciones">
-      <button id="btnRecompensa" class="gold">🏅 Recompensa Extra (+15)</button>
+      <button id="btnPremioDiario" class="gold">🏅 Premio Diario (+10)</button>
       <button id="btnReset" class="danger">❌ Reiniciar Marcador</button>
+    </section>
+
+    <section id="progreso">
+      <h2>Progreso y Nivel</h2>
+      <div id="nivelInfo">
+        <p>Nivel actual: <span id="nivelActual">1</span></p>
+        <div id="xpBar"><div id="xpFill"></div></div>
+        <p><span id="xpTexto">0 / 150 pts</span></p>
+      </div>
     </section>
 
     <section id="categorias"></section>
