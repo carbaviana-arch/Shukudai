@@ -78,8 +78,8 @@ summary {
 
 .task {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 6px 10px;
   border-bottom: 1px solid #eee;
 }
@@ -94,12 +94,38 @@ summary {
   color: crimson;
 }
 
+.task-buttons {
+  display: flex;
+  gap: 8px;
+}
+
 .task button {
-  margin-left: 5px;
-  border: none;
   background: none;
+  border: none;
   cursor: pointer;
   font-size: 1.2em;
+  transition: transform 0.2s;
+}
+
+.task button:hover {
+  transform: scale(1.15);
+}
+
+.btnResetDia {
+  display: block;
+  margin: 10px auto 15px;
+  padding: 8px 16px;
+  background-color: #ff9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnResetDia:hover {
+  background-color: #f57c00;
 }
 
 #xpBar {
