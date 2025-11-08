@@ -1,5 +1,5 @@
 /* =======================================================
-   SHUKUDAI 2.1.3 - Con tareas integradas y botones extra
+   SHUKUDAI 2.2 - Recompensas, niveles y correcciones
    ======================================================= */
 
 // 📋 TAREAS BASE
@@ -32,6 +32,8 @@ const tareas = {
 const categoriasContainer = document.getElementById('categorias');
 const puntosTotalesEl = document.getElementById('puntosTotales');
 const minutosTotalesEl = document.getElementById('minutosTotales');
+const btnPremioDiario = document.getElementById('btnPremioDiario');
+const btnReset = document.getElementById('btnReset');
 
 // 📅 CONFIGURACIÓN DE DÍAS
 const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -51,6 +53,7 @@ function guardarProgreso() {
   localStorage.setItem('progresoShukudai', JSON.stringify(progreso));
 }
 
+// 📊 CÁLCULOS
 function calcularTotalSemanal() {
   return diasSemana.reduce((total, dia) => total + (progreso[dia]?.puntosTotales || 0), 0);
 }
@@ -59,14 +62,15 @@ function calcularTotalDia() {
   return Object.values(tareas).flat().reduce((sum, t) => sum + t.puntos, 0);
 }
 
-// 🧩 RENDERIZADO
+// 🧩 RENDERIZADO DE DÍAS Y TAREAS
 function renderDias() {
+  const abiertos = Array.from(document.querySelectorAll('.dia[open]')).map(d => d.querySelector('summary').textContent.split(' —')[0]);
   categoriasContainer.innerHTML = '';
 
   diasSemana.forEach((dia) => {
     const details = document.createElement('details');
     details.className = 'dia';
-    if (dia === diaActual) details.setAttribute('open', 'true');
+    if (abiertos.includes(dia) || dia === diaActual) details.setAttribute('open', 'true');
 
     const summary = document.createElement('summary');
     const progresoDia = progreso[dia]?.puntosTotales || 0;
@@ -85,6 +89,7 @@ function renderDias() {
   });
 
   actualizarMarcador();
+  actualizarNivel();
 }
 
 function renderTareas(container, dia) {
@@ -119,6 +124,14 @@ function renderTareas(container, dia) {
       const estado = progreso[dia]?.tareas?.[id]?.estado;
       if (estado === 'cumplida') taskDiv.classList.add('completed');
       else if (estado === 'noCumplida') taskDiv.classList.add('failed');
+
+      // 🟢 Botón Deshacer
+      if (estado) {
+        const btnDeshacer = document.createElement('button');
+        btnDeshacer.textContent = '↩️';
+        btnDeshacer.onclick = () => marcarEstado(taskDiv, tarea, 'neutro', dia);
+        taskDiv.appendChild(btnDeshacer);
+      }
 
       catDiv.appendChild(taskDiv);
     });
@@ -163,32 +176,49 @@ function actualizarMarcador() {
   minutosTotalesEl.textContent = totalSemana;
 }
 
-// 🟡 BOTÓN DE RECOMPENSA EXTRA
-const btnRecompensa = document.getElementById('btnRecompensa');
-const btnReset = document.getElementById('btnReset');
-
-btnRecompensa.addEventListener('click', () => {
-  diasSemana.forEach((dia) => {
-    progreso[dia].puntosTotales += 15;
-    progreso[dia].minutosTotales += 15;
-  });
+// 🟡 PREMIO DIARIO (+10 puntos)
+btnPremioDiario.addEventListener('click', () => {
+  const hoy = new Date().toISOString().split('T')[0];
+  if (localStorage.getItem(`premio-${hoy}`)) {
+    alert('Ya has usado el Premio Diario hoy 🏅');
+    return;
+  }
+  const dia = diaActual;
+  progreso[dia].puntosTotales += 10;
+  progreso[dia].minutosTotales += 10;
   guardarProgreso();
   renderDias();
-  alert('🏅 ¡Recompensa otorgada! +15 puntos por buena conducta o excelente desempeño.');
+  localStorage.setItem(`premio-${hoy}`, 'true');
+  alert('🎉 Premio Diario otorgado (+10 pts)');
 });
 
 // 🔴 BOTÓN DE REINICIO
 btnReset.addEventListener('click', () => {
-  if (confirm('¿Seguro que quieres reiniciar el marcador semanal? Esta acción no se puede deshacer.')) {
+  if (confirm('¿Seguro que quieres reiniciar el marcador semanal?')) {
     diasSemana.forEach((dia) => {
       progreso[dia].puntosTotales = 0;
       progreso[dia].minutosTotales = 0;
     });
     guardarProgreso();
     renderDias();
-    alert('❌ Marcador reiniciado por mal comportamiento o control reprobado.');
+    alert('❌ Marcador reiniciado.');
   }
 });
+
+// 🆙 SISTEMA DE NIVEL
+function calcularNivel(puntos) {
+  return Math.floor(puntos / 150) + 1;
+}
+
+function actualizarNivel() {
+  const total = calcularTotalSemanal();
+  const nivel = calcularNivel(total);
+  const puntosEnNivel = total % 150;
+  const progresoNivel = Math.round((puntosEnNivel / 150) * 100);
+  document.getElementById('nivelActual').textContent = nivel;
+  document.getElementById('xpFill').style.width = `${progresoNivel}%`;
+  document.getElementById('xpTexto').textContent = `${puntosEnNivel} / 150 pts`;
+}
 
 // 🚀 INICIO
 cargarProgreso();
