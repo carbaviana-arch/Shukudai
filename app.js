@@ -1,5 +1,5 @@
 /* =======================================================
-   SHUKUDAI 2.2 - Recompensas, niveles y correcciones
+   SHUKUDAI 2.2.1 - Seguimiento y reinicio diario
    ======================================================= */
 
 // 📋 TAREAS BASE
@@ -62,7 +62,7 @@ function calcularTotalDia() {
   return Object.values(tareas).flat().reduce((sum, t) => sum + t.puntos, 0);
 }
 
-// 🧩 RENDERIZADO DE DÍAS Y TAREAS
+// 🧩 RENDERIZADO
 function renderDias() {
   const abiertos = Array.from(document.querySelectorAll('.dia[open]')).map(d => d.querySelector('summary').textContent.split(' —')[0]);
   categoriasContainer.innerHTML = '';
@@ -83,8 +83,15 @@ function renderDias() {
     dayContainer.dataset.dia = dia;
 
     renderTareas(dayContainer, dia);
-
     details.appendChild(dayContainer);
+
+    // 🔄 Botón de reinicio diario
+    const btnResetDia = document.createElement('button');
+    btnResetDia.textContent = `🔄 Reiniciar ${dia}`;
+    btnResetDia.className = 'btnResetDia';
+    btnResetDia.onclick = () => reiniciarDia(dia);
+    details.appendChild(btnResetDia);
+
     categoriasContainer.appendChild(details);
   });
 
@@ -109,34 +116,56 @@ function renderTareas(container, dia) {
 
       const span = document.createElement('span');
       span.textContent = `${tarea.nombre} (+${tarea.puntos} pts)`;
-      taskDiv.appendChild(span);
+
+      const btnGroup = document.createElement('div');
+      btnGroup.className = 'task-buttons';
 
       const btnCumplida = document.createElement('button');
       btnCumplida.textContent = '✅';
       btnCumplida.onclick = () => marcarEstado(taskDiv, tarea, 'cumplida', dia);
-      taskDiv.appendChild(btnCumplida);
 
       const btnNoCumplida = document.createElement('button');
       btnNoCumplida.textContent = '❌';
       btnNoCumplida.onclick = () => marcarEstado(taskDiv, tarea, 'noCumplida', dia);
-      taskDiv.appendChild(btnNoCumplida);
+
+      btnGroup.appendChild(btnCumplida);
+      btnGroup.appendChild(btnNoCumplida);
 
       const estado = progreso[dia]?.tareas?.[id]?.estado;
       if (estado === 'cumplida') taskDiv.classList.add('completed');
       else if (estado === 'noCumplida') taskDiv.classList.add('failed');
 
-      // 🟢 Botón Deshacer
       if (estado) {
         const btnDeshacer = document.createElement('button');
         btnDeshacer.textContent = '↩️';
-        btnDeshacer.onclick = () => marcarEstado(taskDiv, tarea, 'neutro', dia);
-        taskDiv.appendChild(btnDeshacer);
+        btnDeshacer.onclick = () => {
+          if (progreso[dia].tareas[id]?.estado === 'cumplida') {
+            progreso[dia].puntosTotales -= tarea.puntos;
+            progreso[dia].minutosTotales -= tarea.puntos;
+          }
+          delete progreso[dia].tareas[id];
+          guardarProgreso();
+          renderDias();
+        };
+        btnGroup.appendChild(btnDeshacer);
       }
 
+      taskDiv.appendChild(span);
+      taskDiv.appendChild(btnGroup);
       catDiv.appendChild(taskDiv);
     });
 
     container.appendChild(catDiv);
+  }
+}
+
+// 🔄 Reinicio de un solo día
+function reiniciarDia(dia) {
+  if (confirm(`¿Seguro que quieres reiniciar las tareas de ${dia}?`)) {
+    progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
+    guardarProgreso();
+    renderDias();
+    alert(`🔄 ${dia} ha sido reiniciado.`);
   }
 }
 
@@ -151,17 +180,12 @@ function marcarEstado(taskDiv, tarea, estado, dia) {
   }
 
   if (estado === 'cumplida') {
-    taskDiv.classList.add('completed');
-    taskDiv.classList.remove('failed');
     taskDiv.dataset.estado = 'cumplida';
     progreso[dia].puntosTotales += tarea.puntos;
     progreso[dia].minutosTotales += tarea.puntos;
   } else if (estado === 'noCumplida') {
-    taskDiv.classList.remove('completed');
-    taskDiv.classList.add('failed');
     taskDiv.dataset.estado = 'noCumplida';
   } else {
-    taskDiv.classList.remove('completed', 'failed');
     delete taskDiv.dataset.estado;
   }
 
@@ -176,7 +200,7 @@ function actualizarMarcador() {
   minutosTotalesEl.textContent = totalSemana;
 }
 
-// 🟡 PREMIO DIARIO (+10 puntos)
+// 🟡 PREMIO DIARIO (+10)
 btnPremioDiario.addEventListener('click', () => {
   const hoy = new Date().toISOString().split('T')[0];
   if (localStorage.getItem(`premio-${hoy}`)) {
@@ -192,20 +216,19 @@ btnPremioDiario.addEventListener('click', () => {
   alert('🎉 Premio Diario otorgado (+10 pts)');
 });
 
-// 🔴 BOTÓN DE REINICIO
+// 🔁 Reinicio total
 btnReset.addEventListener('click', () => {
-  if (confirm('¿Seguro que quieres reiniciar el marcador semanal?')) {
+  if (confirm('¿Seguro que quieres reiniciar todo el marcador semanal?')) {
     diasSemana.forEach((dia) => {
-      progreso[dia].puntosTotales = 0;
-      progreso[dia].minutosTotales = 0;
+      progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
     });
     guardarProgreso();
     renderDias();
-    alert('❌ Marcador reiniciado.');
+    alert('❌ Marcador semanal reiniciado.');
   }
 });
 
-// 🆙 SISTEMA DE NIVEL
+// 🆙 Sistema de nivel
 function calcularNivel(puntos) {
   return Math.floor(puntos / 150) + 1;
 }
@@ -220,6 +243,6 @@ function actualizarNivel() {
   document.getElementById('xpTexto').textContent = `${puntosEnNivel} / 150 pts`;
 }
 
-// 🚀 INICIO
+// 🚀 Inicio
 cargarProgreso();
 renderDias();
