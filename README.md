@@ -1,6 +1,6 @@
-# 🧩 Shukudai 2.2.1
+# 🧩 Shukudai 2.3
 
-**Versión:** 2.2.1  
+**Versión:** 2.3  
 **Fecha:** Noviembre 2025  
 **Autor:** [carbaviana-arch](https://github.com/carbaviana-arch)
 
@@ -8,125 +8,102 @@
 
 ## 🎯 Descripción general
 
-**Shukudai** es una aplicación web que transforma las tareas diarias en un juego de superación.  
-Diseñada para fomentar la responsabilidad y el esfuerzo en los más pequeños, combina **seguimiento de hábitos**, **recompensas** y **niveles de progreso**, todo dentro de una interfaz sencilla y motivadora.
-
-Cada día tiene sus propias categorías de tareas y un sistema de puntos, recompensas diarias y niveles que suben cada 150 puntos, al estilo de los videojuegos.
+**Shukudai** es una aplicación web que convierte las tareas diarias en un sistema de juego para fomentar la responsabilidad y la constancia.  
+Incluye seguimiento por día, recompensas diarias y semanales, un sistema de niveles y ahora gráficos y medallas visuales para motivar aún más.
 
 ---
 
-## 🚀 Novedades de la versión 2.2.1
+## 🚀 Novedades de la versión 2.3
 
-### 🔧 Mejoras funcionales
-- ↩️ **Función “Deshacer”** totalmente operativa: permite revertir una tarea marcada y corrige automáticamente los puntos.  
-- 🔁 **Reinicio semanal completo:** limpia puntos y estados de todas las tareas.  
-- 🔄 **Reinicio diario individual:** cada día cuenta con su propio botón para reiniciar solo las tareas de ese día (ideal para penalizaciones leves).  
-- 🟡 **Premio Diario** mantiene su función (+10 pts, una vez al día).  
-- 📈 **Sistema de niveles** estable: sube un nivel cada 150 puntos acumulados.  
+- 📊 **Registro gráfico** del progreso semanal (barras por día) y mensual (últimos 30 días).  
+- 🏅 **Medallas/insignias**: aparecen al subir de nivel (medallas de bronce/plata/oro/platino en niveles clave).  
+- 💚 **Premio Semanal (+60 pts)**: botón nuevo para recompensa semanal (solo una vez por semana).  
+- 🔄 **Reinicio diario** mejor espaciado y centrado al final de cada día.  
+- ☢️ **Icono de Reiniciar Marcador cambiado a símbolo nuclear** para indicar acción fuerte.  
+- Se mantienen: Premio Diario (+10 pts), Deshacer, Reinicio semanal, sistema de niveles (150 pts por nivel), persistencia en LocalStorage.
 
-### 🎨 Mejoras visuales
-- ✅❌↩️ **Botones alineados y organizados horizontalmente** para una presentación más limpia.  
-- 🧭 Cabecera actualizada:  
-  > “Seguimiento de tareas, recompensas y progreso semanal”  
-- 🟠 Nuevo botón **Reiniciar [día]** al final de cada bloque diario.  
-- 🎨 Sombras y colores más equilibrados.  
+> Nota: el Premio Semanal aplica +60 puntos al **día actual** para mantener puntos enteros; esto evita fracciones y es fácil de auditar. (Si prefieres repartir entre varios días, lo adaptamos).
 
 ---
 
 ## 🧩 Funcionalidades principales
 
 | Función | Descripción | Estado |
-|----------|-------------|--------|
+|--------:|-------------|:------:|
 | ✅ Completar tarea | Marca una tarea como realizada y suma puntos. | ✔️ |
 | ❌ No cumplida | Marca una tarea como fallida (sin sumar puntos). | ✔️ |
 | ↩️ Deshacer | Revierte una acción si se marcó por error. | ✔️ |
 | 🏅 Premio Diario | Otorga +10 puntos una vez al día. | ✔️ |
+| 💚 Premio Semanal | Otorga +60 puntos una vez por semana (aplicado al día actual). | ✔️ |
 | 🔄 Reiniciar día | Borra las tareas y puntos solo de un día específico. | ✔️ |
-| 🔁 Reiniciar marcador | Limpia el progreso semanal completo. | ✔️ |
-| 📈 Nivel de progreso | Subida automática cada 150 puntos. | ✔️ |
-| 💾 Guardado automático | Todos los datos se conservan en el navegador. | ✔️ |
+| ☢️ Reiniciar marcador | Reinicio total semanal (limpia puntos y estados). | ✔️ |
+| 📈 Historial gráfico | Gráficos semanales y mensuales desde datos guardados. | ✔️ |
+| 🏅 Medallas | Insignias automáticas al subir nivel (niveles clave). | ✔️ |
+| 💾 Guardado automático | Persistencia de datos local (LocalStorage). | ✔️ |
 
 ---
 
-## 🕹️ Cómo usar Shukudai
+## 🕹️ Cómo usar
 
-1. Abre la aplicación en tu navegador.  
-2. Despliega el día de la semana correspondiente.  
-3. Marca cada tarea con **✅** si fue cumplida o **❌** si no se logró.  
-4. Si cometes un error, usa **↩️** para revertir la marca.  
-5. Pulsa **🏅 Premio Diario** (solo una vez al día) para otorgar puntos extra.  
-6. Usa **🔄 Reiniciar [día]** si quieres empezar de nuevo solo ese día.  
-7. Usa **❌ Reiniciar Marcador** si quieres borrar todo el progreso semanal.  
-8. Observa tu nivel y progreso en la sección “Progreso y Nivel”.
-
----
-
-## 📊 Sistema de niveles
-
-- Cada **150 puntos** equivale a un nuevo nivel.  
-- La barra de progreso (XP) muestra cuánto falta para el siguiente.  
-- Ejemplo:  
-  - 0–149 pts → Nivel 1  
-  - 150–299 pts → Nivel 2  
-  - 300–449 pts → Nivel 3  
-  - y así sucesivamente.
+1. Abre la app en un navegador moderno.  
+2. Expande el día correspondiente y marca tareas con ✅ o ❌.  
+3. Usa ↩️ para deshacer una marca incorrecta.  
+4. Pulsa 🏅 Premio Diario (+10) una vez al día si corresponde.  
+5. Pulsa 💚 Premio Semanal (+60) una vez por semana para recompensa adicional (se aplica al día actual).  
+6. Si quieres reiniciar un día concreto, usa 🔄 Reiniciar [día] al final de ese bloque.  
+7. Para reiniciar toda la semana, usa ☢️ Reiniciar Marcador.  
+8. Consulta la sección **Historial de progreso** para ver gráficos semanales y mensuales.  
+9. Al subir de nivel, fíjate en la medalla que aparece en la sección de progreso.
 
 ---
 
-## ⚙️ Tecnologías utilizadas
+## ⚙️ Tecnologías
 
-- **HTML5** → estructura principal.  
-- **CSS3** → estilos visuales y diseño adaptable.  
-- **JavaScript Vanilla** → toda la lógica del juego, puntos y progreso.  
-- **LocalStorage** → persistencia de datos sin conexión.
+- **HTML5**, **CSS3**, **JavaScript (Vanilla)**  
+- **Canvas** para gráficos (sin librerías externas)  
+- **LocalStorage** para persistencia local
 
 ---
 
 ## 📁 Estructura del proyecto
 
-📦 Shukudai 2.2.1
-├── index.html # Estructura y contenido
-├── style.css # Estilos visuales y layout
-├── app.js # Lógica de tareas, puntos y niveles
-└── README.md # Documentación del proyecto
+Shukudai v2.3
+├── index.html
+├── style.css
+├── app.js
+└── README.md
 
 
 ---
 
-## 💡 Consejos de uso
+## 💡 Notas técnicas
 
-- Se recomienda abrir la app **una vez al día** y marcar las tareas al completarlas.  
-- El **Premio Diario** solo puede otorgarse una vez por día natural.  
-- Si algo se marca por error, usa el botón **↩️ Deshacer**.  
-- El progreso se guarda automáticamente: puedes cerrar la página sin perder datos.  
-- Para comenzar una nueva semana, usa el botón **❌ Reiniciar Marcador**.  
+- Los gráficos semanales usan los totales por día almacenados en la estructura `progreso`.  
+- El histórico mensual se construye a partir de `progresoDiario` (mapa fecha → puntos). El sistema actual actualiza la entrada diaria cada vez que se guarda progreso. Esto genera una visión simple de los últimos 30 días.  
+- Las medallas se activan cuando el nivel calculado supera el nivel almacenado previamente en `localStorage` (clave `shukudai_lastLevel`).  
+- El Premio Semanal está limitado a una vez por semana (clave `premioSem-YYYY-Wn` en localStorage).  
 
 ---
 
-## 🧱 Futuras mejoras (versión 2.3 y posteriores)
+## 🧱 Futuras mejoras (2.4+)
 
-- 📊 Gráficos de progreso semanal y mensual.  
-- 🏆 Logros y medallas desbloqueables.  
-- 🔔 Recordatorios automáticos.  
-- 🌙 Modo oscuro.  
-- 📤 Exportar progreso a archivo o PDF.
+- Exportar/importar progreso (CSV / JSON).  
+- Recordatorios por notificación.  
+- Logros avanzados y pantalla de recompensas.  
+- Modo oscuro y accesibilidad mejorada.  
+- Opciones para distribuir premio semanal entre varios días.
 
 ---
 
 ## 👨‍💻 Créditos
 
-- **Desarrollo y diseño:** [Francisco Carballo (carbaviana-arch)](https://github.com/carbaviana-arch)  
-- **Asistencia técnica y documentación:** ChatGPT (OpenAI)  
-- **Inspiración:** Educación, constancia y refuerzo positivo en el hogar.  
+- **Desarrollo y diseño:** Francisco Carballo (carbaviana-arch)  
+- **Asistencia técnica:** ChatGPT (OpenAI)
 
 ---
 
 ## 📜 Licencia
 
-Este proyecto se distribuye bajo la licencia **MIT**, lo que permite su uso, modificación y redistribución libre con atribución al autor original.
+MIT — libre uso y modificación con atribución.
 
 ---
-
-> 🧠 *“Cada día es una oportunidad para mejorar.  
-> Shukudai convierte la constancia en aventura.”*
-
