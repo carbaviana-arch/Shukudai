@@ -1,8 +1,10 @@
 /* =======================================================
-   SHUKUDAI 2.2.1 - Seguimiento y reinicio diario
+   SHUKUDAI 2.3 - Gráficos, medallas y premio semanal
    ======================================================= */
 
-// 📋 TAREAS BASE
+/* ----------------------
+   Datos base de tareas
+   ---------------------- */
 const tareas = {
   "Aseo e higiene personal": [
     { nombre: "Lavarse bien los dientes", puntos: 2 },
@@ -28,46 +30,78 @@ const tareas = {
   ]
 };
 
-// ⚙️ ELEMENTOS DEL DOM
+/* ----------------------
+   Elementos DOM
+   ---------------------- */
 const categoriasContainer = document.getElementById('categorias');
 const puntosTotalesEl = document.getElementById('puntosTotales');
 const minutosTotalesEl = document.getElementById('minutosTotales');
 const btnPremioDiario = document.getElementById('btnPremioDiario');
+const btnPremioSemanal = document.getElementById('btnPremioSemanal');
 const btnReset = document.getElementById('btnReset');
 
-// 📅 CONFIGURACIÓN DE DÍAS
-const diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-let diaActual = diasSemana[(new Date().getDay() + 6) % 7];
-let progreso = {};
+const canvasSemanal = document.getElementById('graficoSemanal');
+const canvasMensual = document.getElementById('graficoMensual');
+const medallaEl = document.getElementById('medalla');
 
-// 💾 GESTIÓN DE PROGRESO
+/* ----------------------
+   Días y progreso
+   ---------------------- */
+const diasSemana = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+let diaActual = diasSemana[(new Date().getDay() + 6) % 7];
+let progreso = {}; // estructura por día
+let progresoDiario = {}; // historial simple por fecha: { '2025-11-06': 12 }
+
+/* ----------------------
+   Almacenamiento
+   ---------------------- */
 function cargarProgreso() {
   const data = localStorage.getItem('progresoShukudai');
   progreso = data ? JSON.parse(data) : {};
-  diasSemana.forEach((dia) => {
-    if (!progreso[dia]) progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
+  // compatibilidad: si no existen días, inicializar
+  diasSemana.forEach(d => {
+    if (!progreso[d]) progreso[d] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
   });
+
+  const pd = localStorage.getItem('progresoDiario');
+  progresoDiario = pd ? JSON.parse(pd) : {};
 }
 
 function guardarProgreso() {
   localStorage.setItem('progresoShukudai', JSON.stringify(progreso));
+  // actualizar registro diario con el total del día actual
+  const hoy = new Date().toISOString().split('T')[0];
+  progresoDiario[hoy] = progreso[diaActual]?.puntosTotales || 0;
+  // mantener solo últimos 60 entradas por seguridad
+  const keys = Object.keys(progresoDiario).sort();
+  if (keys.length > 120) {
+    const slice = keys.slice(keys.length - 120);
+    const newObj = {};
+    slice.forEach(k => newObj[k] = progresoDiario[k]);
+    progresoDiario = newObj;
+  }
+  localStorage.setItem('progresoDiario', JSON.stringify(progresoDiario));
 }
 
-// 📊 CÁLCULOS
+/* ----------------------
+   Cálculos
+   ---------------------- */
 function calcularTotalSemanal() {
-  return diasSemana.reduce((total, dia) => total + (progreso[dia]?.puntosTotales || 0), 0);
+  return diasSemana.reduce((t, d) => t + (progreso[d]?.puntosTotales || 0), 0);
 }
-
 function calcularTotalDia() {
-  return Object.values(tareas).flat().reduce((sum, t) => sum + t.puntos, 0);
+  return Object.values(tareas).flat().reduce((s, t) => s + t.puntos, 0);
 }
 
-// 🧩 RENDERIZADO
+/* ----------------------
+   Renderizado de días y tareas
+   ---------------------- */
 function renderDias() {
+  // conservar estado abiertos
   const abiertos = Array.from(document.querySelectorAll('.dia[open]')).map(d => d.querySelector('summary').textContent.split(' —')[0]);
   categoriasContainer.innerHTML = '';
 
-  diasSemana.forEach((dia) => {
+  diasSemana.forEach(dia => {
     const details = document.createElement('details');
     details.className = 'dia';
     if (abiertos.includes(dia) || dia === diaActual) details.setAttribute('open', 'true');
@@ -85,7 +119,7 @@ function renderDias() {
     renderTareas(dayContainer, dia);
     details.appendChild(dayContainer);
 
-    // 🔄 Botón de reinicio diario
+    // Botón reiniciar sólo para ese día
     const btnResetDia = document.createElement('button');
     btnResetDia.textContent = `🔄 Reiniciar ${dia}`;
     btnResetDia.className = 'btnResetDia';
@@ -97,8 +131,12 @@ function renderDias() {
 
   actualizarMarcador();
   actualizarNivel();
+  renderGraficos(); // actualizar gráficos tras render
 }
 
+/* ----------------------
+   Render de tareas (alineado botones)
+   ---------------------- */
 function renderTareas(container, dia) {
   for (let categoria in tareas) {
     const catDiv = document.createElement('div');
@@ -121,10 +159,12 @@ function renderTareas(container, dia) {
       btnGroup.className = 'task-buttons';
 
       const btnCumplida = document.createElement('button');
+      btnCumplida.title = 'Marcar cumplida';
       btnCumplida.textContent = '✅';
       btnCumplida.onclick = () => marcarEstado(taskDiv, tarea, 'cumplida', dia);
 
       const btnNoCumplida = document.createElement('button');
+      btnNoCumplida.title = 'Marcar no cumplida';
       btnNoCumplida.textContent = '❌';
       btnNoCumplida.onclick = () => marcarEstado(taskDiv, tarea, 'noCumplida', dia);
 
@@ -137,8 +177,10 @@ function renderTareas(container, dia) {
 
       if (estado) {
         const btnDeshacer = document.createElement('button');
+        btnDeshacer.title = 'Deshacer';
         btnDeshacer.textContent = '↩️';
         btnDeshacer.onclick = () => {
+          // revertir puntos si fue cumplida
           if (progreso[dia].tareas[id]?.estado === 'cumplida') {
             progreso[dia].puntosTotales -= tarea.puntos;
             progreso[dia].minutosTotales -= tarea.puntos;
@@ -159,90 +201,43 @@ function renderTareas(container, dia) {
   }
 }
 
-// 🔄 Reinicio de un solo día
+/* ----------------------
+   Reinicio por día
+   ---------------------- */
 function reiniciarDia(dia) {
-  if (confirm(`¿Seguro que quieres reiniciar las tareas de ${dia}?`)) {
-    progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
-    guardarProgreso();
-    renderDias();
-    alert(`🔄 ${dia} ha sido reiniciado.`);
-  }
+  if (!confirm(`¿Seguro que quieres reiniciar las tareas de ${dia}?`)) return;
+  progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
+  guardarProgreso();
+  renderDias();
+  alert(`🔄 ${dia} ha sido reiniciado.`);
 }
 
-// 🧠 ESTADO Y MARCADOR
+/* ----------------------
+   Marcar estado y lógica de puntos
+   ---------------------- */
 function marcarEstado(taskDiv, tarea, estado, dia) {
   const id = taskDiv.dataset.id;
   if (!progreso[dia]) progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
 
-  if (taskDiv.dataset.estado === 'cumplida') {
+  // Si estaba cumplida, restar puntos antes de nueva asignación
+  if (progreso[dia].tareas[id]?.estado === 'cumplida') {
     progreso[dia].puntosTotales -= tarea.puntos;
     progreso[dia].minutosTotales -= tarea.puntos;
   }
 
   if (estado === 'cumplida') {
-    taskDiv.dataset.estado = 'cumplida';
+    progreso[dia].tareas[id] = { estado: 'cumplida' };
     progreso[dia].puntosTotales += tarea.puntos;
     progreso[dia].minutosTotales += tarea.puntos;
   } else if (estado === 'noCumplida') {
-    taskDiv.dataset.estado = 'noCumplida';
+    progreso[dia].tareas[id] = { estado: 'noCumplida' };
   } else {
-    delete taskDiv.dataset.estado;
+    // neutro - eliminar estado
+    delete progreso[dia].tareas[id];
   }
 
-  progreso[dia].tareas[id] = { estado: taskDiv.dataset.estado };
   guardarProgreso();
   renderDias();
 }
 
-function actualizarMarcador() {
-  const totalSemana = calcularTotalSemanal();
-  puntosTotalesEl.textContent = totalSemana;
-  minutosTotalesEl.textContent = totalSemana;
-}
-
-// 🟡 PREMIO DIARIO (+10)
-btnPremioDiario.addEventListener('click', () => {
-  const hoy = new Date().toISOString().split('T')[0];
-  if (localStorage.getItem(`premio-${hoy}`)) {
-    alert('Ya has usado el Premio Diario hoy 🏅');
-    return;
-  }
-  const dia = diaActual;
-  progreso[dia].puntosTotales += 10;
-  progreso[dia].minutosTotales += 10;
-  guardarProgreso();
-  renderDias();
-  localStorage.setItem(`premio-${hoy}`, 'true');
-  alert('🎉 Premio Diario otorgado (+10 pts)');
-});
-
-// 🔁 Reinicio total
-btnReset.addEventListener('click', () => {
-  if (confirm('¿Seguro que quieres reiniciar todo el marcador semanal?')) {
-    diasSemana.forEach((dia) => {
-      progreso[dia] = { tareas: {}, puntosTotales: 0, minutosTotales: 0 };
-    });
-    guardarProgreso();
-    renderDias();
-    alert('❌ Marcador semanal reiniciado.');
-  }
-});
-
-// 🆙 Sistema de nivel
-function calcularNivel(puntos) {
-  return Math.floor(puntos / 150) + 1;
-}
-
-function actualizarNivel() {
-  const total = calcularTotalSemanal();
-  const nivel = calcularNivel(total);
-  const puntosEnNivel = total % 150;
-  const progresoNivel = Math.round((puntosEnNivel / 150) * 100);
-  document.getElementById('nivelActual').textContent = nivel;
-  document.getElementById('xpFill').style.width = `${progresoNivel}%`;
-  document.getElementById('xpTexto').textContent = `${puntosEnNivel} / 150 pts`;
-}
-
-// 🚀 Inicio
-cargarProgreso();
-renderDias();
+/* ----------*
