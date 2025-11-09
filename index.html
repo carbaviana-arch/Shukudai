@@ -1,16 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <!-- 🔒 Meta CSP añadida para permitir carga de scripts en Chrome -->
-  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval';">
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Shukudai 2.3</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shukudai 2.2.1</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🧩 Shukudai 2.3</h1>
+    <h1>🧩 Shukudai 2.2.1</h1>
     <p>Seguimiento de tareas, recompensas y progreso semanal</p>
   </header>
 
@@ -23,8 +21,7 @@
 
     <section id="acciones">
       <button id="btnPremioDiario" class="gold">🏅 Premio Diario (+10)</button>
-      <button id="btnPremioSemanal" class="emerald">💚 Premio Semanal (+60)</button>
-      <button id="btnReset" class="danger">☢️ Reiniciar Marcador</button>
+      <button id="btnReset" class="danger">❌ Reiniciar Marcador</button>
     </section>
 
     <section id="progreso">
@@ -33,30 +30,16 @@
         <p>Nivel actual: <span id="nivelActual">1</span></p>
         <div id="xpBar"><div id="xpFill"></div></div>
         <p><span id="xpTexto">0 / 150 pts</span></p>
-        <div id="medalla" aria-hidden="true"></div>
       </div>
     </section>
 
     <section id="categorias"></section>
-
-    <section id="historial">
-      <h2>📈 Historial de progreso</h2>
-      <div class="canvas-wrap">
-        <canvas id="graficoSemanal" width="720" height="180"></canvas>
-        <p class="canvas-label">Progreso semanal (pts por día)</p>
-      </div>
-      <div class="canvas-wrap">
-        <canvas id="graficoMensual" width="720" height="180"></canvas>
-        <p class="canvas-label">Últimos 30 días (pts por fecha)</p>
-      </div>
-    </section>
   </main>
 
   <footer>
     <p>Hecho con ❤️ para ayudar a los pequeños a cumplir sus tareas</p>
   </footer>
 
-  <!-- Carga del script principal -->
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js"></script>
 </body>
 </html>
