@@ -1,29 +1,36 @@
-# Shukudai 2.2.2
+# Shukudai 2.3
 
-🧩 **Shukudai** es una aplicación web para el seguimiento de tareas diarias, con recompensas y sistema de niveles, pensada para ayudar a los niños a organizar su día.
+Shukudai 2.3 es una **app web para seguimiento de tareas diarias de niños**, gamificada con niveles, barra semanal con emojis y premios diarios.
 
-## Cambios en 2.2.2
+## Funcionalidades
 
-- Mejoras de UX y estabilidad.
-- Control de errores en marcadores y reinicios.
-- Reseteo diario y semanal más consistente.
-- Barra de nivel más precisa.
-- Botones de tarea con efecto hover y deshacer ↩️.
+- Seguimiento diario de tareas por categoría:
+  - Aseo e higiene personal
+  - Académico
+  - Hogar
+  - General
+- Puntaje por tarea y penalizaciones
+- Botón de **Premio Diario** (+10 puntos)
+- Reinicio diario y semanal
+- Sistema de **niveles** y barra XP
+- **Barra semanal visual con emojis**:
+  - ⬜: día sin tareas
+  - 🙂: tareas completadas <50%
+  - 😃: tareas completadas >50%
+  - 🏆: todas las tareas completadas
 
-## Cómo usar
+## Instalación
 
-1. Abrir `index.html` en un navegador moderno.
-2. Marcar tareas diarias como ✅ o ❌.
-3. Usar ↩️ para deshacer cambios.
-4. Hacer click en "🏅 Premio Diario (+10)" para agregar puntos extra.
-5. Reiniciar día o semana según sea necesario.
-6. Observar barra de nivel y puntos acumulados.
+1. Clonar o descargar el repositorio.
+2. Abrir `index.html` en un navegador moderno.
+3. Todo funciona **sin servidor**, solo localStorage para guardar progreso.
 
-## Requisitos
+## Uso
 
-- Navegador moderno con soporte para `localStorage`.
-- No requiere servidor, funciona completamente offline.
+1. Marcar tareas con ✅ o ❌
+2. Observar la barra semanal y el progreso de puntos/nivel
+3. Premios diarios y reinicios disponibles mediante botones
 
 ## Licencia
 
-Proyecto libre para uso personal y educativo.
+Hecho con ❤️ para ayudar a los pequeños a cumplir sus tareas.
