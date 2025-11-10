@@ -143,6 +143,22 @@ summary {
   transition: width 0.5s ease-in-out;
 }
 
+.weekly-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 1.5em;
+}
+
+.weekly-bar span {
+  padding: 5px;
+  transition: transform 0.3s;
+}
+
+.weekly-bar span.completed {
+  transform: scale(1.2);
+}
+
 footer {
   text-align: center;
   padding: 10px;
