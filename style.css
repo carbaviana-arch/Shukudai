@@ -1,7 +1,7 @@
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  padding: 0;
+  padding-bottom: 70px; /* espacio para el dock */
   background: #f4f4f4;
   color: #333;
 }
@@ -40,12 +40,20 @@ h1 { margin: 0; }
   transition: transform 0.2s;
 }
 
-#acciones button:hover { transform: scale(1.05); }
+#acciones button:hover {
+  transform: scale(1.05);
+}
 
 button.gold {
   background-color: gold;
   color: black;
   box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+}
+
+button.blue {
+  background-color: #2196f3;
+  color: white;
+  box-shadow: 0 0 6px rgba(33, 150, 243, 0.6);
 }
 
 button.danger {
@@ -54,74 +62,44 @@ button.danger {
   box-shadow: 0 0 6px rgba(220, 20, 60, 0.7);
 }
 
-button.purple {
-  background-color: #8e24aa;
-  color: white;
-  box-shadow: 0 0 6px rgba(142, 36, 170, 0.7);
-}
-button.purple:hover { background-color: #7b1fa2; }
-
-details {
+/* Dock inferior */
+#dock {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   background: white;
-  margin: 10px;
-  border-radius: 10px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-}
-
-summary {
-  padding: 10px 15px;
-  font-weight: bold;
-  font-size: 1.1em;
-  cursor: pointer;
-}
-
-.category { padding: 10px 15px; }
-
-.task {
+  border-top: 2px solid #4a90e2;
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
-  padding: 6px 10px;
-  border-bottom: 1px solid #eee;
+  padding: 6px 0;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 100;
 }
 
-.task.completed span {
-  text-decoration: line-through;
-  color: green;
+.dock-item {
+  color: #4a90e2;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.8rem;
 }
 
-.task.failed span {
-  text-decoration: line-through;
-  color: crimson;
+.dock-item svg {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 4px;
+  stroke-width: 2.2;
 }
 
-.task-buttons { display: flex; gap: 8px; }
-
-.task button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.2em;
-  transition: transform 0.2s;
+.dock-item:hover {
+  transform: scale(1.1);
+  color: #00c853;
 }
 
-.task button:hover { transform: scale(1.15); }
-
-.btnResetDia {
-  display: block;
-  margin: 10px auto 15px;
-  padding: 8px 16px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btnResetDia:hover { background-color: #f57c00; }
-
+/* XP bar */
 #xpBar {
   height: 20px;
   background: #ddd;
