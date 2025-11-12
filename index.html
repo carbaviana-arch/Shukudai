@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shukudai 2.3</title>
+  <title>Shukudai 2.4</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>🧩 Shukudai 2.3</h1>
+    <h1>🧩 Shukudai 2.4</h1>
     <p>Seguimiento de tareas, recompensas y progreso semanal</p>
   </header>
 
@@ -21,7 +21,7 @@
 
     <section id="acciones">
       <button id="btnPremioDiario" class="gold">🏅 Premio Diario (+10)</button>
-      <button id="btnPremioSemanal" class="purple">🎖 Premio Semanal (+70)</button>
+      <button id="btnPremioSemanal" class="blue">🌟 Premio Semanal (+70)</button>
       <button id="btnReset" class="danger">❌ Reiniciar Marcador</button>
     </section>
 
@@ -36,6 +36,35 @@
 
     <section id="categorias"></section>
   </main>
+
+  <!-- 🚀 Dock de navegación inferior -->
+  <nav id="dock">
+    <a href="index.html" class="dock-item" title="Inicio">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8h5l2 2m-2 2v6H5v-6" />
+      </svg>
+      <span>Inicio</span>
+    </a>
+    <a href="recompensas.html" class="dock-item" title="Recompensas">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 11l7-7 7 7M5 19h14" />
+      </svg>
+      <span>Recompensas</span>
+    </a>
+    <a href="progreso.html" class="dock-item" title="Progreso">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 11V3H5v8h6zm8 0V7h-6v4h6zm0 8v-6h-6v6h6zm-8 0v-4H5v4h6z" />
+      </svg>
+      <span>Progreso</span>
+    </a>
+    <a href="configuracion.html" class="dock-item" title="Configuración">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317a1 1 0 011.35 0l1.149.962a1 1 0 00.742.272l1.451-.144a1 1 0 011.062.847l.144 1.451a1 1 0 00.272.742l.962 1.149a1 1 0 010 1.35l-.962 1.149a1 1 0 00-.272.742l.144 1.451a1 1 0 01-1.062.847l-1.451-.144a1 1 0 00-.742.272l-1.149.962a1 1 0 01-1.35 0l-1.149-.962a1 1 0 00-.742-.272l-1.451.144a1 1 0 01-1.062-.847l-.144-1.451a1 1 0 00-.272-.742l-.962-1.149a1 1 0 010-1.35l.962-1.149a1 1 0 00.272-.742l-.144-1.451a1 1 0 011.062-.847l1.451.144a1 1 0 00.742-.272l1.149-.962z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      <span>Ajustes</span>
+    </a>
+  </nav>
 
   <footer>
     <p>Hecho con ❤️ para ayudar a los pequeños a cumplir sus tareas</p>
