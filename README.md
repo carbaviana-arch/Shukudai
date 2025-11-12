@@ -1,14 +1,29 @@
-# Shukudai 2.3
+# 🧩 Shukudai 2.4
 
-## Nuevas funcionalidades
-- Botón **Premio Semanal** 🎖 (+70 puntos, activable cualquier día, una vez por semana)
-- Meta para subir de nivel ahora es **125 puntos**
-- Premios diarios y reinicios siguen activos
-- Seguimiento de tareas, progreso semanal y nivel
+**Shukudai** es una app web educativa para el seguimiento de tareas, comportamiento y progreso semanal de los niños, con sistema de puntos y recompensas.
 
-## Uso
-1. Marcar tareas ✅ o ❌
-2. Reiniciar tareas diarias o marcador semanal
-3. Obtener Premio Diario (+10 pts)
-4. Obtener Premio Semanal (+70 pts)
-5. Ver progreso y nivel en la barra de XP
+---
+
+## 🚀 Novedades en la versión 2.4
+- Nuevo **Dock inferior** de navegación con iconos SVG.
+- Nuevo **Premio Semanal (+70 pts)** activable cualquier día.
+- Meta de nivel ajustada a **125 pts por nivel**.
+- Mantiene estética limpia, ligera y totalmente compatible con GitHub Pages.
+
+---
+
+## 🛠 Archivos principales
+- `index.html` → Estructura principal con dock y secciones.
+- `style.css` → Estilo visual, colores y diseño del dock.
+- `app.js` → Lógica de puntos, progreso y sistema de niveles.
+
+---
+
+## 📈 Próximas versiones
+- Páginas adicionales: `recompensas.html`, `progreso.html`, `configuracion.html`.
+- Sistema de historial y logros visuales.
+- Animaciones suaves y modo oscuro opcional.
+
+---
+
+Hecho con ❤️ para fomentar la responsabilidad y el aprendizaje.
