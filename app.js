@@ -108,16 +108,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // --- CATÁLOGO DE PREMIOS ACTUALIZADO ---
+    // --- CATÁLOGO DE PREMIOS ACTUALIZADO: AÑADIMOS PROPIEDAD 'moneda' ---
     const catalogoPremios = [
-        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250 },
-        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120 },
-        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200 },
-        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 80 },
-        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 150 },
-        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 150 },
-        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 150 },
-        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200 }
+        // Premios de Puntos
+        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
+        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120, moneda: 'puntos' },
+        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
+        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
+        // Premios de Minutos (Tiempo de Pantalla)
+        // El coste ahora es en minutos, no en puntos.
+        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
+        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
+        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
+        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
     ];
 
     // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE POR SIMPLICIDAD) ---
@@ -266,26 +269,39 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderizarTienda() {
         ui.contenedorPremios.innerHTML = '';
         catalogoPremios.forEach(premio => {
+            
+            const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
+            const cantidadDisponible = premio.moneda === 'minutos' ? estado.minutos : estado.puntos;
+
+            const puedeComprar = cantidadDisponible >= premio.coste;
+            
             const card = document.createElement('div');
             card.className = 'premio-card';
-            const puedeComprar = estado.puntos >= premio.coste;
             card.style.opacity = puedeComprar ? '1' : '0.5';
 
             card.innerHTML = `
                 <div class="premio-icono">${premio.icono}</div>
                 <div style="font-weight:bold;">${premio.nombre}</div>
-                <div class="price-tag">${premio.coste} pts</div>
+                <div class="price-tag">${premio.coste} ${monedaSimbolo}</div>
             `;
 
             card.addEventListener('click', () => {
                 if (!puedeComprar) {
                     reproducir('error');
-                    console.log(`Te faltan ${premio.coste - estado.puntos} puntos.`); 
+                    const faltante = premio.coste - cantidadDisponible;
+                    console.log(`Te faltan ${faltante} ${monedaSimbolo}.`); 
                     return;
                 }
+                
                 // Usamos confirm() temporalmente para simular un modal
-                if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} puntos?`)) {
-                    estado.puntos -= premio.coste;
+                if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} ${monedaSimbolo}?`)) {
+                    // Lógica de DEDUCCIÓN ACTUALIZADA
+                    if (premio.moneda === 'minutos') {
+                        estado.minutos -= premio.coste;
+                    } else {
+                        estado.puntos -= premio.coste;
+                    }
+
                     reproducir('caja');
                     lanzarConfeti(); 
                     guardar();
