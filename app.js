@@ -1,7 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. CONFIGURACIÓN ---
-    const META_XP = 150; // Puntos para subir nivel
+    // SHUKUDAI 2.4: La meta de XP para subir de nivel es 125 puntos.
+    const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
     const SONIDOS = {
@@ -11,30 +12,41 @@ document.addEventListener('DOMContentLoaded', () => {
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
+    // --- NUEVO LISTADO DE TAREAS (VERSIÓN 2.4) ---
     const catalogoTareas = [
         {
-            categoria: "Colegio 🏫",
+            categoria: "Aseo e Higiene Personal 🧴",
             items: [
-                { id: "mat", nombre: "Matemáticas", pts: 10, min: 20 },
-                { id: "len", nombre: "Lengua", pts: 10, min: 20 },
-                { id: "ing", nombre: "Inglés", pts: 10, min: 15 },
-                { id: "lec", nombre: "Leer 15 min", pts: 5, min: 15 }
+                { id: "dientes", nombre: "Lavarse bien los dientes", pts: 2, min: 5 },
+                { id: "ducha", nombre: "Ducharse bien", pts: 2, min: 10 },
+                { id: "desodorante", nombre: "Usar desodorante", pts: 1, min: 1 }
+            ]
+        },
+        {
+            categoria: "Académico 📚",
+            items: [
+                { id: "deberes", nombre: "Hacer deberes", pts: 1, min: 30 },
+                { id: "estudiar", nombre: "Estudiar para controles", pts: 2, min: 45 },
+                { id: "leer", nombre: "Leer 15 Min", pts: 5, min: 15 },
+                { id: "repaso", nombre: "Repaso Contenidos", pts: 3, min: 20 }
             ]
         },
         {
             categoria: "Hogar 🏠",
             items: [
-                { id: "cama", nombre: "Hacer la cama", pts: 5, min: 5 },
-                { id: "dientes", nombre: "Lavarse los dientes", pts: 3, min: 2 },
-                { id: "recoger", nombre: "Recoger juguetes", pts: 8, min: 10 },
-                { id: "ropa", nombre: "Poner ropa sucia", pts: 3, min: 2 }
+                { id: "ordenar", nombre: "Ordenar habitación", pts: 1, min: 10 },
+                { id: "limpiar", nombre: "Limpiar habitación", pts: 2, min: 20 },
+                { id: "lavavajillas", nombre: "Sacar lavavajillas", pts: 1, min: 5 },
+                { id: "bano", nombre: "Limpiar baño", pts: 2, min: 15 }
             ]
         },
         {
-            categoria: "Extra ⭐",
+            categoria: "General ⭐",
             items: [
-                { id: "dibujo", nombre: "Dibujar / Arte", pts: 5, min: 20 },
-                { id: "deporte", nombre: "Ejercicio", pts: 10, min: 30 }
+                // Las tareas de actitud y lenguaje no suman minutos activos, por eso min: 0
+                { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
+                { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
+                { id: "colaborar", nombre: "Colabora en Labores Hogar", pts: 1, min: 15 }
             ]
         }
     ];
@@ -108,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
             estado.nivel = nivelReal;
             lanzarConfeti();
             reproducir('nivel');
-            alert(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`);
+            alert(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`); 
             guardar();
         }
     }
@@ -150,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 div.innerHTML = `
                     <div class="task-info">
                         <span>${tarea.nombre}</span>
-                        <span class="task-pts">+${tarea.pts} pts • ${tarea.min} min</span>
+                        <span class="task-pts">+${tarea.pts} pts ${tarea.min > 0 ? '• ' + tarea.min + ' min' : ''}</span>
                     </div>
                     <div class="task-buttons">
                         ${!estadoTarea ? `
@@ -194,15 +206,15 @@ document.addEventListener('DOMContentLoaded', () => {
             card.addEventListener('click', () => {
                 if (!puedeComprar) {
                     reproducir('error');
-                    alert(`Te faltan ${premio.coste - estado.puntos} puntos.`);
+                    alert(`Te faltan ${premio.coste - estado.puntos} puntos.`); 
                     return;
                 }
                 if (confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} puntos?`)) {
                     estado.puntos -= premio.coste;
                     reproducir('caja');
-                    lanzarConfeti(); // ¡Confeti también al comprar!
+                    lanzarConfeti(); 
                     guardar();
-                    renderizarTienda(); // Actualizar visualmente la tienda
+                    renderizarTienda(); 
                 }
             });
 
@@ -243,8 +255,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ui.btnDiario.addEventListener('click', () => {
-        // Puedes añadir logica de fecha aquí para limitar a 1 vez
+        const hoy = new Date().toDateString();
+        if (estado.ultimoDiario === hoy) {
+            alert("Ya has recogido el premio diario de hoy. Vuelve mañana.");
+            reproducir('error');
+            return;
+        }
+
         estado.puntos += 10;
+        estado.ultimoDiario = hoy; 
         reproducir('exito');
         guardar();
         alert("+10 Puntos recibidos 🎁");
