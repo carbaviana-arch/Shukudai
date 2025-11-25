@@ -15,7 +15,6 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg);
   color: var(--dark);
-  /* Asegura espacio para el dock */
   padding-bottom: calc(var(--dock-height) + 20px); 
 }
 
@@ -37,7 +36,7 @@ main { padding: 15px; max-width: 600px; margin: 0 auto; }
 
 h3 { color: var(--primary); margin: 20px 0 10px; border-left: 4px solid var(--secondary); padding-left: 10px; }
 
-section, details, .premio-card, .horario-card {
+section, details, .premio-card, .horario-card, .agenda-card, .form-card {
   background: var(--white);
   border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0,0,0,0.05);
@@ -62,7 +61,7 @@ button:active { transform: scale(0.95); }
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 .gold { background: var(--accent); color: var(--dark) !important; }
-.blue { background: #0984e3; }
+.blue { background: var(--primary); color: var(--white) !important; }
 .danger-outline { 
   background: transparent; border: 2px solid var(--danger); color: var(--danger); 
   padding: 10px 20px; border-radius: 20px; font-weight: bold;
@@ -113,56 +112,71 @@ details[open] summary::after { content: '▲'; }
 .price-tag { background: var(--accent); color: var(--dark); padding: 4px 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
 .premio-icono { font-size: 3rem; margin-bottom: 5px; }
 
-/* HORARIO (NUEVO) */
-#contenedorHorario {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+/* HORARIO */
+#contenedorHorario { display: flex; flex-direction: column; gap: 15px; }
 .horario-dia {
-  background: var(--white);
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 .dia-titulo {
-  background: var(--primary);
-  color: var(--white);
-  padding: 10px 15px;
-  font-weight: bold;
-  font-size: 1.1rem;
+  background: var(--primary); color: var(--white); padding: 10px 15px; font-weight: bold; font-size: 1.1rem;
 }
 .asignatura {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 15px;
-  border-bottom: 1px solid #f1f2f6;
+  display: flex; justify-content: space-between; padding: 10px 15px; border-bottom: 1px solid #f1f2f6;
 }
-.asignatura:last-child {
-  border-bottom: none;
-}
-.asignatura-nombre {
-  font-weight: 500;
-  color: var(--dark);
-}
-.asignatura-hora {
-  font-size: 0.9rem;
-  color: #6c757d;
-}
+.asignatura:last-child { border-bottom: none; }
+.asignatura-nombre { font-weight: 500; color: var(--dark); }
+.asignatura-hora { font-size: 0.9rem; color: #6c757d; }
 
-/* DOCK NAVEGACIÓN (MODERNO) */
+/* AGENDA (NUEVO) */
+.form-card { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.input-field {
+    padding: 10px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+#formAgenda textarea { resize: vertical; min-height: 80px; }
+
+.agenda-card {
+    padding: 15px;
+    border-left: 5px solid var(--secondary);
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    overflow: visible; /* Necesario para que el botón de eliminar no se corte */
+}
+.agenda-card.examen { border-left-color: var(--danger); }
+.agenda-card.cita { border-left-color: var(--accent); }
+.agenda-info-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; }
+.agenda-title { font-weight: bold; font-size: 1.1rem; color: var(--dark); }
+.agenda-comments { font-style: italic; font-size: 0.9rem; color: #888; margin-top: 5px; }
+.agenda-actions { display: flex; gap: 8px; margin-top: 10px; }
+.agenda-actions button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.btn-edit { background: var(--accent); color: var(--dark); }
+.btn-delete { background: var(--danger); color: var(--white); }
+
+/* DOCK NAVEGACIÓN (Ajustado para 4 elementos) */
 #dock {
   position: fixed; bottom: 0; left: 50%; 
-  transform: translateX(-50%); /* Centrar el dock */
-  width: 95%; /* Ocupa casi todo el ancho */
-  max-width: 400px; /* Límite para que no sea enorme en desktop */
+  transform: translateX(-50%); 
+  width: 100%; /* Permite que el dock ocupe todo el ancho en móviles */
+  max-width: 600px; /* Ancho máximo en pantallas grandes */
   height: var(--dock-height);
   
-  /* Estilos Modernos */
-  background: rgba(255, 255, 255, 0.9); /* Fondo blanco semitransparente */
-  border-radius: 20px 20px 0 0; /* Bordes redondeados */
+  background: rgba(255, 255, 255, 0.9); 
+  border-radius: 20px 20px 0 0; 
   box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.5); /* Borde superior suave */
+  border-top: 1px solid rgba(255, 255, 255, 0.5); 
 
   display: flex; 
   justify-content: space-around; 
@@ -178,10 +192,11 @@ details[open] summary::after { content: '▲'; }
   padding: 5px;
   border-radius: 10px;
   transition: all 0.2s ease-out;
+  flex: 1; /* Distribuye el espacio entre los 4 botones */
 }
 .dock-item span { font-size: 1.5rem; }
-.dock-label { font-size: 0.7rem; font-weight: bold; }
+.dock-label { font-size: 0.7rem; font-weight: bold; text-align: center; }
 .dock-item.active { 
   color: var(--primary); 
-  transform: translateY(-5px); /* Efecto de elevación al estar activo */
+  transform: translateY(-5px); 
 }
