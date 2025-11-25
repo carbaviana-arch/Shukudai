@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 2.4: La meta de XP para subir de nivel es 125 puntos.
+    // SHUKUDAI 2.5: La meta de XP para subir de nivel es 125 puntos.
     const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
@@ -12,7 +12,41 @@ document.addEventListener('DOMContentLoaded', () => {
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
-    // --- NUEVO LISTADO DE TAREAS (VERSIÓN 2.4) ---
+    // --- HORARIO SEMANAL (NUEVO) ---
+    const horarioSemanal = {
+        Lunes: [
+            { nombre: "Lengua", hora: "09:00 - 10:00" },
+            { nombre: "Matemáticas", hora: "10:00 - 11:00" },
+            { nombre: "Recreo", hora: "11:00 - 11:30" },
+            { nombre: "Inglés", hora: "11:30 - 12:30" }
+        ],
+        Martes: [
+            { nombre: "Ciencias Sociales", hora: "09:00 - 10:30" },
+            { nombre: "Música", hora: "10:30 - 11:00" },
+            { nombre: "Recreo", hora: "11:00 - 11:30" },
+            { nombre: "Educación Física", hora: "11:30 - 12:30" }
+        ],
+        Miercoles: [
+            { nombre: "Matemáticas", hora: "09:00 - 10:00" },
+            { nombre: "Ciencias Naturales", hora: "10:00 - 11:00" },
+            { nombre: "Recreo", hora: "11:00 - 11:30" },
+            { nombre: "Lengua", hora: "11:30 - 12:30" }
+        ],
+        Jueves: [
+            { nombre: "Inglés", hora: "09:00 - 10:30" },
+            { nombre: "Plástica", hora: "10:30 - 11:00" },
+            { nombre: "Recreo", hora: "11:00 - 11:30" },
+            { nombre: "Tutoría", hora: "11:30 - 12:30" }
+        ],
+        Viernes: [
+            { nombre: "Lengua", hora: "09:00 - 10:00" },
+            { nombre: "Educación Física", hora: "10:00 - 11:00" },
+            { nombre: "Recreo", hora: "11:00 - 11:30" },
+            { nombre: "Matemáticas", hora: "11:30 - 12:30" }
+        ]
+    };
+    
+    // --- LISTADO DE TAREAS ---
     const catalogoTareas = [
         {
             categoria: "Aseo e Higiene Personal 🧴",
@@ -43,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
         {
             categoria: "General ⭐",
             items: [
-                // Las tareas de actitud y lenguaje no suman minutos activos, por eso min: 0
                 { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
                 { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
                 { id: "colaborar", nombre: "Colabora en Labores Hogar", pts: 1, min: 15 }
@@ -60,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // --- 2. ESTADO Y PERSISTENCIA ---
-    // Intentamos cargar del localStorage
     let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
         puntos: 0,
         minutos: 0,
@@ -72,8 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 3. LÓGICA DE NUEVO DÍA ---
     const hoy = new Date().toDateString();
     if (estado.ultimaFecha !== hoy) {
-        // Es un día distinto al guardado -> Reseteamos tareas
-        console.log("¡Nuevo día detectado!");
+        console.log("¡Nuevo día detectado! Reseteando tareas.");
         estado.tareasHoy = {}; 
         estado.ultimaFecha = hoy;
         guardar();
@@ -88,10 +119,13 @@ document.addEventListener('DOMContentLoaded', () => {
         xpTexto: document.getElementById('xpTexto'),
         contenedorCategorias: document.getElementById('categorias'),
         contenedorPremios: document.getElementById('contenedorPremios'),
+        contenedorHorario: document.getElementById('contenedorHorario'), // NUEVO
         vistaTareas: document.getElementById('vistaTareas'),
         vistaTienda: document.getElementById('vistaTienda'),
+        vistaHorario: document.getElementById('vistaHorario'), // NUEVO
         btnHome: document.getElementById('homeBtn'),
         btnShop: document.getElementById('shopBtn'),
+        btnSchedule: document.getElementById('scheduleBtn'), // NUEVO
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
         btnSemanal: document.getElementById('btnPremioSemanal')
@@ -137,14 +171,26 @@ document.addEventListener('DOMContentLoaded', () => {
             confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
     }
+    
+    // Función para ocultar todas las vistas excepto la deseada
+    function mostrarVista(vistaId, btnActivo) {
+        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario];
+        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule];
 
-    // --- 6. RENDERIZADO ---
+        vistas.forEach(v => v.style.display = 'none');
+        botones.forEach(b => b.classList.remove('active'));
+
+        document.getElementById(vistaId).style.display = 'block';
+        btnActivo.classList.add('active');
+    }
+
+    // --- 6. RENDERIZADO DE VISTAS ---
+
     function renderizarTareas() {
         ui.contenedorCategorias.innerHTML = '';
-
         catalogoTareas.forEach(grupo => {
             const details = document.createElement('details');
-            details.open = true; // Abierto por defecto
+            details.open = true;
             
             const summary = document.createElement('summary');
             summary.textContent = grupo.categoria;
@@ -153,8 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             grupo.items.forEach(tarea => {
                 const div = document.createElement('div');
                 div.className = 'task';
-                
-                // Comprobar estado
                 const estadoTarea = estado.tareasHoy[tarea.id];
                 if (estadoTarea === 'hecho') div.classList.add('completed');
                 if (estadoTarea === 'fail') div.classList.add('failed');
@@ -173,16 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
                         `}
                     </div>
                 `;
-
-                // Eventos
                 if (!estadoTarea) {
                     div.querySelector('.check').addEventListener('click', () => completarTarea(tarea, true));
                     div.querySelector('.cross').addEventListener('click', () => completarTarea(tarea, false));
                 }
-
                 details.appendChild(div);
             });
-
             ui.contenedorCategorias.appendChild(details);
         });
     }
@@ -192,8 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
         catalogoPremios.forEach(premio => {
             const card = document.createElement('div');
             card.className = 'premio-card';
-            
-            // Ver si alcanza el dinero
             const puedeComprar = estado.puntos >= premio.coste;
             card.style.opacity = puedeComprar ? '1' : '0.5';
 
@@ -222,6 +260,33 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function renderizarHorario() {
+        ui.contenedorHorario.innerHTML = '';
+        const dias = Object.keys(horarioSemanal);
+        
+        dias.forEach(dia => {
+            const diaDiv = document.createElement('div');
+            diaDiv.className = 'horario-dia';
+
+            const titulo = document.createElement('div');
+            titulo.className = 'dia-titulo';
+            titulo.textContent = dia;
+            diaDiv.appendChild(titulo);
+
+            horarioSemanal[dia].forEach(asignatura => {
+                const asigDiv = document.createElement('div');
+                asigDiv.className = 'asignatura';
+                asigDiv.innerHTML = `
+                    <span class="asignatura-nombre">${asignatura.nombre}</span>
+                    <span class="asignatura-hora">${asignatura.hora}</span>
+                `;
+                diaDiv.appendChild(asigDiv);
+            });
+
+            ui.contenedorHorario.appendChild(diaDiv);
+        });
+    }
+
     // --- 7. ACCIONES ---
     function completarTarea(tarea, exito) {
         if (exito) {
@@ -237,23 +302,23 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarTareas();
     }
 
-    // --- 8. EVENTOS GLOBALES ---
+    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN ---
     ui.btnHome.addEventListener('click', () => {
-        ui.vistaTienda.style.display = 'none';
-        ui.vistaTareas.style.display = 'block';
-        ui.btnHome.classList.add('active');
-        ui.btnShop.classList.remove('active');
+        mostrarVista('vistaTareas', ui.btnHome);
         renderizarTareas();
     });
 
     ui.btnShop.addEventListener('click', () => {
-        ui.vistaTareas.style.display = 'none';
-        ui.vistaTienda.style.display = 'block';
-        ui.btnShop.classList.add('active');
-        ui.btnHome.classList.remove('active');
+        mostrarVista('vistaTienda', ui.btnShop);
         renderizarTienda();
     });
 
+    ui.btnSchedule.addEventListener('click', () => { // NUEVO EVENTO
+        mostrarVista('vistaHorario', ui.btnSchedule);
+        renderizarHorario();
+    });
+
+    // --- 9. EVENTOS DE ACCIONES RÁPIDAS ---
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
@@ -284,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // INICIO
-    renderizarTareas();
+    // INICIO: Mostrar la vista de tareas por defecto al cargar.
+    mostrarVista('vistaTareas', ui.btnHome);
     actualizarUI();
 });
