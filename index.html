@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Shukudai 2.3 - Super App</title>
+  <title>Shukudai 2.5 - Super App</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Librería ligera para el efecto de confeti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -41,7 +41,7 @@
       <div id="nivelInfo">
         <p>Nivel <span id="nivelActual">1</span></p>
         <div id="xpBar"><div id="xpFill"></div></div>
-        <p><small><span id="xpTexto">0 / 150 xp</span></small></p>
+        <p><small><span id="xpTexto">0 / 125 xp</span></small></p>
       </div>
     </section>
 
@@ -62,13 +62,26 @@
       <div id="contenedorPremios" class="grid-tienda"></div> <!-- Se llena con JS -->
     </div>
 
+    <!-- VISTA 3: HORARIO (Oculta por defecto) -->
+    <div id="vistaHorario" style="display: none;">
+      <h3>🗓️ Horario Escolar</h3>
+      <p style="text-align: center; margin-bottom: 15px; color: #666;">Asignaturas y horarios de la semana.</p>
+      <div id="contenedorHorario">
+        <!-- El contenido se cargará con JS -->
+      </div>
+    </div>
+
   </main>
 
-  <!-- DOCK DE NAVEGACIÓN INFERIOR -->
+  <!-- DOCK DE NAVEGACIÓN INFERIOR (3 Botones) -->
   <nav id="dock">
     <button id="homeBtn" class="dock-item active">
       <span>📝</span>
       <span class="dock-label">Tareas</span>
+    </button>
+    <button id="scheduleBtn" class="dock-item">
+      <span>⏰</span>
+      <span class="dock-label">Horario</span>
     </button>
     <button id="shopBtn" class="dock-item">
       <span>🛍️</span>
