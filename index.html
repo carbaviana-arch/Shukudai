@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Shukudai 2.5 - Super App</title>
+  <title>Shukudai 2.6 - Agenda y Horario</title>
   <link rel="stylesheet" href="style.css" />
   <!-- Librería ligera para el efecto de confeti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -55,14 +55,7 @@
       </div>
     </div>
 
-    <!-- VISTA 2: TIENDA (Oculta por defecto) -->
-    <div id="vistaTienda" style="display: none;">
-      <h3>🛍️ Tienda de Premios</h3>
-      <p style="text-align: center; margin-bottom: 15px; color: #666;">¡Gasta tus puntos aquí!</p>
-      <div id="contenedorPremios" class="grid-tienda"></div> <!-- Se llena con JS -->
-    </div>
-
-    <!-- VISTA 3: HORARIO (Oculta por defecto) -->
+    <!-- VISTA 2: HORARIO (Oculta por defecto) -->
     <div id="vistaHorario" style="display: none;">
       <h3>🗓️ Horario Escolar</h3>
       <p style="text-align: center; margin-bottom: 15px; color: #666;">Asignaturas y horarios de la semana.</p>
@@ -71,9 +64,53 @@
       </div>
     </div>
 
+    <!-- VISTA 3: AGENDA (NUEVA) -->
+    <div id="vistaAgenda" style="display: none;">
+      <h3>📌 Agenda de Evaluaciones y Eventos</h3>
+      <form id="formAgenda" class="form-card">
+        <input type="hidden" id="agendaId">
+        <input type="date" id="agendaFecha" required class="input-field" title="Fecha">
+        <input type="time" id="agendaHora" class="input-field" title="Hora (opcional)">
+        
+        <select id="agendaAsignatura" required class="input-field" title="Asignatura">
+          <option value="">-- Seleccionar Asignatura --</option>
+          <option value="Lengua">Lengua</option>
+          <option value="Matemáticas">Matemáticas</option>
+          <option value="Inglés">Inglés</option>
+          <option value="Ciencias Naturales">Ciencias Naturales</option>
+          <option value="Ciencias Sociales">Ciencias Sociales</option>
+          <option value="Otro">Otro/Actividad</option>
+        </select>
+
+        <select id="agendaTipo" required class="input-field" title="Tipo de Actividad">
+          <option value="">-- Tipo de Actividad --</option>
+          <option value="Examen">Examen</option>
+          <option value="Control">Control</option>
+          <option value="Actividad">Actividad</option>
+          <option value="Cita">Cita Importante</option>
+        </select>
+        
+        <textarea id="agendaComentarios" placeholder="Comentarios y detalles..." class="input-field"></textarea>
+        
+        <button type="submit" id="btnGuardarAgenda" class="blue">Guardar Evento</button>
+      </form>
+
+      <h4 style="margin-top: 25px; color: var(--dark);">Próximos Eventos</h4>
+      <div id="listaEventos">
+        <!-- Eventos de la agenda se cargarán aquí -->
+      </div>
+    </div>
+    
+    <!-- VISTA 4: TIENDA (Oculta por defecto) -->
+    <div id="vistaTienda" style="display: none;">
+      <h3>🛍️ Tienda de Premios</h3>
+      <p style="text-align: center; margin-bottom: 15px; color: #666;">¡Gasta tus puntos aquí!</p>
+      <div id="contenedorPremios" class="grid-tienda"></div> <!-- Se llena con JS -->
+    </div>
+
   </main>
 
-  <!-- DOCK DE NAVEGACIÓN INFERIOR (3 Botones) -->
+  <!-- DOCK DE NAVEGACIÓN INFERIOR (4 Botones) -->
   <nav id="dock">
     <button id="homeBtn" class="dock-item active">
       <span>📝</span>
@@ -82,6 +119,10 @@
     <button id="scheduleBtn" class="dock-item">
       <span>⏰</span>
       <span class="dock-label">Horario</span>
+    </button>
+    <button id="agendaBtn" class="dock-item">
+      <span>📅</span>
+      <span class="dock-label">Agenda</span>
     </button>
     <button id="shopBtn" class="dock-item">
       <span>🛍️</span>
