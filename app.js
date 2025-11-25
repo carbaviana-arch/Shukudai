@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 2.5: La meta de XP para subir de nivel es 125 puntos.
+    // SHUKUDAI 2.6: Agenda y 4 Vistas en el Dock.
     const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
-    // --- HORARIO SEMANAL (NUEVO) ---
+    // --- HORARIO SEMANAL ---
     const horarioSemanal = {
         Lunes: [
             { nombre: "Lengua", hora: "09:00 - 10:00" },
@@ -93,11 +93,13 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     // --- 2. ESTADO Y PERSISTENCIA ---
+    // Incluimos agendaEventos en el estado
     let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
         puntos: 0,
         minutos: 0,
         nivel: 1,
         tareasHoy: {},
+        agendaEventos: [], // NUEVO: Array para guardar eventos de agenda
         ultimaFecha: new Date().toDateString()
     };
 
@@ -119,13 +121,17 @@ document.addEventListener('DOMContentLoaded', () => {
         xpTexto: document.getElementById('xpTexto'),
         contenedorCategorias: document.getElementById('categorias'),
         contenedorPremios: document.getElementById('contenedorPremios'),
-        contenedorHorario: document.getElementById('contenedorHorario'), // NUEVO
+        contenedorHorario: document.getElementById('contenedorHorario'),
+        listaEventos: document.getElementById('listaEventos'), // NUEVO
+        formAgenda: document.getElementById('formAgenda'), // NUEVO
         vistaTareas: document.getElementById('vistaTareas'),
         vistaTienda: document.getElementById('vistaTienda'),
-        vistaHorario: document.getElementById('vistaHorario'), // NUEVO
+        vistaHorario: document.getElementById('vistaHorario'),
+        vistaAgenda: document.getElementById('vistaAgenda'), // NUEVO
         btnHome: document.getElementById('homeBtn'),
         btnShop: document.getElementById('shopBtn'),
-        btnSchedule: document.getElementById('scheduleBtn'), // NUEVO
+        btnSchedule: document.getElementById('scheduleBtn'),
+        btnAgenda: document.getElementById('agendaBtn'), // NUEVO
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
         btnSemanal: document.getElementById('btnPremioSemanal')
@@ -172,10 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Función para ocultar todas las vistas excepto la deseada
+    // Función para gestionar la navegación entre las 4 vistas
     function mostrarVista(vistaId, btnActivo) {
-        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario];
-        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule];
+        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda];
+        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda];
 
         vistas.forEach(v => v.style.display = 'none');
         botones.forEach(b => b.classList.remove('active'));
@@ -287,7 +293,121 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 7. ACCIONES ---
+    // --- RENDERIZADO AGENDA (NUEVO) ---
+    function renderizarAgenda() {
+        ui.listaEventos.innerHTML = '';
+        
+        // Ordenar eventos por fecha ascendente
+        const eventosOrdenados = [...estado.agendaEventos].sort((a, b) => 
+            new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00'))
+        );
+
+        eventosOrdenados.forEach(evento => {
+            const card = document.createElement('div');
+            // Añade una clase para estilizar según el tipo (e.g., examen, cita)
+            let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
+            card.className = `agenda-card ${tipoClase}`;
+
+            const horaMostrar = evento.hora ? ` • ${evento.hora}` : '';
+
+            card.innerHTML = `
+                <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
+                <div class="agenda-info-row">
+                    <span>Fecha: ${new Date(evento.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    <span>Hora: ${evento.hora || 'No especificada'}</span>
+                </div>
+                ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
+                <div class="agenda-actions">
+                    <button class="btn-edit btn-secondary" data-id="${evento.id}">📝 Editar</button>
+                    <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
+                </div>
+            `;
+
+            ui.listaEventos.appendChild(card);
+        });
+
+        // Añadir listeners para editar y eliminar
+        ui.listaEventos.querySelectorAll('.btn-edit').forEach(btn => {
+            btn.addEventListener('click', (e) => cargarEventoParaEdicion(e.target.dataset.id));
+        });
+
+        ui.listaEventos.querySelectorAll('.btn-delete').forEach(btn => {
+            btn.addEventListener('click', (e) => eliminarEvento(e.target.dataset.id));
+        });
+    }
+
+    // --- LÓGICA AGENDA CRUD (NUEVO) ---
+
+    function generarId() {
+        return '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function cargarEventoParaEdicion(id) {
+        const evento = estado.agendaEventos.find(e => e.id === id);
+        if (!evento) return;
+
+        // Cargar datos en el formulario
+        document.getElementById('agendaId').value = evento.id;
+        document.getElementById('agendaFecha').value = evento.fecha;
+        document.getElementById('agendaHora').value = evento.hora || '';
+        document.getElementById('agendaAsignatura').value = evento.asignatura;
+        document.getElementById('agendaTipo').value = evento.tipo;
+        document.getElementById('agendaComentarios').value = evento.comentarios || '';
+        
+        // Mover la vista a la Agenda y hacer scroll al formulario (opcional pero útil)
+        mostrarVista('vistaAgenda', ui.btnAgenda);
+        ui.formAgenda.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function guardarEvento(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('agendaId').value;
+        const fecha = document.getElementById('agendaFecha').value;
+        const hora = document.getElementById('agendaHora').value;
+        const asignatura = document.getElementById('agendaAsignatura').value;
+        const tipo = document.getElementById('agendaTipo').value;
+        const comentarios = document.getElementById('agendaComentarios').value;
+
+        const nuevoEvento = {
+            id: id || generarId(),
+            fecha,
+            hora,
+            asignatura,
+            tipo,
+            comentarios
+        };
+
+        if (id) {
+            // Edición: Encontrar y reemplazar el evento existente
+            const index = estado.agendaEventos.findIndex(e => e.id === id);
+            if (index !== -1) {
+                estado.agendaEventos[index] = nuevoEvento;
+                alert('Evento actualizado con éxito. 🎉');
+            }
+        } else {
+            // Creación: Añadir nuevo evento
+            estado.agendaEventos.push(nuevoEvento);
+            alert('Nuevo evento guardado. 🎉');
+        }
+
+        guardar();
+        ui.formAgenda.reset(); // Limpiar formulario
+        document.getElementById('agendaId').value = ''; // Resetear ID oculto
+        renderizarAgenda();
+    }
+
+    function eliminarEvento(id) {
+        if (confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
+            estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
+            guardar();
+            renderizarAgenda();
+            reproducir('error');
+            alert('Evento eliminado.');
+        }
+    }
+
+    // --- 7. ACCIONES DE TAREAS ---
     function completarTarea(tarea, exito) {
         if (exito) {
             estado.puntos += tarea.pts;
@@ -313,12 +433,19 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarTienda();
     });
 
-    ui.btnSchedule.addEventListener('click', () => { // NUEVO EVENTO
+    ui.btnSchedule.addEventListener('click', () => {
         mostrarVista('vistaHorario', ui.btnSchedule);
         renderizarHorario();
     });
 
-    // --- 9. EVENTOS DE ACCIONES RÁPIDAS ---
+    ui.btnAgenda.addEventListener('click', () => { // NUEVO EVENTO
+        mostrarVista('vistaAgenda', ui.btnAgenda);
+        renderizarAgenda();
+    });
+
+    ui.formAgenda.addEventListener('submit', guardarEvento); // NUEVO EVENTO
+
+    // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET ---
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
