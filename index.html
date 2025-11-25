@@ -3,216 +3,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shukudai GO! | Misión Recompensa (Gamer)</title>
+    <title>Hogwarts: Registro de Puntos</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Confetti CDN (para efectos visuales) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Fuente temática: Lora para un aspecto de pergamino/antiguo -->
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        /* Estilos Base Cyber-Gamer */
+        /* Estilos Base Hogwarts */
         :root {
-            --bg-dark: #1e293b; /* Slate 900 */
-            --primary: #38bdf8; /* Sky 400 - Electric Blue */
-            --secondary: #34d399; /* Emerald 400 - Neon Green */
-            --danger: #f87171; /* Red 400 */
-            --accent-glow: rgba(56, 189, 248, 0.5); /* Primary Glow */
+            --bg-parchment: #f9f6e6; /* Fondo Crema/Pergamino */
+            --bg-hogwarts-main: #3a2b16; /* Marrón Oscuro de Madera/Roble */
+            --color-gryffindor: #740001; /* Rojo Gryffindor */
+            --color-gold: #eeb111; /* Dorado de Hogwarts */
+            --color-text: #3a2b16; /* Texto Oscuro */
         }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: #e5e7eb; /* Light gray text */
+            font-family: 'Lora', serif; /* Fuente más antigua y elegante */
+            background-color: var(--bg-parchment);
+            color: var(--color-text);
+            padding-bottom: 7rem; /* Espacio para el Dock */
         }
         
-        /* Contenedor principal de la APP */
+        /* Contenedor principal del Libro de Clases */
         .app-container {
-            background-color: #334155; /* Slate 700 */
-            border: 2px solid var(--primary);
-            box-shadow: 0 0 15px var(--accent-glow);
+            background-color: #e8e2c6; /* Pergamino más claro */
+            border: 5px solid var(--bg-hogwarts-main);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5); /* Sombra de libro */
         }
 
-        /* DOCK de Navegación */
-        .dock-btn {
-            color: #94a3b8; /* Slate 400 */
-            transition: all 0.2s;
-        }
-        .dock-btn.active, .dock-btn:hover {
-            background-color: #1e293b; /* Dark background on hover/active */
-            color: var(--primary);
-            box-shadow: 0 0 8px var(--accent-glow);
-        }
-
-        /* HEADER & STATS (HUD) */
+        /* HEADER / CUADRO DE MANDO DE CASA (Scoreboard) */
         .header-bg {
-            background: #1e293b; /* Slate 900 */
-            border: 1px solid var(--primary);
-            border-bottom: 3px solid var(--primary);
+            background: var(--color-gryffindor); /* Rojo principal */
+            color: white;
+            border-bottom: 5px solid var(--color-gold);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
         .stat-box {
-            padding: 0.5rem;
-            border-radius: 6px;
-            background-color: #0f172a; /* Darker box for stats */
-            border: 1px dashed #475569;
-            text-shadow: 0 0 5px rgba(56, 189, 248, 0.7);
+            padding: 0.75rem;
+            border-radius: 4px;
+            background-color: var(--color-gold); 
+            color: var(--color-gryffindor);
+            text-shadow: 1px 1px 0 #fff;
+            font-family: 'Inter', sans-serif; /* Números en Inter para claridad */
         }
         .stat-label {
-            color: #94a3b8;
+            color: var(--color-gryffindor);
+            font-weight: 700;
         }
         
-        /* Barra XP (Health Bar Style) */
+        /* Barra de Experiencia (Nivel Mágico) */
         #xpFill {
-            background-color: var(--secondary); /* Neon Green */
-            box-shadow: 0 0 8px var(--secondary);
+            background-color: #5d5d5d; /* Gris de piedra */
+            box-shadow: none;
+        }
+        #xpTexto {
+            color: var(--color-text);
+            font-family: 'Inter', sans-serif;
         }
         
-        /* TAREAS */
+        /* TAREAS (Misiones Mágicas) */
         .task {
-            background-color: #334155; /* Slate 700 */
-            border: 1px solid #475569;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+            background-color: var(--bg-parchment);
+            border: 1px dashed var(--bg-hogwarts-main);
+            box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
         }
         .task.completed {
-            background-color: #14532d; /* Darker Green */
-            border-color: var(--secondary);
+            background-color: #d1e7c9; /* Verde Suave */
+            border-left: 5px solid #005f00; /* Verde Oscuro de Éxito */
         }
         .task.failed {
-            background-color: #7f1d1d; /* Darker Red */
-            border-color: var(--danger);
+            background-color: #f7d4d4; /* Rojo Suave */
+            border-left: 5px solid #a80000; /* Rojo Oscuro de Fracaso */
         }
         .task-pts {
-            color: var(--secondary);
+            color: var(--color-gryffindor);
+            font-family: 'Inter', sans-serif;
             font-weight: 700;
         }
         .btn-circle {
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.7);
+            box-shadow: none;
+            width: 30px;
+            height: 30px;
         }
         .check {
-            background-color: var(--secondary);
-            color: #0f172a;
+            background-color: #005f00;
+            color: white;
         }
         .cross {
-            background-color: var(--danger);
-            color: #0f172a;
+            background-color: #a80000;
+            color: white;
         }
         details > summary {
-            background-color: #1e293b; /* Darker background for category headers */
-            color: var(--primary);
-            border: 1px solid var(--primary);
+            background-color: var(--color-gold); 
+            color: var(--color-gryffindor);
+            border: 1px solid var(--bg-hogwarts-main);
+            font-weight: 700;
         }
         
-        /* TIENDA */
+        /* TIENDA (La Bóveda de Gringotts) */
         .premio-card {
-            background-color: #475569; /* Slate 600 */
-            border: 2px solid var(--primary);
+            background-color: var(--bg-parchment); 
+            border: 2px solid var(--color-gryffindor);
+            transition: all 0.3s;
         }
         .premio-card:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--accent-glow);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border-color: var(--color-gold);
         }
         .price-tag {
-            background-color: var(--primary);
-            color: var(--bg-dark);
+            background-color: var(--color-text); /* Marrón Oscuro */
+            color: var(--color-gold);
             text-shadow: none;
-            font-weight: 900;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
         }
         
-        /* Horario */
+        /* Horario (Mapa del Merodeador) */
         .horario-dia {
-            border: 2px solid var(--secondary);
-            background-color: #1e293b;
+            border: 2px solid var(--bg-hogwarts-main);
+            background-color: var(--bg-parchment);
         }
         .dia-titulo {
-            background-color: var(--secondary);
-            color: var(--bg-dark);
-            font-weight: 900;
-            text-shadow: none;
+            background-color: var(--bg-hogwarts-main);
+            color: var(--color-gold);
+            font-weight: 700;
+            text-shadow: 1px 1px 0 #000;
         }
         .asignatura {
-            background-color: #334155;
-            border-bottom: 1px solid #475569;
+            background-color: #fcfbf5;
+            border-bottom: 1px dashed #cccccc;
         }
         .extra-curricular {
-            background-color: #1e293b; /* Darker background for extra */
-            color: var(--primary);
+            background-color: #e8e2c6; /* Pergamino ligeramente más oscuro */
+            color: var(--color-gryffindor);
         }
 
-        /* Agenda */
+        /* Agenda (Profecías y Eventos) */
         .agenda-card {
-            background-color: #334155;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            background-color: var(--bg-parchment);
+            box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+            border: 1px solid #c9c9c9;
         }
-        .agenda-card.examen { border-left: 6px solid var(--danger); } 
-        .agenda-card.cita { border-left: 6px solid var(--primary); } 
-        .agenda-card.entrega { border-left: 6px solid var(--secondary); } 
+        .agenda-card.examen { border-left: 6px solid #a80000; } /* Rojo de peligro */
+        .agenda-card.cita { border-left: 6px solid #005f00; } /* Verde de recuperación */
+        .agenda-card.entrega { border-left: 6px solid var(--color-gold); } /* Dorado de tarea */
+        .agenda-card.otro { border-left: 6px solid #5d5d5d; }
         
         .agenda-title {
-            color: var(--primary);
-            text-shadow: 0 0 3px rgba(56, 189, 248, 0.7);
+            color: var(--color-gryffindor);
+            font-weight: 700;
         }
         .agenda-info-row {
-            color: #94a3b8;
+            color: var(--color-text);
         }
         .agenda-comments {
-            background-color: #1e293b;
-            border: 1px solid #475569;
+            background-color: #fcfbf5;
+            border: 1px dashed #cccccc;
+            color: #555;
         }
-        .btn-edit { background-color: #475569; color: var(--primary); }
-        .btn-delete { background-color: #7f1d1d; color: var(--danger); }
+        .btn-edit { background-color: var(--color-gold); color: var(--color-text); font-family: 'Inter', sans-serif; }
+        .btn-delete { background-color: var(--color-gryffindor); color: white; font-family: 'Inter', sans-serif; }
         
-        /* Formulario Agenda */
+        /* Formulario Agenda (Pluma y Tinta) */
         #formAgenda {
-            background-color: #1e293b;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+            background-color: #fcfbf5;
+            border: 2px solid var(--bg-hogwarts-main);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        #formAgenda label {
+            color: var(--color-text);
+            font-weight: 700;
         }
         #formAgenda input, #formAgenda select, #formAgenda textarea {
-            background-color: #334155;
-            color: #e5e7eb;
-            border: 1px solid #475569;
+            background-color: var(--bg-parchment);
+            color: var(--color-text);
+            border: 1px solid #a1a1a1;
+            font-family: 'Inter', sans-serif;
         }
         #formAgenda button {
-            background-color: var(--primary);
-            color: var(--bg-dark);
-            font-weight: 900;
+            background-color: var(--color-gryffindor);
+            color: white;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.2s;
+        }
+
+        /* DOCK DE NAVEGACIÓN (Libro de Hechizos) */
+        .dock-footer {
+            background-color: var(--bg-hogwarts-main);
+            border-top: 5px solid var(--color-gold);
+        }
+        .dock-btn {
+            color: var(--color-gold);
+            transition: all 0.2s;
+        }
+        .dock-btn.active, .dock-btn:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+            color: white;
+            box-shadow: 0 0 5px var(--color-gold);
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
     <div class="max-w-xl mx-auto p-4 app-container sm:rounded-xl">
         
-        <!-- HEADER / RESUMEN DE PUNTOS (HUD) -->
-        <header class="text-center mb-6 p-4 header-bg rounded-lg shadow-2xl">
-            <h1 class="text-3xl font-extrabold text-white mb-2" style="text-shadow: 0 0 10px var(--primary);">Shukudai GO! ⭐</h1>
+        <!-- HEADER / RESUMEN DE PUNTOS (Puntos de la Casa) -->
+        <header class="text-center mb-6 p-4 header-bg rounded-lg shadow-xl">
+            <h1 class="text-3xl font-bold mb-2 font-['Lora']">Hogwarts: Registro de Puntos 🏰</h1>
+            <h2 class="text-xl font-bold mb-4 font-['Lora']">Casa Gryffindor</h2>
             <div class="flex justify-around items-center mb-4">
                 <div class="stat-box">
-                    <div class="text-xs font-medium stat-label">Puntos (Pts)</div>
-                    <div id="puntosTotales" class="text-3xl font-extrabold text-yellow-400">0</div>
+                    <div class="text-xs font-medium stat-label">Puntos (Galeones)</div>
+                    <div id="puntosTotales" class="text-3xl font-extrabold">0</div>
                 </div>
                 <div class="stat-box">
-                    <div class="text-xs font-medium stat-label">Minutos (Min)</div>
-                    <div id="minutosTotales" class="text-3xl font-extrabold text-pink-400">0</div>
+                    <div class="text-xs font-medium stat-label">Minutos (M. Mágicos)</div>
+                    <div id="minutosTotales" class="text-3xl font-extrabold">0</div>
                 </div>
                 <div class="stat-box">
-                    <div class="text-xs font-medium stat-label">Nivel</div>
-                    <div id="nivelActual" class="text-3xl font-extrabold text-red-500">1</div>
+                    <div class="text-xs font-medium stat-label">Nivel de Magia</div>
+                    <div id="nivelActual" class="text-3xl font-extrabold">1</div>
                 </div>
             </div>
             
-            <!-- Barra de XP (Mana/Health Bar) -->
-            <div class="w-full bg-gray-700 rounded-full h-4 border-2 border-gray-600">
+            <!-- Barra de XP (Nivel de Dominio de Hechizos) -->
+            <div class="w-full bg-gray-300 rounded-full h-4 border border-gray-400">
                 <div id="xpFill" class="h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
             </div>
-            <div id="xpTexto" class="text-xs text-gray-400 mt-1 font-mono font-bold">0 / 125 xp</div>
+            <div id="xpTexto" class="text-xs font-medium mt-1 font-['Inter']">0 / 125 puntos mágicos</div>
             
-            <!-- Botones Rápidos -->
-            <div class="flex justify-center space-x-2 mt-4">
-                <button id="btnPremioDiario" class="px-3 py-1 bg-yellow-400 text-gray-900 text-sm font-bold rounded-full hover:bg-yellow-500 transition shadow-lg hover:shadow-yellow-700/50">
-                    🎁 Diario (+10)
+            <!-- Botones Rápidos (Pociones de Recompensa) -->
+            <div class="flex justify-center space-x-2 mt-4 font-['Inter']">
+                <button id="btnPremioDiario" class="px-3 py-1 bg-yellow-400 text-gray-900 text-sm font-bold rounded-full hover:bg-yellow-500 transition shadow-lg">
+                    🔮 Poción Diaria (+10)
                 </button>
-                <button id="btnPremioSemanal" class="px-3 py-1 bg-green-500 text-gray-900 text-sm font-bold rounded-full hover:bg-green-600 transition shadow-lg hover:shadow-green-700/50">
-                    🏆 Semanal (+70)
+                <button id="btnPremioSemanal" class="px-3 py-1 bg-green-500 text-gray-900 text-sm font-bold rounded-full hover:bg-green-600 transition shadow-lg">
+                    🧪 Elixir Semanal (+70)
                 </button>
             </div>
         </header>
@@ -220,115 +253,115 @@
         <!-- CONTENIDO PRINCIPAL (VISTAS) -->
         <main>
             
-            <!-- VISTA 1: TAREAS (HOME) -->
+            <!-- VISTA 1: TAREAS (Misiones Mágicas) -->
             <section id="vistaTareas" class="view">
-                <h2 class="text-2xl font-bold text-white mb-4">Misiones de Hoy 🚀</h2>
+                <h2 class="text-2xl font-bold mb-4 font-['Lora']">Tareas del Día: Clases y Misiones 📜</h2>
                 <div id="categorias" class="space-y-4">
                     <!-- Las categorías de tareas se renderizan aquí -->
                 </div>
             </section>
 
-            <!-- VISTA 2: TIENDA DE RECOMPENSAS -->
+            <!-- VISTA 2: TIENDA DE RECOMPENSAS (La Bóveda de Gringotts) -->
             <section id="vistaTienda" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-white mb-4">Zona de Canje (Loot Box) 💎</h2>
+                <h2 class="text-2xl font-bold mb-4 font-['Lora']">Bóveda de Gringotts (Canje) 💰</h2>
                 
                 <!-- MENSAJE DE REGLA DEL FIN DE SEMANA -->
                 <div id="storeMessage" class="mb-4 p-3 rounded-lg text-center transition-colors duration-300">
-                    <h3 id="storeMessageTitle" class="font-extrabold text-lg"></h3>
-                    <p id="storeMessageBody" class="text-sm"></p>
+                    <h3 id="storeMessageTitle" class="font-bold text-lg font-['Inter']"></h3>
+                    <p id="storeMessageBody" class="text-sm font-['Inter']"></p>
                 </div>
                 
-                <div id="contenedorPremios" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div id="contenedorPremios" class="grid grid-cols-2 sm:grid-cols-3 gap-4 font-['Inter']">
                     <!-- Las tarjetas de premios se renderizan aquí -->
                 </div>
             </section>
 
-            <!-- VISTA 3: HORARIO ESCOLAR -->
+            <!-- VISTA 3: HORARIO ESCOLAR (Mapa del Merodeador) -->
             <section id="vistaHorario" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-white mb-4">Cronograma de Batalla ⏱️</h2>
-                <div id="contenedorHorario" class="space-y-4">
+                <h2 class="text-2xl font-bold mb-4 font-['Lora']">Mapa del Merodeador (Horario) 🕰️</h2>
+                <div id="contenedorHorario" class="space-y-4 font-['Inter']">
                     <!-- El horario se renderiza aquí -->
                 </div>
             </section>
             
-            <!-- VISTA 4: AGENDA Y EVENTOS -->
+            <!-- VISTA 4: AGENDA Y EVENTOS (Profecías y Eventos) -->
             <section id="vistaAgenda" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-white mb-4">Log de Eventos 🗃️</h2>
+                <h2 class="text-2xl font-bold mb-4 font-['Lora']">Registro de Profecías y Eventos ✨</h2>
                 
-                <h3 class="text-xl font-semibold text-gray-300 mb-2">Próximos Eventos</h3>
-                <div id="listaEventos" class="mb-6">
+                <h3 class="text-xl font-semibold mb-2 font-['Lora']">Próximas Profecías</h3>
+                <div id="listaEventos" class="mb-6 space-y-3 font-['Inter']">
                     <!-- Los eventos de la agenda se renderizan aquí -->
                 </div>
                 
-                <h3 class="text-xl font-semibold text-gray-300 mb-2">Añadir/Editar Evento</h3>
+                <h3 class="text-xl font-semibold mb-2 font-['Lora']">Añadir/Editar Profecía</h3>
                 <form id="formAgenda" class="space-y-3 p-4 rounded-lg shadow-inner">
                     <input type="hidden" id="agendaId" value="">
                     
                     <div>
-                        <label for="agendaFecha" class="block text-sm font-medium text-gray-300">Fecha</label>
-                        <input type="date" id="agendaFecha" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        <label for="agendaFecha" class="block text-sm font-medium">Fecha de Profecía</label>
+                        <input type="date" id="agendaFecha" required class="mt-1 block w-full rounded-md shadow-sm p-2">
                     </div>
                     
                     <div>
-                        <label for="agendaHora" class="block text-sm font-medium text-gray-300">Hora (Opcional)</label>
-                        <input type="time" id="agendaHora" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
+                        <label for="agendaHora" class="block text-sm font-medium">Hora (Opcional)</label>
+                        <input type="time" id="agendaHora" class="mt-1 block w-full rounded-md shadow-sm p-2">
                     </div>
                     
                     <div class="flex space-x-3">
                         <div class="flex-1">
-                            <label for="agendaAsignatura" class="block text-sm font-medium text-gray-300">Asignatura/Tema</label>
-                            <input type="text" id="agendaAsignatura" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Boss Fight - Cálculo">
+                            <label for="agendaAsignatura" class="block text-sm font-medium">Asignatura/Tema Mágico</label>
+                            <input type="text" id="agendaAsignatura" required class="mt-1 block w-full rounded-md shadow-sm p-2" placeholder="Ej: Encantamientos Avanzados">
                         </div>
                         <div class="flex-1">
-                            <label for="agendaTipo" class="block text-sm font-medium text-gray-300">Tipo de Evento</label>
-                            <select id="agendaTipo" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                                <option value="Examen">Examen</option>
-                                <option value="Cita">Cita / Médico</option>
-                                <option value="Entrega">Entrega de Trabajo</option>
-                                <option value="Otro">Otro</option>
+                            <label for="agendaTipo" class="block text-sm font-medium">Tipo de Evento</label>
+                            <select id="agendaTipo" required class="mt-1 block w-full rounded-md shadow-sm p-2 bg-white">
+                                <option value="Examen">T.I.M.O / E.X.T.A.S.I.S</option>
+                                <option value="Cita">Visita a Madame Pomfrey</option>
+                                <option value="Entrega">Entrega de Pergamino</option>
+                                <option value="Otro">Otro Evento Mágico</option>
                             </select>
                         </div>
                     </div>
                     
                     <div>
-                        <label for="agendaComentarios" class="block text-sm font-medium text-gray-300">Comentarios</label>
-                        <textarea id="agendaComentarios" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Notas de misión..."></textarea>
+                        <label for="agendaComentarios" class="block text-sm font-medium">Comentarios / Hechizos</label>
+                        <textarea id="agendaComentarios" rows="2" class="mt-1 block w-full rounded-md shadow-sm p-2" placeholder="Detalles de la profecía..."></textarea>
                     </div>
                     
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-lg text-sm font-medium text-white bg-sky-500 hover:bg-sky-600 transition">
-                        Registrar Misión
+                    <button type="submit" class="w-full py-2 px-4 rounded-md shadow-lg text-sm transition">
+                        Registrar Profecía
                     </button>
                 </form>
             </section>
 
             <!-- Botón de Reset -->
             <div class="text-center mt-6">
-                <button id="btnReset" class="text-xs text-gray-500 hover:text-red-500 transition">Reiniciar Todos los Datos (Protocolo Nuke)</button>
+                <button id="btnReset" class="text-xs text-gray-500 hover:text-red-700 transition font-['Inter']">Reiniciar Todos los Datos (Obliviate Total)</button>
             </div>
             
         </main>
 
-        <!-- DOCK DE NAVEGACIÓN (Fijo en el fondo) -->
-        <footer class="fixed inset-x-0 bottom-0 max-w-xl mx-auto bg-slate-900 border-t-2 border-sky-400 shadow-2xl rounded-t-xl z-10">
+        <!-- DOCK DE NAVEGACIÓN (Libro de Hechizos) -->
+        <footer class="fixed inset-x-0 bottom-0 max-w-xl mx-auto dock-footer shadow-2xl rounded-t-xl z-10 font-['Inter']">
             <div class="flex justify-around items-center p-2">
                 
                 <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center">
-                    <span class="text-2xl">📋</span>
+                    <span class="text-2xl">🪄</span>
                     <span class="text-xs font-medium mt-1">Misiones</span>
                 </button>
                 
                 <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center">
-                    <span class="text-2xl">🎁</span>
+                    <span class="text-2xl">🪙</span>
                     <span class="text-xs font-medium mt-1">Canje</span>
                 </button>
 
                 <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center">
-                    <span class="text-2xl">⏰</span>
-                    <span class="text-xs font-medium mt-1">Cronograma</span>
+                    <span class="text-2xl">🦉</span>
+                    <span class="text-xs font-medium mt-1">Mapa</span>
                 </button>
 
                 <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center">
-                    <span class="text-2xl">📅</span>
+                    <span class="text-2xl">📜</span>
                     <span class="text-xs font-medium mt-1">Log</span>
                 </button>
             </div>
@@ -344,10 +377,10 @@
     
     // Sonidos (URLs estables de Google CDN)
     const SONIDOS = {
-        exito: new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
-        nivel: new Audio('https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'),
-        error: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
-        caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
+        exito: new Audio('https://actions.google.com/sounds/v1/fantasy/magic_chime_sound.ogg'), // Chime mágico
+        nivel: new Audio('https://actions.google.com/sounds/v1/cartoon/trumpet_flourish.ogg'), // Fanfarria
+        error: new Audio('https://actions.google.com/sounds/v1/cartoon/slide_whistle.ogg'), // Error divertido
+        caja: new Audio('https://actions.google.com/sounds/v1/objects/coins_in_hand.ogg') // Monedas
     };
 
     // --- HORARIO SEMANAL COMPLETO ---
@@ -411,24 +444,24 @@
     // --- LISTADO DE TAREAS ---
     const catalogoTareas = [
         {
-            categoria: "Aseo e Higiene Personal 🧴",
+            categoria: "Pociones y Encantamientos Diarios ✨",
             items: [
-                { id: "dientes", nombre: "Lavarse bien los dientes", pts: 2, min: 5 },
-                { id: "ducha", nombre: "Ducharse bien", pts: 2, min: 10 },
-                { id: "desodorante", nombre: "Usar desodorante", pts: 1, min: 1 }
+                { id: "dientes", nombre: "Dientes (Hechizo de Limpieza)", pts: 2, min: 5 },
+                { id: "ducha", nombre: "Ducharse (Poción Purificadora)", pts: 2, min: 10 },
+                { id: "desodorante", nombre: "Usar desodorante (Esencia)", pts: 1, min: 1 }
             ]
         },
         {
-            categoria: "Académico 📚",
+            categoria: "Clases y Deberes 🦉",
             items: [
-                { id: "deberes", nombre: "Hacer deberes", pts: 1, min: 30 },
-                { id: "estudiar", nombre: "Estudiar para controles", pts: 2, min: 45 },
-                { id: "leer", nombre: "Leer 15 Min", pts: 5, min: 15 },
-                { id: "repaso", nombre: "Repaso Contenidos", pts: 3, min: 20 }
+                { id: "deberes", nombre: "Hacer deberes (Tarea)", pts: 1, min: 30 },
+                { id: "estudiar", nombre: "Estudiar para T.I.M.O.", pts: 2, min: 45 },
+                { id: "leer", nombre: "Lectura 15 Min (Biblioteca)", pts: 5, min: 15 },
+                { id: "repaso", nombre: "Repaso de Contenidos", pts: 3, min: 20 }
             ]
         },
         {
-            categoria: "Hogar 🏠",
+            categoria: "Mantenimiento del Castillo 🏰",
             items: [
                 { id: "ordenar", nombre: "Ordenar habitación", pts: 1, min: 10 },
                 { id: "limpiar", nombre: "Limpiar habitación", pts: 2, min: 20 },
@@ -437,7 +470,7 @@
             ]
         },
         {
-            categoria: "General ⭐",
+            categoria: "Comportamiento Mágico ⭐",
             items: [
                 { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
                 { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
@@ -449,15 +482,15 @@
     // --- CATÁLOGO DE PREMIOS CON DOBLE MONEDA (PUNTOS Y MINUTOS) ---
     const catalogoPremios = [
         // Premios de Puntos
-        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
-        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120, moneda: 'puntos' },
-        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
-        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
+        { id: 'peli', nombre: 'Noche de Cine (Cámara de los Secretos)', icono: '🎬', coste: 250, moneda: 'puntos' },
+        { id: 'helado', nombre: 'Comer Helado (Honeydukes)', icono: '🍦', coste: 120, moneda: 'puntos' },
+        { id: 'parque', nombre: 'Visita a Hogsmeade', icono: '🛝', coste: 200, moneda: 'puntos' },
+        { id: 'pizza', nombre: 'Cena de Gran Comedor', icono: '🍕', coste: 200, moneda: 'puntos' },
         // Premios de Minutos (Tiempo de Pantalla)
-        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
-        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
+        { id: 'tablet', nombre: '30 min de Telaraña (Web)', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
+        { id: 'consola', nombre: '1 Hora de Partida de Quidditch', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
+        { id: 'movil', nombre: '1 Hora de Radio Mágica', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
+        { id: 'ordenador', nombre: '1 Hora de G.E.M.A. (PC)', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
     ];
 
     // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE POR SIMPLICIDAD) ---
@@ -529,7 +562,7 @@
             estado.nivel = nivelReal;
             lanzarConfeti();
             reproducir('nivel');
-            console.log(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`);
+            console.log(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL MÁGICO ${estado.nivel}! 🎉`);
             guardar();
         }
     }
@@ -543,7 +576,13 @@
 
     function lanzarConfeti() {
         if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            // Confeti con colores de Gryffindor
+            confetti({ 
+                particleCount: 150, 
+                spread: 70, 
+                origin: { y: 0.6 },
+                colors: ['#740001', '#eeb111', '#a80000', '#f9f6e6'] 
+            });
         }
     }
     
@@ -568,27 +607,30 @@
             details.open = true;
             
             const summary = document.createElement('summary');
+            summary.className = "p-2 rounded-t-lg cursor-pointer";
             summary.textContent = grupo.categoria;
             details.appendChild(summary);
 
             grupo.items.forEach(tarea => {
                 const div = document.createElement('div');
-                div.className = 'task';
+                div.className = 'task p-3 flex justify-between items-center rounded-lg mt-1';
                 const estadoTarea = estado.tareasHoy[tarea.id];
                 if (estadoTarea === 'hecho') div.classList.add('completed');
                 if (estadoTarea === 'fail') div.classList.add('failed');
 
                 div.innerHTML = `
-                    <div class="task-info">
-                        <span class="text-white">${tarea.nombre}</span>
-                        <span class="task-pts">+${tarea.pts} pts ${tarea.min > 0 ? '• ' + tarea.min + ' min' : ''}</span>
+                    <div class="task-info flex-1">
+                        <span class="text-lg font-['Lora']">${tarea.nombre}</span>
+                        <div class="task-pts text-sm font-['Inter'] mt-1">
+                            +${tarea.pts} Galeones ${tarea.min > 0 ? '• ' + tarea.min + ' M. Mágicos' : ''}
+                        </div>
                     </div>
-                    <div class="task-buttons">
+                    <div class="task-buttons flex space-x-2">
                         ${!estadoTarea ? `
-                        <button class="btn-circle check">✔</button>
-                        <button class="btn-circle cross">✖</button>
+                        <button class="btn-circle check flex items-center justify-center rounded-full hover:shadow-lg transition">✔</button>
+                        <button class="btn-circle cross flex items-center justify-center rounded-full hover:shadow-lg transition">✖</button>
                         ` : `
-                        <span>${estadoTarea === 'hecho' ? '✅' : '❌'}</span>
+                        <span class="text-2xl">${estadoTarea === 'hecho' ? '✅' : '❌'}</span>
                         `}
                     </div>
                 `;
@@ -614,32 +656,32 @@
         const messageBody = document.getElementById('storeMessageBody');
 
         if (isWeekend) {
-            messageDiv.className = 'mb-4 p-3 bg-green-900/50 text-green-300 border border-green-400 rounded-lg text-center shadow-lg';
+            messageDiv.className = 'mb-4 p-3 bg-green-200 text-green-800 border-l-4 border-green-500 rounded-lg text-center shadow-md';
             messageTitle.textContent = '¡HOY ES FIN DE SEMANA! 🎉';
-            messageBody.textContent = '¡Ya puedes canjear tus premios! ¡Felicidades por tu esfuerzo!';
+            messageBody.textContent = '¡La Bóveda de Gringotts está abierta! Puedes canjear tus Galeones y Minutos Mágicos.';
         } else {
-            messageDiv.className = 'mb-4 p-3 bg-red-900/50 text-red-300 border border-red-400 rounded-lg text-center shadow-lg';
-            messageTitle.textContent = 'Canje de Premios: ¡SÓLO FINES DE SEMANA! 🛑';
-            messageBody.textContent = 'Aún no es momento de canjear. Sigue acumulando puntos y minutos para el Sábado y Domingo.';
+            messageDiv.className = 'mb-4 p-3 bg-red-200 text-red-800 border-l-4 border-red-500 rounded-lg text-center shadow-md';
+            messageTitle.textContent = 'Canje de Premios: ¡SOLO FINES DE SEMANA! 🛑';
+            messageBody.textContent = 'La bóveda se abre el Sábado y el Domingo. Sigue acumulando monedas hasta entonces.';
         }
 
 
         catalogoPremios.forEach(premio => {
             
-            const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
+            const monedaSimbolo = premio.moneda === 'minutos' ? 'M. Mág.' : 'Galeones';
             const cantidadDisponible = premio.moneda === 'minutos' ? estado.minutos : estado.puntos;
 
             const puedeComprar = cantidadDisponible >= premio.coste;
             
             const card = document.createElement('div');
-            card.className = 'premio-card';
+            card.className = 'premio-card p-3 rounded-lg flex flex-col items-center text-center cursor-pointer';
             // Opacidad reducida si no puede comprar O si no es fin de semana.
-            card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.5';
+            card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.6';
 
             card.innerHTML = `
-                <div class="premio-icono">${premio.icono}</div>
-                <div style="font-weight:bold; color: #e5e7eb;">${premio.nombre}</div>
-                <div class="price-tag">${premio.coste} ${monedaSimbolo}</div>
+                <div class="text-4xl mb-2">${premio.icono}</div>
+                <div class="font-bold text-base mb-2">${premio.nombre}</div>
+                <div class="price-tag mt-auto">${premio.coste} ${monedaSimbolo}</div>
             `;
 
             card.addEventListener('click', () => {
@@ -683,20 +725,20 @@
         
         dias.forEach(dia => {
             const diaDiv = document.createElement('div');
-            diaDiv.className = 'horario-dia';
+            diaDiv.className = 'horario-dia p-3 rounded-lg';
 
             const titulo = document.createElement('div');
-            titulo.className = 'dia-titulo';
+            titulo.className = 'dia-titulo p-2 rounded-t text-center mb-2';
             titulo.textContent = dia;
             diaDiv.appendChild(titulo);
 
             horarioSemanal[dia].forEach(asignatura => {
                 const asigDiv = document.createElement('div');
                 // Añadimos una clase condicional para extraescolares
-                asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : 'text-white'}`;
+                asigDiv.className = `asignatura p-2 flex justify-between items-center text-sm rounded-sm ${asignatura.tipo === 'extra' ? 'extra-curricular' : 'text-gray-800'}`;
                 asigDiv.innerHTML = `
-                    <span class="asignatura-nombre">${asignatura.nombre}</span>
-                    <span class="asignatura-hora text-gray-400">${asignatura.hora}</span>
+                    <span class="asignatura-nombre font-bold">${asignatura.nombre}</span>
+                    <span class="asignatura-hora text-gray-600">${asignatura.hora}</span>
                 `;
                 diaDiv.appendChild(asigDiv);
             });
@@ -715,7 +757,7 @@
         );
 
         if (eventosOrdenados.length === 0) {
-            ui.listaEventos.innerHTML = '<p class="text-gray-500 text-center">No hay eventos próximos en el log.</p>';
+            ui.listaEventos.innerHTML = '<p class="text-gray-500 text-center mt-5">No hay profecías registradas. ¡Tranquilidad mágica!</p>';
             return;
         }
 
@@ -723,18 +765,28 @@
             const card = document.createElement('div');
             // Añade una clase para estilizar según el tipo (e.g., examen, cita)
             let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
-            card.className = `agenda-card ${tipoClase}`;
+            
+            // Mapeo de tipos para los títulos de Agenda/HP
+            let tituloDisplay;
+            switch(evento.tipo) {
+                case 'Examen': tituloDisplay = 'T.I.M.O / E.X.T.A.S.I.S'; break;
+                case 'Cita': tituloDisplay = 'Visita a Madame Pomfrey'; break;
+                case 'Entrega': tituloDisplay = 'Entrega de Pergamino'; break;
+                default: tituloDisplay = evento.tipo;
+            }
+
+            card.className = `agenda-card p-3 rounded-lg shadow-md transition ${tipoClase}`;
 
             card.innerHTML = `
-                <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
-                <div class="agenda-info-row">
-                    <span>Fecha: ${new Date(evento.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                    <span>Hora: ${evento.hora || 'N/A'}</span>
+                <div class="agenda-title text-lg mb-1">${tituloDisplay}: ${evento.asignatura}</div>
+                <div class="agenda-info-row flex justify-between text-sm mb-2">
+                    <span>📅 Fecha: ${new Date(evento.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                    <span>⏰ Hora: ${evento.hora || 'N/A'}</span>
                 </div>
-                ${evento.comentarios ? `<p class="agenda-comments text-gray-300">${evento.comentarios}</p>` : ''}
-                <div class="agenda-actions">
-                    <button class="btn-edit btn-secondary" data-id="${evento.id}">📝 Editar</button>
-                    <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
+                ${evento.comentarios ? `<p class="agenda-comments p-2 text-xs italic rounded-md mt-2">${evento.comentarios}</p>` : ''}
+                <div class="agenda-actions flex justify-end space-x-2 mt-3">
+                    <button class="btn-edit text-xs px-2 py-1 rounded hover:opacity-80 transition" data-id="${evento.id}">📝 Editar</button>
+                    <button class="btn-delete text-xs px-2 py-1 rounded hover:opacity-80 transition" data-id="${evento.id}">🗑️ Eliminar</button>
                 </div>
             `;
 
@@ -766,7 +818,17 @@
         document.getElementById('agendaFecha').value = evento.fecha;
         document.getElementById('agendaHora').value = evento.hora || '';
         document.getElementById('agendaAsignatura').value = evento.asignatura;
-        document.getElementById('agendaTipo').value = evento.tipo;
+        
+        // Mapeo de tipos de vuelta al formulario
+        let tipoValor;
+        switch(evento.tipo) {
+            case 'T.I.M.O / E.X.T.A.S.I.S': tipoValor = 'Examen'; break;
+            case 'Visita a Madame Pomfrey': tipoValor = 'Cita'; break;
+            case 'Entrega de Pergamino': tipoValor = 'Entrega'; break;
+            default: tipoValor = evento.tipo; // Usa el valor original si no coincide
+        }
+
+        document.getElementById('agendaTipo').value = tipoValor;
         document.getElementById('agendaComentarios').value = evento.comentarios || '';
         
         // Mover la vista a la Agenda y hacer scroll al formulario (opcional pero útil)
@@ -781,15 +843,24 @@
         const fecha = document.getElementById('agendaFecha').value;
         const hora = document.getElementById('agendaHora').value;
         const asignatura = document.getElementById('agendaAsignatura').value;
-        const tipo = document.getElementById('agendaTipo').value;
+        const tipoInput = document.getElementById('agendaTipo').value;
         const comentarios = document.getElementById('agendaComentarios').value;
+
+        // Mapeo de tipos para guardar el nombre temático
+        let tipoTematico;
+        switch(tipoInput) {
+            case 'Examen': tipoTematico = 'T.I.M.O / E.X.T.A.S.I.S'; break;
+            case 'Cita': tipoTematico = 'Visita a Madame Pomfrey'; break;
+            case 'Entrega': tipoTematico = 'Entrega de Pergamino'; break;
+            default: tipoTematico = 'Otro Evento Mágico';
+        }
 
         const nuevoEvento = {
             id: id || generarId(),
             fecha,
             hora,
             asignatura,
-            tipo,
+            tipo: tipoTematico,
             comentarios
         };
 
@@ -798,12 +869,12 @@
             const index = estado.agendaEventos.findIndex(e => e.id === id);
             if (index !== -1) {
                 estado.agendaEventos[index] = nuevoEvento;
-                console.log('Evento actualizado con éxito. 🎉');
+                console.log('Profecía mágica actualizada con éxito. 🎉');
             }
         } else {
             // Creación: Añadir nuevo evento
             estado.agendaEventos.push(nuevoEvento);
-            console.log('Nuevo evento guardado. 🎉');
+            console.log('Nueva Profecía registrada. 🎉');
         }
 
         guardar();
@@ -814,12 +885,12 @@
 
     function eliminarEvento(id) {
         // Usamos confirm() temporalmente para simular un modal
-        if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
+        if (window.confirm('¿Seguro que quieres borrar esta Profecía (Usar Hechizo Obliviate)?')) {
             estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
             guardar();
             renderizarAgenda();
             reproducir('error');
-            console.log('Evento eliminado.');
+            console.log('Profecía eliminada.');
         }
     }
 
@@ -865,7 +936,7 @@
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
-            console.log("Ya has recogido el premio diario de hoy. Vuelve mañana.");
+            console.log("Ya has recogido la poción diaria de hoy. Vuelve mañana.");
             reproducir('error');
             return;
         }
@@ -874,12 +945,12 @@
         estado.ultimoDiario = hoy; 
         reproducir('exito');
         guardar();
-        console.log("+10 Puntos recibidos 🎁");
+        console.log("+10 Galeones recibidos 💰");
     });
 
     ui.btnSemanal.addEventListener('click', () => {
         // Usamos confirm() temporalmente para simular un modal
-        if(window.confirm("¿Reclamar premio semanal (+70)?")) {
+        if(window.confirm("¿Reclamar Elixir Semanal (+70 Galeones)?")) {
             estado.puntos += 70;
             reproducir('nivel');
             guardar();
@@ -888,7 +959,7 @@
 
     ui.btnReset.addEventListener('click', () => {
         // Usamos confirm() temporalmente para simular un modal
-        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos y nivel.")) {
+        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos, nivel y eventos. (Hechizo Obliviate Total)")) {
             localStorage.removeItem('shukudai_v3_data');
             location.reload();
         }
