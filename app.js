@@ -108,11 +108,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
+    // --- CATÁLOGO DE PREMIOS ACTUALIZADO ---
     const catalogoPremios = [
-        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 100 },
-        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 50 },
-        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 30 },
+        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250 },
+        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120 },
+        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200 },
         { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 80 },
+        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 150 },
+        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 150 },
+        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 150 },
         { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200 }
     ];
 
