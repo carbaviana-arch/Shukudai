@@ -12,37 +12,61 @@ document.addEventListener('DOMContentLoaded', () => {
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
-    // --- HORARIO SEMANAL ---
+    // --- HORARIO SEMANAL COMPLETO ---
     const horarioSemanal = {
         Lunes: [
-            { nombre: "Lengua", hora: "09:00 - 10:00" },
-            { nombre: "Matemáticas", hora: "10:00 - 11:00" },
-            { nombre: "Recreo", hora: "11:00 - 11:30" },
-            { nombre: "Inglés", hora: "11:30 - 12:30" }
+            { nombre: "P.E. (Educación Física)", hora: "09:00 - 09:45" },
+            { nombre: "Religión", hora: "09:45 - 10:30" },
+            { nombre: "Lengua", hora: "10:30 - 11:15" },
+            { nombre: "Matemáticas", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Values / Ética", hora: "12:30 - 13:15" },
+            { nombre: "English (Inglés)", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
         ],
         Martes: [
-            { nombre: "Ciencias Sociales", hora: "09:00 - 10:30" },
-            { nombre: "Música", hora: "10:30 - 11:00" },
-            { nombre: "Recreo", hora: "11:00 - 11:30" },
-            { nombre: "Educación Física", hora: "11:30 - 12:30" }
+            { nombre: "Religión", hora: "09:00 - 09:45" },
+            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
+            { nombre: "Inglés", hora: "10:30 - 11:15" },
+            { nombre: "Lengua", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Ciencias Naturales", hora: "12:30 - 13:15" },
+            { nombre: "P.E. (Educación Física)", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" }, 
+            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 19:00", tipo: "extra" },
+            { nombre: "Programación 💻 (Extraescolar)", hora: "19:00 - 20:00", tipo: "extra" }
         ],
         Miercoles: [
-            { nombre: "Matemáticas", hora: "09:00 - 10:00" },
-            { nombre: "Ciencias Naturales", hora: "10:00 - 11:00" },
-            { nombre: "Recreo", hora: "11:00 - 11:30" },
-            { nombre: "Lengua", hora: "11:30 - 12:30" }
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Values / Ética", hora: "09:45 - 10:30" },
+            { nombre: "Inglés", hora: "10:30 - 11:15" },
+            { nombre: "Arts / Plástica", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Ciencias Sociales", hora: "12:30 - 13:15" },
+            { nombre: "Lengua", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
         ],
         Jueves: [
-            { nombre: "Inglés", hora: "09:00 - 10:30" },
-            { nombre: "Plástica", hora: "10:30 - 11:00" },
-            { nombre: "Recreo", hora: "11:00 - 11:30" },
-            { nombre: "Tutoría", hora: "11:30 - 12:30" }
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Ciencias Naturales", hora: "09:45 - 10:30" },
+            { nombre: "Ciencias Sociales", hora: "10:30 - 11:15" },
+            { nombre: "Lengua", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Lengua", hora: "12:30 - 13:15" },
+            { nombre: "Inglés", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" },
+            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 17:45", tipo: "extra" },
+            { nombre: "Inglés 🇬🇧 (Extraescolar)", hora: "17:45 - 19:00", tipo: "extra" }
         ],
         Viernes: [
-            { nombre: "Lengua", hora: "09:00 - 10:00" },
-            { nombre: "Educación Física", hora: "10:00 - 11:00" },
-            { nombre: "Recreo", hora: "11:00 - 11:30" },
-            { nombre: "Matemáticas", hora: "11:30 - 12:30" }
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
+            { nombre: "P.E. (Educación Física)", hora: "10:30 - 11:15" },
+            { nombre: "Música", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "English (Inglés)", hora: "12:30 - 13:15" },
+            { nombre: "Lengua", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
         ]
     };
     
@@ -92,15 +116,16 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200 }
     ];
 
-    // --- 2. ESTADO Y PERSISTENCIA ---
+    // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE POR SIMPLICIDAD) ---
     // Incluimos agendaEventos en el estado
     let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
         puntos: 0,
         minutos: 0,
         nivel: 1,
         tareasHoy: {},
-        agendaEventos: [], // NUEVO: Array para guardar eventos de agenda
-        ultimaFecha: new Date().toDateString()
+        agendaEventos: [], 
+        ultimaFecha: new Date().toDateString(),
+        ultimoDiario: null,
     };
 
     // --- 3. LÓGICA DE NUEVO DÍA ---
@@ -109,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log("¡Nuevo día detectado! Reseteando tareas.");
         estado.tareasHoy = {}; 
         estado.ultimaFecha = hoy;
+        // No reseteamos el 'ultimoDiario' aquí, se maneja en el botón de premio.
         guardar();
     }
 
@@ -122,16 +148,16 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedorCategorias: document.getElementById('categorias'),
         contenedorPremios: document.getElementById('contenedorPremios'),
         contenedorHorario: document.getElementById('contenedorHorario'),
-        listaEventos: document.getElementById('listaEventos'), // NUEVO
-        formAgenda: document.getElementById('formAgenda'), // NUEVO
+        listaEventos: document.getElementById('listaEventos'), 
+        formAgenda: document.getElementById('formAgenda'), 
         vistaTareas: document.getElementById('vistaTareas'),
         vistaTienda: document.getElementById('vistaTienda'),
         vistaHorario: document.getElementById('vistaHorario'),
-        vistaAgenda: document.getElementById('vistaAgenda'), // NUEVO
+        vistaAgenda: document.getElementById('vistaAgenda'), 
         btnHome: document.getElementById('homeBtn'),
         btnShop: document.getElementById('shopBtn'),
         btnSchedule: document.getElementById('scheduleBtn'),
-        btnAgenda: document.getElementById('agendaBtn'), // NUEVO
+        btnAgenda: document.getElementById('agendaBtn'), 
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
         btnSemanal: document.getElementById('btnPremioSemanal')
@@ -160,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             estado.nivel = nivelReal;
             lanzarConfeti();
             reproducir('nivel');
-            alert(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`); 
+            console.log(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`);
             guardar();
         }
     }
@@ -250,10 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
             card.addEventListener('click', () => {
                 if (!puedeComprar) {
                     reproducir('error');
-                    alert(`Te faltan ${premio.coste - estado.puntos} puntos.`); 
+                    console.log(`Te faltan ${premio.coste - estado.puntos} puntos.`); 
                     return;
                 }
-                if (confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} puntos?`)) {
+                // Usamos confirm() temporalmente para simular un modal
+                if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} puntos?`)) {
                     estado.puntos -= premio.coste;
                     reproducir('caja');
                     lanzarConfeti(); 
@@ -281,7 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             horarioSemanal[dia].forEach(asignatura => {
                 const asigDiv = document.createElement('div');
-                asigDiv.className = 'asignatura';
+                // Añadimos una clase condicional para extraescolares
+                asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : ''}`;
                 asigDiv.innerHTML = `
                     <span class="asignatura-nombre">${asignatura.nombre}</span>
                     <span class="asignatura-hora">${asignatura.hora}</span>
@@ -302,13 +330,16 @@ document.addEventListener('DOMContentLoaded', () => {
             new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00'))
         );
 
+        if (eventosOrdenados.length === 0) {
+            ui.listaEventos.innerHTML = '<p class="text-gray-500">No hay eventos próximos en la agenda.</p>';
+            return;
+        }
+
         eventosOrdenados.forEach(evento => {
             const card = document.createElement('div');
             // Añade una clase para estilizar según el tipo (e.g., examen, cita)
             let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
             card.className = `agenda-card ${tipoClase}`;
-
-            const horaMostrar = evento.hora ? ` • ${evento.hora}` : '';
 
             card.innerHTML = `
                 <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
@@ -383,12 +414,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const index = estado.agendaEventos.findIndex(e => e.id === id);
             if (index !== -1) {
                 estado.agendaEventos[index] = nuevoEvento;
-                alert('Evento actualizado con éxito. 🎉');
+                console.log('Evento actualizado con éxito. 🎉');
             }
         } else {
             // Creación: Añadir nuevo evento
             estado.agendaEventos.push(nuevoEvento);
-            alert('Nuevo evento guardado. 🎉');
+            console.log('Nuevo evento guardado. 🎉');
         }
 
         guardar();
@@ -398,12 +429,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function eliminarEvento(id) {
-        if (confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
+        // Usamos confirm() temporalmente para simular un modal
+        if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
             estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
             guardar();
             renderizarAgenda();
             reproducir('error');
-            alert('Evento eliminado.');
+            console.log('Evento eliminado.');
         }
     }
 
@@ -438,18 +470,18 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarHorario();
     });
 
-    ui.btnAgenda.addEventListener('click', () => { // NUEVO EVENTO
+    ui.btnAgenda.addEventListener('click', () => { 
         mostrarVista('vistaAgenda', ui.btnAgenda);
         renderizarAgenda();
     });
 
-    ui.formAgenda.addEventListener('submit', guardarEvento); // NUEVO EVENTO
+    ui.formAgenda.addEventListener('submit', guardarEvento); 
 
     // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET ---
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
-            alert("Ya has recogido el premio diario de hoy. Vuelve mañana.");
+            console.log("Ya has recogido el premio diario de hoy. Vuelve mañana.");
             reproducir('error');
             return;
         }
@@ -458,11 +490,12 @@ document.addEventListener('DOMContentLoaded', () => {
         estado.ultimoDiario = hoy; 
         reproducir('exito');
         guardar();
-        alert("+10 Puntos recibidos 🎁");
+        console.log("+10 Puntos recibidos 🎁");
     });
 
     ui.btnSemanal.addEventListener('click', () => {
-        if(confirm("¿Reclamar premio semanal (+70)?")) {
+        // Usamos confirm() temporalmente para simular un modal
+        if(window.confirm("¿Reclamar premio semanal (+70)?")) {
             estado.puntos += 70;
             reproducir('nivel');
             guardar();
@@ -470,7 +503,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ui.btnReset.addEventListener('click', () => {
-        if(confirm("⚠️ ¿BORRAR TODO? Se perderán puntos y nivel.")) {
+        // Usamos confirm() temporalmente para simular un modal
+        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos y nivel.")) {
             localStorage.removeItem('shukudai_v3_data');
             location.reload();
         }
