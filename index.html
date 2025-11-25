@@ -1,135 +1,528 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Shukudai 2.6 - Agenda y Horario</title>
-  <link rel="stylesheet" href="style.css" />
-  <!-- Librería ligera para el efecto de confeti -->
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shukudai v2.6</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 1rem 0;
+        }
+
+        /* Contenedor Principal de la App */
+        .app-container {
+            width: 100%;
+            max-width: 420px; /* Tamaño típico de móvil */
+            min-height: 80vh;
+            background-color: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Encabezado/Marcador */
+        .header {
+            background-image: linear-gradient(to right, #4c51bf, #6b46c1); /* Indigo to Purple */
+            color: white;
+            padding: 1.5rem 1.5rem 2rem 1.5rem;
+            border-bottom-left-radius: 1.5rem;
+            border-bottom-right-radius: 1.5rem;
+            position: relative;
+        }
+
+        .stat-card {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            flex: 1;
+            margin: 0 0.25rem;
+        }
+        .stat-card:first-child { margin-left: 0; }
+        .stat-card:last-child { margin-right: 0; }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            opacity: 0.8;
+            margin-top: 0.25rem;
+        }
+
+        /* Barra de Nivel/XP */
+        .xp-bar-container {
+            margin-top: 1rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 9999px;
+            height: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        #xpFill {
+            height: 100%;
+            background-color: #f6e05e; /* Yellow */
+            transition: width 0.5s ease-out;
+            border-radius: 9999px;
+        }
+        #xpTexto {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #2d3748; /* Dark text on XP bar */
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Contenido Principal y Vistas */
+        .main-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 4rem; /* Espacio para el dock */
+        }
+        .view {
+            display: none;
+        }
+
+        /* Tareas */
+        details {
+            margin-bottom: 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            background-color: #f7fafc;
+            overflow: hidden;
+        }
+        summary {
+            font-weight: 600;
+            padding: 1rem;
+            background-color: #edf2f7;
+            border-bottom: 1px solid #e2e8f0;
+            cursor: pointer;
+            list-style: none; /* Elimina la flecha por defecto */
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary {
+            border-bottom: 1px solid #cbd5e0;
+        }
+        
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f7fafc;
+            background-color: white;
+            transition: background-color 0.3s ease;
+        }
+        .task:last-child {
+            border-bottom: none;
+        }
+        .task.completed {
+            background-color: #e6fffa; /* Greenish background for completed */
+        }
+        .task.failed {
+            background-color: #fff5f5; /* Reddish background for failed */
+        }
+        .task-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .task-pts {
+            font-size: 0.75rem;
+            color: #4a5568;
+            margin-top: 0.25rem;
+        }
+        
+        .btn-circle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-weight: 700;
+            border: none;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+        .btn-circle:active {
+            transform: scale(0.95);
+        }
+        .check {
+            background-color: #48bb78; /* Green */
+            color: white;
+        }
+        .cross {
+            background-color: #f56565; /* Red */
+            color: white;
+        }
+
+        /* Tienda */
+        .premio-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .premio-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .premio-icono {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .price-tag {
+            background-color: #f6e05e; /* Yellow */
+            color: #2d3748;
+            font-weight: 700;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            margin-top: 0.5rem;
+        }
+
+        /* Horario */
+        .horario-dia {
+            margin-bottom: 1.5rem;
+            padding: 0.5rem;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .dia-titulo {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #4c51bf;
+            padding: 0.5rem 0;
+            border-bottom: 2px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+        .asignatura {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed #ebf4ff;
+            font-weight: 500;
+        }
+        .asignatura:last-child {
+            border-bottom: none;
+        }
+        .asignatura-nombre {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .asignatura-hora {
+            color: #718096;
+            font-size: 0.9rem;
+        }
+        
+        /* Estilo para actividades extraescolares (NUEVO) */
+        .asignatura.extra-curricular {
+            background-color: #fff7ed; /* Light orange background */
+            border-left: 4px solid #ed8936; /* Orange bar */
+            padding-left: 0.75rem;
+            border-radius: 0.25rem;
+            margin: 0.25rem 0;
+            color: #9c4221;
+        }
+        .asignatura.extra-curricular .asignatura-nombre {
+            color: #9c4221;
+        }
+        .asignatura.extra-curricular .asignatura-hora {
+            color: #dd6b20;
+        }
+
+
+        /* Agenda */
+        .agenda-card {
+            background-color: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: border-left 0.3s ease;
+            border-left: 5px solid #a0aec0; /* Default gray border */
+        }
+
+        /* Colores según Tipo de Evento */
+        .agenda-card.examen, .agenda-card.control {
+            border-left-color: #e53e3e; /* Red for Exams/Tests */
+            background-color: #fff5f5;
+        }
+        .agenda-card.cita {
+            border-left-color: #3182ce; /* Blue for Appointments */
+            background-color: #ebf8ff;
+        }
+        .agenda-card.actividad {
+            border-left-color: #38a169; /* Green for Activities */
+            background-color: #f0fff4;
+        }
+
+        .agenda-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #2d3748;
+        }
+        .agenda-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        .agenda-comments {
+            font-style: italic;
+            font-size: 0.9rem;
+            color: #718096;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .agenda-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            justify-content: flex-end;
+        }
+        .agenda-actions button {
+            padding: 0.3rem 0.6rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: background-color 0.2s;
+        }
+        .btn-delete {
+            background-color: #f56565;
+            color: white;
+        }
+        .btn-delete:hover {
+            background-color: #e53e3e;
+        }
+        .btn-secondary {
+            background-color: #edf2f7;
+            color: #4a5568;
+            border-color: #cbd5e0;
+        }
+        .btn-secondary:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Botón de reset */
+        #btnReset {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        #btnReset:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Dock de Navegación (Bottom Nav) */
+        .nav-dock {
+            position: fixed; /* Fixed position */
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 420px; 
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-around;
+            padding: 0.5rem 0;
+            border-top-left-radius: 1.5rem;
+            border-top-right-radius: 1.5rem;
+            z-index: 1000; /* Asegura que esté encima del contenido */
+        }
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            cursor: pointer;
+            color: #a0aec0; /* Gray default */
+            transition: color 0.2s;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .nav-button.active {
+            color: #6b46c1; /* Purple active */
+        }
+        .nav-button-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+    </style>
 </head>
 <body>
+    <div class="app-container">
+        <!-- Marcador y Header -->
+        <div class="header">
+            <h1 class="text-xl font-bold mb-2">Shukudai <span class="text-sm font-normal">(v2.6)</span></h1>
+            <button id="btnReset" title="Reiniciar todos los datos">⚠️ Reset</button>
+            
+            <!-- Contenedor de Estadísticas -->
+            <div class="flex justify-between items-center mb-4">
+                <div class="stat-card">
+                    <div id="puntosTotales" class="stat-value">0</div>
+                    <div class="stat-label">PUNTOS</div>
+                </div>
+                <div class="stat-card">
+                    <div id="minutosTotales" class="stat-value">0</div>
+                    <div class="stat-label">MINUTOS</div>
+                </div>
+                <div class="stat-card">
+                    <div id="nivelActual" class="stat-value">1</div>
+                    <div class="stat-label">NIVEL</div>
+                </div>
+            </div>
 
-  <header>
-    <h1>🧩 Shukudai</h1>
-    <p>Gana puntos, sube de nivel y consigue premios</p>
-  </header>
-
-  <main id="app">
-    <!-- SECCIÓN: MARCADOR (Siempre visible) -->
-    <section id="marcador">
-      <div class="stats-row">
-        <div>
-          <span class="label">Puntos Disponibles</span>
-          <span id="puntosTotales" class="big-number">0</span>
+            <!-- Barra de XP/Nivel -->
+            <div class="xp-bar-container">
+                <div id="xpFill"></div>
+                <div id="xpTexto">0 / 125 xp</div>
+            </div>
         </div>
-        <div>
-          <span class="label">Minutos Totales</span>
-          <span id="minutosTotales" class="big-number">0</span>
+
+        <!-- Contenido Principal (Vistas) -->
+        <div class="main-content">
+            
+            <!-- VISTA 1: TAREAS (HOME) -->
+            <div id="vistaTareas" class="view">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🎯 Misiones de Hoy</h2>
+                
+                <!-- Acciones Rápidas -->
+                <div class="flex gap-2 mb-4">
+                    <button id="btnPremioDiario" class="flex-1 bg-yellow-400 text-gray-900 font-bold py-2 rounded-xl shadow-md hover:bg-yellow-500 transition duration-150 text-sm">
+                        🎁 Regalo Diario (+10 pts)
+                    </button>
+                    <button id="btnPremioSemanal" class="flex-1 bg-indigo-500 text-white font-bold py-2 rounded-xl shadow-md hover:bg-indigo-600 transition duration-150 text-sm">
+                        🌟 Bonus Semanal (+70 pts)
+                    </button>
+                </div>
+
+                <div id="categorias">
+                    <!-- Contenido de tareas cargado por JS -->
+                </div>
+            </div>
+
+            <!-- VISTA 2: TIENDA -->
+            <div id="vistaTienda" class="view">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🛍️ Tienda de Premios</h2>
+                <div id="contenedorPremios" class="grid grid-cols-2 gap-4">
+                    <!-- Contenido de premios cargado por JS -->
+                </div>
+            </div>
+            
+            <!-- VISTA 3: HORARIO -->
+            <div id="vistaHorario" class="view">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">🗓️ Horario Escolar</h2>
+                <p class="text-sm text-gray-600 mb-4">Consulta las asignaturas y horarios de la semana.</p>
+                <div id="contenedorHorario">
+                    <!-- Contenido del horario cargado por JS -->
+                </div>
+            </div>
+
+            <!-- VISTA 4: AGENDA (NUEVO) -->
+            <div id="vistaAgenda" class="view">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 border-b pb-2">📌 Agenda de Eventos</h2>
+                
+                <!-- Formulario de Eventos -->
+                <div class="bg-gray-50 p-4 rounded-xl mb-6 shadow-sm">
+                    <h3 class="font-semibold text-gray-700 mb-3">Nuevo Evento / Editar</h3>
+                    <form id="formAgenda" class="space-y-3">
+                        <input type="hidden" id="agendaId">
+                        
+                        <input type="date" id="agendaFecha" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Fecha">
+                        
+                        <div class="flex gap-3">
+                            <input type="time" id="agendaHora" class="flex-1 p-2 border border-gray-300 rounded-lg" placeholder="Hora (Opcional)">
+                            <select id="agendaTipo" required class="flex-1 p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Tipo...</option>
+                                <option value="Control">Control</option>
+                                <option value="Examen">Examen</option>
+                                <option value="Cita">Cita</option>
+                                <option value="Actividad">Actividad</option>
+                            </select>
+                        </div>
+
+                        <input type="text" id="agendaAsignatura" required class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Asignatura/Tema">
+                        
+                        <textarea id="agendaComentarios" rows="2" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" placeholder="Comentarios y detalles..."></textarea>
+                        
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-xl hover:bg-indigo-700 transition duration-150">Guardar Evento</button>
+                    </form>
+                </div>
+
+                <h3 class="font-semibold text-gray-700 mb-3">Próximos Recordatorios</h3>
+                <div id="listaEventos">
+                    <p class="text-gray-500 text-sm italic">No hay eventos próximos.</p>
+                    <!-- Lista de eventos cargada por JS -->
+                </div>
+            </div>
+
+        </div> <!-- Fin .main-content -->
+
+        <!-- Dock de Navegación -->
+        <div class="nav-dock">
+            <div id="homeBtn" class="nav-button active">
+                <span class="nav-button-icon">🏠</span>
+                <span>Tareas</span>
+            </div>
+            <div id="shopBtn" class="nav-button">
+                <span class="nav-button-icon">💰</span>
+                <span>Tienda</span>
+            </div>
+            <div id="scheduleBtn" class="nav-button">
+                <span class="nav-button-icon">⏱️</span>
+                <span>Horario</span>
+            </div>
+            <div id="agendaBtn" class="nav-button">
+                <span class="nav-button-icon">📅</span>
+                <span>Agenda</span>
+            </div>
         </div>
-      </div>
-    </section>
-
-    <!-- SECCIÓN: ACCIONES RÁPIDAS -->
-    <section id="acciones">
-      <button id="btnPremioDiario" class="gold">🎁 Regalo Diario (+10)</button>
-      <button id="btnPremioSemanal" class="blue">🌟 Bonus Semanal (+70)</button>
-    </section>
-
-    <!-- SECCIÓN: NIVEL -->
-    <section id="progreso">
-      <div id="nivelInfo">
-        <p>Nivel <span id="nivelActual">1</span></p>
-        <div id="xpBar"><div id="xpFill"></div></div>
-        <p><small><span id="xpTexto">0 / 125 xp</span></small></p>
-      </div>
-    </section>
-
-    <!-- VISTA 1: TAREAS (Visible por defecto) -->
-    <div id="vistaTareas">
-      <h3>📋 Tus Misiones de Hoy</h3>
-      <div id="categorias"></div> <!-- Se llena con JS -->
-      
-      <div style="margin-top: 20px; text-align: center;">
-        <button id="btnReset" class="danger-outline">⚠️ Reiniciar Todo (Empezar de cero)</button>
-      </div>
     </div>
 
-    <!-- VISTA 2: HORARIO (Oculta por defecto) -->
-    <div id="vistaHorario" style="display: none;">
-      <h3>🗓️ Horario Escolar</h3>
-      <p style="text-align: center; margin-bottom: 15px; color: #666;">Asignaturas y horarios de la semana.</p>
-      <div id="contenedorHorario">
-        <!-- El contenido se cargará con JS -->
-      </div>
-    </div>
-
-    <!-- VISTA 3: AGENDA (NUEVA) -->
-    <div id="vistaAgenda" style="display: none;">
-      <h3>📌 Agenda de Evaluaciones y Eventos</h3>
-      <form id="formAgenda" class="form-card">
-        <input type="hidden" id="agendaId">
-        <input type="date" id="agendaFecha" required class="input-field" title="Fecha">
-        <input type="time" id="agendaHora" class="input-field" title="Hora (opcional)">
-        
-        <select id="agendaAsignatura" required class="input-field" title="Asignatura">
-          <option value="">-- Seleccionar Asignatura --</option>
-          <option value="Lengua">Lengua</option>
-          <option value="Matemáticas">Matemáticas</option>
-          <option value="Inglés">Inglés</option>
-          <option value="Ciencias Naturales">Ciencias Naturales</option>
-          <option value="Ciencias Sociales">Ciencias Sociales</option>
-          <option value="Otro">Otro/Actividad</option>
-        </select>
-
-        <select id="agendaTipo" required class="input-field" title="Tipo de Actividad">
-          <option value="">-- Tipo de Actividad --</option>
-          <option value="Examen">Examen</option>
-          <option value="Control">Control</option>
-          <option value="Actividad">Actividad</option>
-          <option value="Cita">Cita Importante</option>
-        </select>
-        
-        <textarea id="agendaComentarios" placeholder="Comentarios y detalles..." class="input-field"></textarea>
-        
-        <button type="submit" id="btnGuardarAgenda" class="blue">Guardar Evento</button>
-      </form>
-
-      <h4 style="margin-top: 25px; color: var(--dark);">Próximos Eventos</h4>
-      <div id="listaEventos">
-        <!-- Eventos de la agenda se cargarán aquí -->
-      </div>
-    </div>
-    
-    <!-- VISTA 4: TIENDA (Oculta por defecto) -->
-    <div id="vistaTienda" style="display: none;">
-      <h3>🛍️ Tienda de Premios</h3>
-      <p style="text-align: center; margin-bottom: 15px; color: #666;">¡Gasta tus puntos aquí!</p>
-      <div id="contenedorPremios" class="grid-tienda"></div> <!-- Se llena con JS -->
-    </div>
-
-  </main>
-
-  <!-- DOCK DE NAVEGACIÓN INFERIOR (4 Botones) -->
-  <nav id="dock">
-    <button id="homeBtn" class="dock-item active">
-      <span>📝</span>
-      <span class="dock-label">Tareas</span>
-    </button>
-    <button id="scheduleBtn" class="dock-item">
-      <span>⏰</span>
-      <span class="dock-label">Horario</span>
-    </button>
-    <button id="agendaBtn" class="dock-item">
-      <span>📅</span>
-      <span class="dock-label">Agenda</span>
-    </button>
-    <button id="shopBtn" class="dock-item">
-      <span>🛍️</span>
-      <span class="dock-label">Tienda</span>
-    </button>
-  </nav>
-
-  <script src="app.js"></script>
+    <!-- Script de la aplicación -->
+    <script type="module" src="./app.js"></script>
 </body>
 </html>
