@@ -190,7 +190,7 @@
     </style>
 </head>
 <body class="min-h-screen">
-    <div class="max-w-xl mx-auto p-4 bg-white shadow-lg sm:rounded-xl">
+    <div class="max-w-xl mx-auto px-4 pt-4 pb-20 bg-white shadow-lg sm:rounded-xl">
         
         <header class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow-md">
             <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Shukudai GO! ⭐</h1>
@@ -349,3 +349,166 @@
                         <label for="agendaComentarios" class="block text-sm font-medium text-gray-700">Comentarios</label>
                         <textarea id="agendaComentarios" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Detalles de la prueba o evento..."></textarea>
                     </div>
+                    
+                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition">
+                        Guardar Evento
+                    </button>
+                </form>
+            </section>
+
+            <div class="text-center mt-6">
+                <button id="btnReset" class="text-xs text-gray-400 hover:text-red-500 transition">Reiniciar Todos los Datos (Borrar)</button>
+            </div>
+            
+        </main>
+
+        <footer class="fixed inset-x-0 bottom-0 max-w-xl mx-auto bg-white border-t border-gray-200 shadow-2xl rounded-t-xl z-10">
+            <div class="flex justify-around items-center p-2">
+                
+                <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 active">
+                    <span class="text-2xl">📋</span>
+                    <span class="text-xs font-medium mt-1">Tareas</span>
+                </button>
+                
+                <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600">
+                    <span class="text-2xl">🎁</span>
+                    <span class="text-xs font-medium mt-1">Tienda</span>
+                </button>
+
+                <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600">
+                    <span class="text-2xl">⏰</span>
+                    <span class="text-xs font-medium mt-1">Horario</span>
+                </button>
+
+                <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600">
+                    <span class="text-2xl">📅</span>
+                    <span class="text-xs font-medium mt-1">Agenda</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- 1. CONFIGURACIÓN ---
+    const META_XP = 125; 
+    
+    // Sonidos (URLs estables de Google CDN)
+    const SONIDOS = {
+        exito: new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
+        nivel: new Audio('https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'),
+        error: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
+        caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
+    };
+
+    // --- DATOS POR DEFECTO (USADOS PARA INICIALIZAR EL ESTADO LA PRIMERA VEZ) ---
+
+    // Estructura de Horario por defecto
+    const DEFAULT_HORARIO_SEMANAL = {
+        Lunes: [
+            { nombre: "P.E. (Educación Física)", hora: "09:00 - 09:45" },
+            { nombre: "Religión", hora: "09:45 - 10:30" },
+            { nombre: "Lengua", hora: "10:30 - 11:15" },
+            { nombre: "Matemáticas", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Values / Ética", hora: "12:30 - 13:15" },
+            { nombre: "English (Inglés)", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
+        ],
+        Martes: [
+            { nombre: "Religión", hora: "09:00 - 09:45" },
+            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
+            { nombre: "Inglés", hora: "10:30 - 11:15" },
+            { nombre: "Lengua", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Ciencias Naturales", hora: "12:30 - 13:15" },
+            { nombre: "P.E. (Educación Física)", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" }, 
+            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 19:00", tipo: "extra" },
+            { nombre: "Programación 💻 (Extraescolar)", hora: "19:00 - 20:00", tipo: "extra" }
+        ],
+        Miercoles: [
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Values / Ética", hora: "09:45 - 10:30" },
+            { nombre: "Inglés", hora: "10:30 - 11:15" },
+            { nombre: "Arts / Plástica", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Ciencias Sociales", hora: "12:30 - 13:15" },
+            { nombre: "Lengua", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
+        ],
+        Jueves: [
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Ciencias Naturales", hora: "09:45 - 10:30" },
+            { nombre: "Ciencias Sociales", hora: "10:30 - 11:15" },
+            { nombre: "Lengua", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "Lengua", hora: "12:30 - 13:15" },
+            { nombre: "Inglés", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" },
+            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 17:45", tipo: "extra" },
+            { nombre: "Inglés 🇬🇧 (Extraescolar)", hora: "17:45 - 19:00", tipo: "extra" }
+        ],
+        Viernes: [
+            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
+            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
+            { nombre: "P.E. (Educación Física)", hora: "10:30 - 11:15" },
+            { nombre: "Música", hora: "11:15 - 12:00" },
+            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
+            { nombre: "English (Inglés)", hora: "12:30 - 13:15" },
+            { nombre: "Lengua", hora: "13:15 - 14:00" },
+            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
+        ],
+        Sabado: [], // Días sin actividades por defecto
+        Domingo: []
+    };
+    
+    // El catálogo de tareas se mueve al estado para persistencia
+    const DEFAULT_CATALOGO_TAREAS = [
+        {
+            categoria: "Aseo e Higiene Personal 🧴",
+            items: [
+                { id: "dientes", nombre: "Lavarse bien los dientes", pts: 2, min: 5 },
+                { id: "ducha", nombre: "Ducharse bien", pts: 2, min: 10 },
+                { id: "desodorante", nombre: "Usar desodorante", pts: 1, min: 1 }
+            ]
+        },
+        {
+            categoria: "Académico 📚",
+            items: [
+                { id: "deberes", nombre: "Hacer deberes", pts: 1, min: 30 },
+                { id: "estudiar", nombre: "Estudiar para controles", pts: 2, min: 45 },
+                { id: "leer", nombre: "Leer 15 Min", pts: 5, min: 15 },
+                { id: "repaso", nombre: "Repaso Contenidos", pts: 3, min: 20 }
+            ]
+        },
+        {
+            categoria: "Hogar 🏠",
+            items: [
+                { id: "ordenar", nombre: "Ordenar habitación", pts: 1, min: 10 },
+                { id: "limpiar", nombre: "Limpiar habitación", pts: 2, min: 20 },
+                { id: "lavavajillas", nombre: "Sacar lavavajillas", pts: 1, min: 5 },
+                { id: "bano", nombre: "Limpiar baño", pts: 2, min: 15 }
+            ]
+        },
+        {
+            categoria: "General ⭐",
+            items: [
+                { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
+                { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
+                { id: "colaborar", nombre: "Colabora en Labores Hogar", pts: 1, min: 15 }
+            ]
+        }
+    ];
+
+    // --- CATÁLOGO DE PREMIOS (Se mantiene como constante ya que no se espera que se edite por el usuario) ---
+    const catalogoPremios = [
+        // Premios de Puntos
+        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
+        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120, moneda: 'puntos' },
+        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
+        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
+        // Premios de Minutos (Tiempo de Pantalla)
+        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
+        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 6
