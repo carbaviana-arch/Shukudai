@@ -233,7 +233,54 @@
                     </div>
                 <div id="contenedorGestionTareas" class="mt-6 p-4 bg-indigo-100 border-l-4 border-indigo-400 rounded-lg shadow-inner" style="display:none;">
                     <h3 class="text-xl font-semibold text-indigo-700 mb-4">Gestión de Tareas (Modo Edición)</h3>
-                    <p class="text-gray-600">Aquí se añadiría la interfaz completa para: Añadir nueva categoría, Añadir nueva tarea, Editar/Eliminar tareas existentes (leyendo de `estado.catalogo`).</p>
+                    
+                    <form id="formGestionTareas" class="space-y-3 p-4 bg-white rounded-lg shadow-md mb-4">
+                        <input type="hidden" id="taskEditId" value="">
+                        <h4 id="taskFormTitle" class="text-lg font-semibold text-gray-800">Crear Nueva Tarea</h4>
+
+                        <div>
+                            <label for="taskName" class="block text-sm font-medium text-gray-700">Nombre de la Tarea</label>
+                            <input type="text" id="taskName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Repasar Inglés">
+                        </div>
+                        
+                        <div class="flex space-x-3">
+                            <div class="flex-1">
+                                <label for="taskPts" class="block text-sm font-medium text-gray-700">Puntos (XP)</label>
+                                <input type="number" id="taskPts" required min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="1">
+                            </div>
+                            <div class="flex-1">
+                                <label for="taskMin" class="block text-sm font-medium text-gray-700">Minutos (+Tiempo)</label>
+                                <input type="number" id="taskMin" required min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="0">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="taskCategory" class="block text-sm font-medium text-gray-700">Categoría</label>
+                            <select id="taskCategory" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                </select>
+                            <p class="text-xs text-gray-500 mt-1">Si la categoría no existe, créala en la sección de abajo.</p>
+                        </div>
+
+                        <button type="submit" id="btnGuardarTarea" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition">
+                            Guardar Tarea
+                        </button>
+                        <button type="button" id="btnCancelarEdicion" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-500 hover:bg-gray-600 transition" style="display:none;">
+                            Cancelar Edición
+                        </button>
+                    </form>
+                    
+                    <div class="mt-6 p-4 bg-white rounded-lg shadow-md">
+                        <h4 class="text-lg font-semibold text-gray-800 mb-3">Administrar Categorías</h4>
+                        <div id="categoryList" class="space-y-2 mb-4 text-sm">
+                            </div>
+                        <form id="formNuevaCategoria" class="flex space-x-2">
+                            <input type="text" id="newCategoryName" required class="flex-1 rounded-md border-gray-300 shadow-sm p-2" placeholder="Nombre de nueva categoría...">
+                            <button type="submit" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-600 transition">
+                                + Añadir
+                            </button>
+                        </form>
+                    </div>
+
                     <button id="btnCerrarGestionTareas" class="mt-4 py-1 px-4 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Cerrar Gestión</button>
                 </div>
             </section>
@@ -474,7 +521,7 @@
         puntos: 0,
         minutos: 0,
         nivel: 1,
-        // *** NUEVOS ELEMENTOS DEL ESTADO ***
+        // *** ELEMENTOS EDITABLES DEL ESTADO ***
         catalogo: DEFAULT_CATALOGO_TAREAS,
         horario: DEFAULT_HORARIO_SEMANAL,
         // **********************************
@@ -491,6 +538,11 @@
         estado.tareasHoy = {}; 
         estado.ultimaFecha = hoy;
         guardar();
+    }
+    
+    // Función de ayuda para generar IDs
+    function generarId() {
+        return '_' + Math.random().toString(36).substr(2, 9);
     }
 
     // --- 4. REFERENCIAS DOM ---
@@ -517,10 +569,23 @@
         btnDiario: document.getElementById('btnPremioDiario'),
         btnSemanal: document.getElementById('btnPremioSemanal'),
         
-        // --- NUEVAS REFERENCIAS UI DE EDICIÓN ---
+        // --- NUEVAS REFERENCIAS UI DE GESTIÓN DE TAREAS ---
         btnEditarTareas: document.getElementById('btnEditarTareas'),
         contenedorGestionTareas: document.getElementById('contenedorGestionTareas'),
         btnCerrarGestionTareas: document.getElementById('btnCerrarGestionTareas'),
+        formGestionTareas: document.getElementById('formGestionTareas'),
+        taskEditId: document.getElementById('taskEditId'),
+        taskFormTitle: document.getElementById('taskFormTitle'),
+        taskName: document.getElementById('taskName'),
+        taskPts: document.getElementById('taskPts'),
+        taskMin: document.getElementById('taskMin'),
+        taskCategory: document.getElementById('taskCategory'),
+        btnCancelarEdicion: document.getElementById('btnCancelarEdicion'),
+        formNuevaCategoria: document.getElementById('formNuevaCategoria'),
+        newCategoryName: document.getElementById('newCategoryName'),
+        categoryList: document.getElementById('categoryList'),
+        
+        // --- REFERENCIAS UI DE GESTIÓN DE HORARIO ---
         btnEditarHorario: document.getElementById('btnEditarHorario'),
         contenedorGestionHorario: document.getElementById('contenedorGestionHorario'),
         btnCerrarGestionHorario: document.getElementById('btnCerrarGestionHorario')
@@ -583,7 +648,10 @@
 
     function renderizarTareas() {
         ui.contenedorCategorias.innerHTML = '';
-        // *** CAMBIO: Usar estado.catalogo en lugar de la constante catalogoTareas ***
+        
+        // Comprobar si estamos en modo gestión
+        const isGestionMode = ui.contenedorGestionTareas.style.display === 'block'; 
+
         estado.catalogo.forEach(grupo => {
             const details = document.createElement('details');
             details.open = true;
@@ -604,29 +672,48 @@
                         <span>${tarea.nombre}</span>
                         <span class="task-pts">+${tarea.pts} pts ${tarea.min > 0 ? '• ' + tarea.min + ' min' : ''}</span>
                     </div>
-                    <div class="task-buttons">
-                        ${!estadoTarea ? `
+                    <div class="task-buttons flex items-center">
+                        ${!estadoTarea && !isGestionMode ? `
                         <button class="btn-circle check">✔</button>
                         <button class="btn-circle cross">✖</button>
-                        ` : `
+                        ` : estadoTarea ? `
                         <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
-                        `}
+                        ` : ''}
+                        
+                        ${isGestionMode ? `
+                        <button class="ml-2 text-sm text-indigo-500 hover:text-indigo-700" data-task-id="${tarea.id}" data-task-name="${tarea.nombre}">✏️ Editar</button>
+                        <button class="ml-2 text-sm text-red-500 hover:text-red-700" data-task-id="${tarea.id}" data-task-name="${tarea.nombre}">🗑️ Eliminar</button>
+                        ` : ''}
                     </div>
                 `;
-                if (!estadoTarea) {
+                
+                // Listeners de check/cross (solo si no es modo gestión y no está hecha)
+                if (!estadoTarea && !isGestionMode) {
                     div.querySelector('.check').addEventListener('click', () => completarTarea(tarea, true));
                     div.querySelector('.cross').addEventListener('click', () => completarTarea(tarea, false));
                 }
+
+                // Listeners de edición/eliminación (solo si es modo gestión)
+                if (isGestionMode) {
+                    div.querySelector('[data-task-id][class*="text-indigo"]').addEventListener('click', (e) => 
+                        cargarTareaParaEdicion(e.target.dataset.taskId)
+                    );
+                    div.querySelector('[data-task-id][class*="text-red"]').addEventListener('click', (e) => 
+                        eliminarTarea(e.target.dataset.taskId, e.target.dataset.taskName)
+                    );
+                }
+                
                 details.appendChild(div);
             });
             ui.contenedorCategorias.appendChild(details);
         });
         
-        // Asegura que se muestren las tareas y se oculte el gestor al renderizar
-        ui.contenedorGestionTareas.style.display = 'none';
-        ui.contenedorCategorias.style.display = 'block';
-        ui.btnEditarTareas.textContent = '⚙️ Administrar';
+        // Controlar la visibilidad de los contenedores
+        ui.contenedorCategorias.style.display = isGestionMode ? 'block' : 'block';
+        ui.contenedorGestionTareas.style.display = isGestionMode ? 'block' : 'none';
+        ui.btnEditarTareas.textContent = isGestionMode ? '✅ Modo Tareas' : '⚙️ Administrar';
     }
+
 
     function renderizarTienda() {
         ui.contenedorPremios.innerHTML = '';
@@ -705,7 +792,7 @@
 
     function renderizarHorario() {
         ui.contenedorHorario.innerHTML = '';
-        // *** CAMBIO: Usar estado.horario en lugar de la constante horarioSemanal ***
+        // Usar estado.horario
         const dias = Object.keys(estado.horario);
         
         dias.forEach(dia => {
@@ -717,7 +804,7 @@
             titulo.textContent = dia;
             diaDiv.appendChild(titulo);
 
-            // *** CAMBIO: Usar estado.horario[dia] ***
+            // Usar estado.horario[dia]
             estado.horario[dia].forEach(asignatura => {
                 const asigDiv = document.createElement('div');
                 // Añadimos una clase condicional para extraescolares
@@ -784,10 +871,6 @@
     }
 
     // --- LÓGICA AGENDA CRUD (MANTENIDA) ---
-
-    function generarId() {
-        return '_' + Math.random().toString(36).substr(2, 9);
-    }
 
     function cargarEventoParaEdicion(id) {
         const evento = estado.agendaEventos.find(e => e.id === id);
@@ -869,7 +952,195 @@
         guardar();
         renderizarTareas();
     }
+    
+    // --- LÓGICA CRUD DE TAREAS Y CATEGORÍAS ---
 
+    function renderizarGestionTareas() {
+        // 1. Llenar el <select> de Categorías
+        ui.taskCategory.innerHTML = estado.catalogo.map(grupo => 
+            `<option value="${grupo.categoria}">${grupo.categoria}</option>`
+        ).join('');
+
+        // 2. Llenar la lista de Categorías
+        ui.categoryList.innerHTML = estado.catalogo.map(grupo => `
+            <div class="flex justify-between items-center p-2 bg-white rounded-md border border-gray-200">
+                <span>${grupo.categoria} (${grupo.items.length} tareas)</span>
+                ${grupo.items.length === 0 ? 
+                    `<button type="button" class="text-red-500 hover:text-red-700 text-sm font-semibold" data-category-name="${grupo.categoria}">🗑️ Eliminar</button>`
+                    : `<span class="text-xs text-gray-500">Vacía las tareas antes de eliminar.</span>`}
+            </div>
+        `).join('');
+        
+        // 3. Añadir listeners a los botones de eliminar categoría
+        ui.categoryList.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', (e) => eliminarCategoria(e.target.dataset.categoryName));
+        });
+    }
+
+    function resetTaskForm() {
+        ui.formGestionTareas.reset();
+        ui.taskEditId.value = '';
+        ui.taskFormTitle.textContent = 'Crear Nueva Tarea';
+        document.getElementById('btnGuardarTarea').textContent = 'Guardar Tarea';
+        ui.btnCancelarEdicion.style.display = 'none';
+        // Asegurar valores por defecto
+        ui.taskPts.value = 1; 
+        ui.taskMin.value = 0;
+    }
+
+    function handleCategoryFormSubmit(e) {
+        e.preventDefault();
+        const nombre = ui.newCategoryName.value.trim();
+        if (!nombre) return;
+        
+        if (estado.catalogo.some(g => g.categoria === nombre)) {
+            alert('Esta categoría ya existe.');
+            return;
+        }
+        
+        estado.catalogo.push({ categoria: nombre, items: [] });
+        ui.newCategoryName.value = '';
+        guardar();
+        renderizarGestionTareas();
+        console.log(`Categoría "${nombre}" añadida.`);
+    }
+
+    function eliminarCategoria(nombre) {
+        if (confirm(`¿Estás seguro de que quieres eliminar la categoría "${nombre}"? Esta acción no se puede deshacer.`)) {
+            // Aseguramos que la categoría esté vacía (el renderizado ya lo verifica, pero es una doble comprobación)
+            const grupo = estado.catalogo.find(g => g.categoria === nombre);
+            if (grupo && grupo.items.length > 0) {
+                 alert('No se puede eliminar la categoría. Primero elimina todas las tareas dentro de ella.');
+                 return;
+            }
+
+            estado.catalogo = estado.catalogo.filter(g => g.categoria !== nombre);
+            guardar();
+            renderizarGestionTareas();
+            renderizarTareas(); // Refresh main task view
+            console.log(`Categoría "${nombre}" eliminada.`);
+        }
+    }
+
+    function handleTaskFormSubmit(e) {
+        e.preventDefault();
+        
+        const id = ui.taskEditId.value;
+        const nombre = ui.taskName.value.trim();
+        const pts = parseInt(ui.taskPts.value);
+        const min = parseInt(ui.taskMin.value);
+        const categoriaSeleccionada = ui.taskCategory.value;
+        
+        if (pts < 1 || min < 0) {
+            alert('Puntos deben ser al menos 1 y Minutos al menos 0.');
+            return;
+        }
+
+        const nuevaTarea = {
+            id: id || generarId(),
+            nombre,
+            pts,
+            min
+        };
+        
+        if (id) {
+            // Modo Edición
+            let categoriaAntigua = null;
+            
+            // 1. Buscar y remover la tarea de su ubicación actual
+            estado.catalogo.forEach(grupo => {
+                const index = grupo.items.findIndex(t => t.id === id);
+                if (index !== -1) {
+                    categoriaAntigua = grupo.categoria;
+                    grupo.items.splice(index, 1);
+                }
+            });
+            
+            // 2. Insertar la tarea actualizada en la nueva categoría (o la misma)
+            const nuevoGrupo = estado.catalogo.find(g => g.categoria === categoriaSeleccionada);
+            if (nuevoGrupo) {
+                nuevoGrupo.items.push(nuevaTarea);
+                console.log(`Tarea "${nombre}" actualizada y movida a ${categoriaSeleccionada}.`);
+            } else {
+                // Esto no debería ocurrir si renderizarGestionTareas funciona correctamente
+                alert('Error: La categoría seleccionada no existe.');
+                return;
+            }
+            
+        } else {
+            // Modo Creación
+            const grupo = estado.catalogo.find(g => g.categoria === categoriaSeleccionada);
+            if (grupo) {
+                grupo.items.push(nuevaTarea);
+                console.log(`Tarea "${nombre}" creada en ${categoriaSeleccionada}.`);
+            } else {
+                alert('Categoría no encontrada. Por favor, crea la categoría primero.');
+                return;
+            }
+        }
+        
+        guardar();
+        resetTaskForm();
+        renderizarGestionTareas();
+        renderizarTareas(); // Refrescar la vista principal de tareas
+    }
+
+    function cargarTareaParaEdicion(id) {
+        let tarea = null;
+        let categoria = '';
+        
+        // Buscar la tarea y su categoría
+        estado.catalogo.forEach(grupo => {
+            const found = grupo.items.find(t => t.id === id);
+            if (found) {
+                tarea = found;
+                categoria = grupo.categoria;
+            }
+        });
+
+        if (tarea) {
+            // 1. Cargar datos en el formulario
+            ui.taskEditId.value = tarea.id;
+            ui.taskName.value = tarea.nombre;
+            ui.taskPts.value = tarea.pts;
+            ui.taskMin.value = tarea.min;
+            ui.taskCategory.value = categoria;
+            
+            // 2. Ajustar UI
+            ui.taskFormTitle.textContent = `Editar Tarea: ${tarea.nombre}`;
+            document.getElementById('btnGuardarTarea').textContent = 'Actualizar Tarea';
+            ui.btnCancelarEdicion.style.display = 'block';
+            
+            // 3. Asegurar que el modo gestión esté activo y hacer scroll
+            mostrarVista('vistaTareas', ui.btnHome); 
+            ui.contenedorGestionTareas.style.display = 'block';
+            ui.contenedorCategorias.style.display = 'block'; 
+            ui.btnEditarTareas.textContent = '✅ Modo Tareas';
+            renderizarGestionTareas();
+            
+            ui.contenedorGestionTareas.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    function eliminarTarea(id, nombre) {
+        if (confirm(`¿Estás seguro de que quieres eliminar la tarea "${nombre}"? Esta acción no se puede deshacer.`)) {
+            // Eliminar tarea del catálogo
+            estado.catalogo.forEach(grupo => {
+                grupo.items = grupo.items.filter(t => t.id !== id);
+            });
+            
+            // Eliminar de las tareas de hoy si existe
+            if (estado.tareasHoy[id]) {
+                 delete estado.tareasHoy[id];
+            }
+            
+            guardar();
+            renderizarTareas(); // Refrescar la vista principal
+            renderizarGestionTareas(); // Refrescar lista de categorías
+            console.log(`Tarea "${nombre}" eliminada.`);
+        }
+    }
+    
     // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN Y GESTIÓN (ACTUALIZADO) ---
     ui.btnHome.addEventListener('click', () => {
         mostrarVista('vistaTareas', ui.btnHome);
@@ -893,18 +1164,39 @@
 
     ui.formAgenda.addEventListener('submit', guardarEvento); 
     
-    // --- LÓGICA DE ACTIVACIÓN/DESACTIVACIÓN DEL MODO ADMINISTRACIÓN DE TAREAS ---
+    // --- LISTENERS CRUD TAREAS ---
+    
+    ui.formGestionTareas.addEventListener('submit', handleTaskFormSubmit);
+    ui.btnCancelarEdicion.addEventListener('click', resetTaskForm);
+    ui.formNuevaCategoria.addEventListener('submit', handleCategoryFormSubmit);
+
+    // LÓGICA DE ACTIVACIÓN/DESACTIVACIÓN DEL MODO ADMINISTRACIÓN DE TAREAS
     ui.btnEditarTareas.addEventListener('click', () => {
         const isVisible = ui.contenedorGestionTareas.style.display !== 'none';
-        ui.contenedorGestionTareas.style.display = isVisible ? 'none' : 'block';
-        ui.contenedorCategorias.style.display = isVisible ? 'block' : 'none';
-        ui.btnEditarTareas.textContent = isVisible ? '⚙️ Administrar' : '✅ Modo Tareas';
+        
+        if (isVisible) {
+            // Salida del modo gestión
+            ui.contenedorGestionTareas.style.display = 'none';
+            ui.contenedorCategorias.style.display = 'block';
+            ui.btnEditarTareas.textContent = '⚙️ Administrar';
+            resetTaskForm(); // Limpiar formulario
+        } else {
+            // Entrada al modo gestión
+            ui.contenedorGestionTareas.style.display = 'block';
+            // Mantenemos visible la lista de tareas para ver los botones de editar/eliminar
+            ui.contenedorCategorias.style.display = 'block'; 
+            ui.btnEditarTareas.textContent = '✅ Modo Tareas';
+            renderizarGestionTareas(); // Renderizar formulario y categorías
+        }
+        renderizarTareas(); // Re-renderizar tareas para mostrar/ocultar los botones de gestión
     });
 
     ui.btnCerrarGestionTareas.addEventListener('click', () => {
         ui.contenedorGestionTareas.style.display = 'none';
         ui.contenedorCategorias.style.display = 'block';
         ui.btnEditarTareas.textContent = '⚙️ Administrar';
+        resetTaskForm();
+        renderizarTareas(); // Re-renderizar para salir del modo edición
     });
     
     // --- LÓGICA DE ACTIVACIÓN/DESACTIVACIÓN DEL MODO ADMINISTRACIÓN DE HORARIO ---
