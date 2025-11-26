@@ -1,52 +1,202 @@
+:root {
+  --primary: #6c5ce7;
+  --secondary: #00b894;
+  --accent: #fdcb6e;
+  --danger: #ff7675;
+  --bg: #f4f7f6;
+  --dark: #2d3436;
+  --white: #ffffff;
+  --dock-height: 70px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--bg);
+  color: var(--dark);
+  padding-bottom: calc(var(--dock-height) + 20px); 
 }
 
-/* Botones base */
-.btn {
-  background: #3b82f6;
-  color: white;
-  padding: 10px 14px;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: 0.2s;
-}
-.btn:hover {
-  background: #2563eb;
+/* HEADER */
+header {
+  background: var(--primary);
+  color: var(--white);
+  padding: 20px;
+  text-align: center;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
 }
 
-/* Inputs */
-.input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #bbb;
-  border-radius: 8px;
+header h1 { font-size: 1.8rem; margin-bottom: 5px; }
+header p { opacity: 0.8; font-size: 0.9rem; }
+
+/* MAIN LAYOUT */
+main { padding: 15px; max-width: 600px; margin: 0 auto; }
+
+h3 { color: var(--primary); margin: 20px 0 10px; border-left: 4px solid var(--secondary); padding-left: 10px; }
+
+section, details, .premio-card, .horario-card, .agenda-card, .form-card {
+  background: var(--white);
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-bottom: 15px;
+  overflow: hidden;
 }
 
-/* Dock inferior */
-.dock {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #1e293b;
-  color: white;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
+/* MARCADOR */
+#marcador { padding: 15px; background: linear-gradient(135deg, #fff, #f0f3ff); }
+.stats-row { display: flex; justify-content: space-around; text-align: center; }
+.label { display: block; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.big-number { font-size: 2rem; font-weight: 800; color: var(--secondary); }
+
+/* BOTONES */
+button { border: none; cursor: pointer; font-family: inherit; transition: transform 0.1s; }
+button:active { transform: scale(0.95); }
+
+#acciones { display: flex; gap: 10px; background: transparent; box-shadow: none; padding: 0; }
+#acciones button {
+  flex: 1; padding: 12px; border-radius: 12px;
+  color: white; font-weight: bold; font-size: 0.9rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
-.dock button {
-  background: transparent;
-  color: white;
-  font-size: 24px;
+.gold { background: var(--accent); color: var(--dark) !important; }
+.blue { background: var(--primary); color: var(--white) !important; }
+.danger-outline { 
+  background: transparent; border: 2px solid var(--danger); color: var(--danger); 
+  padding: 10px 20px; border-radius: 20px; font-weight: bold;
 }
 
-/* Lista */
-li {
-  background: #f4f4f4;
-  padding: 12px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
+/* PROGRESO */
+#progreso { padding: 15px; text-align: center; }
+#xpBar { height: 15px; background: #dfe6e9; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+#xpFill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--secondary), #55efc4); transition: width 0.5s ease; }
+
+/* TAREAS (ACORDEÓN) */
+details { margin-bottom: 10px; }
+summary {
+  padding: 15px; font-weight: bold; cursor: pointer;
+  background: #fff; list-style: none; display: flex; align-items: center; justify-content: space-between;
+}
+summary::-webkit-details-marker { display: none; }
+summary::after { content: '▼'; color: #b2bec3; font-size: 0.8em; }
+details[open] summary::after { content: '▲'; }
+
+.task {
+  padding: 12px 15px; border-top: 1px solid #f1f2f6;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.task-info { display: flex; flex-direction: column; }
+.task-pts { font-size: 0.75rem; color: #b2bec3; }
+
+.task-buttons { display: flex; gap: 8px; }
+.btn-circle {
+  width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+}
+.check { background: #e6fffa; color: var(--secondary); }
+.cross { background: #fff5f5; color: var(--danger); }
+
+/* ESTADOS TAREA */
+.task.completed { background: #f0fff4; }
+.task.completed span { text-decoration: line-through; color: #aaa; }
+.task.failed { background: #fff5f5; }
+.task.failed span { text-decoration: line-through; color: #aaa; }
+
+/* TIENDA */
+.grid-tienda { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.premio-card {
+  padding: 15px; text-align: center; border: 2px solid transparent;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+}
+.premio-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.price-tag { background: var(--accent); color: var(--dark); padding: 4px 10px; border-radius: 10px; font-weight: bold; font-size: 0.9rem; }
+.premio-icono { font-size: 3rem; margin-bottom: 5px; }
+
+/* HORARIO */
+#contenedorHorario { display: flex; flex-direction: column; gap: 15px; }
+.horario-dia {
+  background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+.dia-titulo {
+  background: var(--primary); color: var(--white); padding: 10px 15px; font-weight: bold; font-size: 1.1rem;
+}
+.asignatura {
+  display: flex; justify-content: space-between; padding: 10px 15px; border-bottom: 1px solid #f1f2f6;
+}
+.asignatura:last-child { border-bottom: none; }
+.asignatura-nombre { font-weight: 500; color: var(--dark); }
+.asignatura-hora { font-size: 0.9rem; color: #6c757d; }
+
+/* AGENDA (NUEVO) */
+.form-card { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
+.input-field {
+    padding: 10px;
+    border: 1px solid #dfe6e9;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+#formAgenda textarea { resize: vertical; min-height: 80px; }
+
+.agenda-card {
+    padding: 15px;
+    border-left: 5px solid var(--secondary);
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    position: relative;
+    overflow: visible; /* Necesario para que el botón de eliminar no se corte */
+}
+.agenda-card.examen { border-left-color: var(--danger); }
+.agenda-card.cita { border-left-color: var(--accent); }
+.agenda-info-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: #666; }
+.agenda-title { font-weight: bold; font-size: 1.1rem; color: var(--dark); }
+.agenda-comments { font-style: italic; font-size: 0.9rem; color: #888; margin-top: 5px; }
+.agenda-actions { display: flex; gap: 8px; margin-top: 10px; }
+.agenda-actions button {
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.btn-edit { background: var(--accent); color: var(--dark); }
+.btn-delete { background: var(--danger); color: var(--white); }
+
+/* DOCK NAVEGACIÓN (Ajustado para 4 elementos) */
+#dock {
+  position: fixed; bottom: 0; left: 50%; 
+  transform: translateX(-50%); 
+  width: 100%; /* Permite que el dock ocupe todo el ancho en móviles */
+  max-width: 600px; /* Ancho máximo en pantallas grandes */
+  height: var(--dock-height);
+  
+  background: rgba(255, 255, 255, 0.9); 
+  border-radius: 20px 20px 0 0; 
+  box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.5); 
+
+  display: flex; 
+  justify-content: space-around; 
   align-items: center;
+  z-index: 1000; 
+  padding: 0 10px;
+}
+.dock-item {
+  background: none; 
+  display: flex; flex-direction: column; align-items: center;
+  color: #b2bec3; 
+  gap: 4px;
+  padding: 5px;
+  border-radius: 10px;
+  transition: all 0.2s ease-out;
+  flex: 1; /* Distribuye el espacio entre los 4 botones */
+}
+.dock-item span { font-size: 1.5rem; }
+.dock-label { font-size: 0.7rem; font-weight: bold; text-align: center; }
+.dock-item.active { 
+  color: var(--primary); 
+  transform: translateY(-5px); 
 }
