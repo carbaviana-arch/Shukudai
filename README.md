@@ -1,1 +1,50 @@
-🧩 Shukudai (v2.6) - Tu Super App de Productividad y Gamificación¡Bienvenido a Shukudai! (宿題, "Deberes" en japonés).Esta es una aplicación de gamificación diseñada para ayudarte a ti o a tu familia a gestionar tareas diarias, hábitos, y responsabilidades académicas de una manera divertida y motivadora. Ganarás puntos por completar misiones y podrás gastarlos en recompensas reales.🚀 Novedades en la Versión 2.6Esta versión trae grandes herramientas de planificación para el ámbito académico:Agenda 📌 (NUEVO): Una sección dedicada a la planificación de eventos importantes.Registro: Guarda exámenes, controles, citas y actividades.Gestión: Edita y elimina eventos fácilmente.Campos Clave: Incluye fecha, hora, asignatura, tipo de actividad y comentarios detallados.Horario 🗓️: Consulta rápidamente las asignaturas y horarios de clase de la semana.Dock de Navegación Moderno: El Dock inferior ha sido re-estilizado para una apariencia más moderna y ahora soporta cuatro módulos de navegación.✨ Módulos Principales1. Tareas (Misiones Diarias)El núcleo de la aplicación. Aquí se encuentran las misiones organizadas por categorías (Aseo, Académico, Hogar, General).Completar: Gana Puntos y Minutos Totales al marcar una tarea como completada (✔).Fallar: Marca una tarea como fallida (✖) para registrar su incumplimiento, aunque no afecta tu puntuación.Categorías: Las tareas se organizan en secciones de acordeón (<details>) para una mejor visualización.2. Marcador y ProgresoSigue tu progreso en tiempo real:Puntos Totales: Moneda principal para comprar premios.Minutos Totales: Registro del tiempo invertido en tareas productivas.Sistema de Nivel: Cada 125 puntos (XP) ganas un nivel. ¡Avanzar de nivel te recompensa con confeti y un sonido de celebración!Acciones Rápidas:🎁 Regalo Diario: Recompensa diaria de +10 Puntos (solo una vez al día).🌟 Bonus Semanal: Recompensa mayor de +70 Puntos.3. Tienda de PremiosEl lugar donde se gasta el esfuerzo y se materializan las recompensas.Catálogo: Premios predefinidos (Noche de Cine, Helado, 30 min Tablet, etc.) con sus costos en Puntos.Compra: Los puntos se restan y la compra se confirma con un sonido de caja registradora y confeti.4. Horario (v2.5)Permite visualizar la estructura de asignaturas de la semana.5. Agenda (v2.6 - NUEVO)Herramienta de planificación para controles y evaluaciones.💾 Persistencia de DatosTodos los datos (puntos, minutos, nivel, tareas del día, y eventos de la Agenda) se guardan automáticamente en tu navegador usando localStorage.Reseteo Diario: Las tareas se reinician automáticamente al detectar un nuevo día para que puedas empezar de nuevo.Reiniciar Todo: Hay un botón de "⚠️ Reiniciar Todo" en la vista de Tareas para borrar completamente el progreso y empezar de cero si es necesario.
+# Shukudai: Misión Recompensa - v3.1 ⭐️
+
+**Shukudai** (宿題, "deberes" en japonés) es un sistema gamificado simple, implementado en un único archivo HTML/JavaScript, diseñado para ayudar a gestionar y motivar la realización de tareas y la buena conducta a través de puntos y recompensas.
+
+## 🚀 Novedades de la Versión 3.1: Gestión Total del Horario
+
+La característica principal de esta versión es la implementación completa del **CRUD (Crear, Leer, Actualizar, Eliminar)** de actividades en la sección "Horario".
+
+---
+
+## ✨ Características Principales
+
+### 1. Sistema de Gamificación (Puntos, Minutos y Nivel)
+* **Puntos (Pts):** Se obtienen por completar tareas con éxito. Se usan para comprar premios "físicos" o experiencias.
+* **Minutos (Min):** Se obtienen por completar tareas con éxito. Funcionan como tiempo de pantalla canjeable (tablet, consola, etc.).
+* **Nivel:** Se calcula automáticamente (cada 125 puntos = +1 Nivel) con un efecto de confeti visual de celebración.
+* **Recompensas Diarias/Semanales:** Botones rápidos para sumar puntos bonus recurrentes.
+
+### 2. Tareas (Home)
+* Panel de gestión diaria con categorías predefinidas (**Aseo, Académico, Hogar, General**).
+* Se puede marcar cada tarea como **✅ Hecha** (sumando Puntos/Minutos) o **❌ Fallida** (sin sumar).
+* Las tareas se resetean automáticamente al iniciar un **Nuevo Día**.
+
+### 3. Tienda de Premios
+* Catálogo de recompensas canjeables por **Puntos** o **Minutos**.
+* **Regla del Fin de Semana:** El canje de premios solo está permitido los **Sábados y Domingos** para fomentar la concentración durante la semana.
+
+### 4. Agenda y Eventos (CRUD)
+* Sección para planificar eventos importantes como **Exámenes, Entregas de Trabajo o Citas**.
+* **Creación, Edición y Eliminación** de eventos persistentes.
+
+### 5. Horario Escolar (Gestión CRUD Total - ¡NUEVO!)
+El Horario ahora es completamente personalizable:
+* **Botón ⚙️ Administrar:** Activa el "Modo Gestión" y muestra el formulario CRUD.
+* **Crear:** Añadir nuevas clases o actividades extraescolares a cualquier día de la semana.
+* **Editar:** Modificar el nombre, hora, día o tipo de cualquier actividad existente.
+* **Eliminar:** Quitar actividades del horario.
+* **Persistencia:** Todos los cambios realizados en el horario se guardan automáticamente en el almacenamiento local.
+
+---
+
+## 🛠️ Instalación y Uso
+
+**Shukudai** está diseñado para ser extremadamente fácil de usar y no requiere ningún servidor ni herramientas de construcción.
+
+1.  **Guardar el Código:** Guarda todo el código HTML proporcionado en un único archivo llamado `index.html`.
+2.  **Abrir en Navegador:** Abre el archivo `index.html` con cualquier navegador web moderno (Chrome, Safari, Firefox).
+3.  **Persistencia:** Todos los datos (puntos, tareas, agenda y el horario personalizado) se guardan automáticamente en la memoria local de tu navegador (`localStorage`). No necesitas guardar el archivo `index.html` cada vez que lo editas, solo la primera vez.
+
+**⚠️ Advertencia:** Para evitar la pérdida de datos, utiliza siempre el mismo navegador y dispositivo. Si borras el caché/datos del sitio, los datos se perderán (a menos que uses el botón de **Resetear** intencionadamente).
