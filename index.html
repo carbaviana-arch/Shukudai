@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shukudai: Misión Recompensa</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Confetti CDN (para efectos visuales) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
@@ -193,7 +191,6 @@
 <body class="min-h-screen">
     <div class="max-w-xl mx-auto p-4 bg-white shadow-lg sm:rounded-xl">
         
-        <!-- HEADER / RESUMEN DE PUNTOS -->
         <header class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow-md">
             <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Shukudai GO! ⭐</h1>
             <div class="flex justify-around items-center mb-4">
@@ -211,13 +208,11 @@
                 </div>
             </div>
             
-            <!-- Barra de XP -->
             <div class="w-full bg-gray-200 rounded-full h-3">
                 <div id="xpFill" class="bg-indigo-500 h-3 rounded-full transition-all duration-500" style="width: 0%;"></div>
             </div>
             <div id="xpTexto" class="text-xs text-gray-600 mt-1 font-medium">0 / 125 xp</div>
             
-            <!-- Botones Rápidos -->
             <div class="flex justify-center space-x-2 mt-4">
                 <button id="btnPremioDiario" class="px-3 py-1 bg-yellow-500 text-white text-sm font-bold rounded-full hover:bg-yellow-600 transition">
                     🎁 Diario (+10)
@@ -228,48 +223,52 @@
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL (VISTAS) -->
         <main>
             
-            <!-- VISTA 1: TAREAS (HOME) -->
             <section id="vistaTareas" class="view">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Tareas de Hoy 📝</h2>
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Tareas de Hoy 📝
+                    <button id="btnEditarTareas" class="ml-4 px-3 py-1 bg-gray-200 text-sm rounded-full hover:bg-gray-300 transition">⚙️ Administrar</button>
+                </h2>
                 <div id="categorias" class="space-y-4">
-                    <!-- Las categorías de tareas se renderizan aquí -->
+                    </div>
+                <div id="contenedorGestionTareas" class="mt-6 p-4 bg-indigo-100 border-l-4 border-indigo-400 rounded-lg shadow-inner" style="display:none;">
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-4">Gestión de Tareas (Modo Edición)</h3>
+                    <p class="text-gray-600">Aquí se añadiría la interfaz completa para: Añadir nueva categoría, Añadir nueva tarea, Editar/Eliminar tareas existentes (leyendo de `estado.catalogo`).</p>
+                    <button id="btnCerrarGestionTareas" class="mt-4 py-1 px-4 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Cerrar Gestión</button>
                 </div>
             </section>
 
-            <!-- VISTA 2: TIENDA DE RECOMPENSAS -->
             <section id="vistaTienda" class="view" style="display:none;">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Tienda de Premios ✨</h2>
                 
-                <!-- NUEVO MENSAJE DE REGLA DEL FIN DE SEMANA -->
                 <div id="storeMessage" class="mb-4 p-3 rounded-lg text-center transition-colors duration-300">
                     <h3 id="storeMessageTitle" class="font-extrabold text-lg"></h3>
                     <p id="storeMessageBody" class="text-sm"></p>
                 </div>
                 
                 <div id="contenedorPremios" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <!-- Las tarjetas de premios se renderizan aquí -->
-                </div>
+                    </div>
             </section>
 
-            <!-- VISTA 3: HORARIO ESCOLAR -->
             <section id="vistaHorario" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Horario Escolar 🏫</h2>
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Horario Escolar 🏫
+                    <button id="btnEditarHorario" class="ml-4 px-3 py-1 bg-gray-200 text-sm rounded-full hover:bg-gray-300 transition">⚙️ Administrar</button>
+                </h2>
                 <div id="contenedorHorario" class="space-y-4">
-                    <!-- El horario se renderiza aquí -->
+                    </div>
+                <div id="contenedorGestionHorario" class="mt-6 p-4 bg-indigo-100 border-l-4 border-indigo-400 rounded-lg shadow-inner" style="display:none;">
+                    <h3 class="text-xl font-semibold text-indigo-700 mb-4">Gestión del Horario (Modo Edición)</h3>
+                    <p class="text-gray-600">Aquí se añadiría la interfaz completa para: Añadir/Editar/Eliminar asignaturas dentro de cada día de la semana (leyendo de `estado.horario`).</p>
+                    <button id="btnCerrarGestionHorario" class="mt-4 py-1 px-4 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition">Cerrar Gestión</button>
                 </div>
             </section>
             
-            <!-- VISTA 4: AGENDA Y EVENTOS -->
             <section id="vistaAgenda" class="view" style="display:none;">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Agenda y Eventos 🗓️</h2>
                 
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Próximos Eventos</h3>
                 <div id="listaEventos" class="mb-6">
-                    <!-- Los eventos de la agenda se renderizan aquí -->
-                </div>
+                    </div>
                 
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Evento</h3>
                 <form id="formAgenda" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
@@ -312,14 +311,12 @@
                 </form>
             </section>
 
-            <!-- Botón de Reset -->
             <div class="text-center mt-6">
                 <button id="btnReset" class="text-xs text-gray-400 hover:text-red-500 transition">Reiniciar Todos los Datos (Borrar)</button>
             </div>
             
         </main>
 
-        <!-- DOCK DE NAVEGACIÓN (Fijo en el fondo) -->
         <footer class="fixed inset-x-0 bottom-0 max-w-xl mx-auto bg-white border-t border-gray-200 shadow-2xl rounded-t-xl z-10">
             <div class="flex justify-around items-center p-2">
                 
@@ -346,12 +343,10 @@
         </footer>
     </div>
 
-    <!-- CÓDIGO JAVASCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 2.6: Agenda y 4 Vistas en el Dock.
     const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
@@ -362,8 +357,9 @@
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
-    // --- HORARIO SEMANAL COMPLETO ---
-    const horarioSemanal = {
+    // --- DATOS POR DEFECTO (USADOS PARA INICIALIZAR EL ESTADO LA PRIMERA VEZ) ---
+
+    const DEFAULT_HORARIO_SEMANAL = {
         Lunes: [
             { nombre: "P.E. (Educación Física)", hora: "09:00 - 09:45" },
             { nombre: "Religión", hora: "09:45 - 10:30" },
@@ -420,8 +416,7 @@
         ]
     };
     
-    // --- LISTADO DE TAREAS ---
-    const catalogoTareas = [
+    const DEFAULT_CATALOGO_TAREAS = [
         {
             categoria: "Aseo e Higiene Personal 🧴",
             items: [
@@ -458,7 +453,7 @@
         }
     ];
 
-    // --- CATÁLOGO DE PREMIOS CON DOBLE MONEDA (PUNTOS Y MINUTOS) ---
+    // --- CATÁLOGO DE PREMIOS (Se mantiene como constante ya que no se espera que se edite por el usuario) ---
     const catalogoPremios = [
         // Premios de Puntos
         { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
@@ -472,12 +467,17 @@
         { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
     ];
 
+
     // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE POR SIMPLICIDAD) ---
-    // Incluimos agendaEventos en el estado
+    // Se inicializa el estado con los datos por defecto si no existe en localStorage.
     let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
         puntos: 0,
         minutos: 0,
         nivel: 1,
+        // *** NUEVOS ELEMENTOS DEL ESTADO ***
+        catalogo: DEFAULT_CATALOGO_TAREAS,
+        horario: DEFAULT_HORARIO_SEMANAL,
+        // **********************************
         tareasHoy: {},
         agendaEventos: [], 
         ultimaFecha: new Date().toDateString(),
@@ -515,7 +515,15 @@
         btnAgenda: document.getElementById('agendaBtn'), 
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
-        btnSemanal: document.getElementById('btnPremioSemanal')
+        btnSemanal: document.getElementById('btnPremioSemanal'),
+        
+        // --- NUEVAS REFERENCIAS UI DE EDICIÓN ---
+        btnEditarTareas: document.getElementById('btnEditarTareas'),
+        contenedorGestionTareas: document.getElementById('contenedorGestionTareas'),
+        btnCerrarGestionTareas: document.getElementById('btnCerrarGestionTareas'),
+        btnEditarHorario: document.getElementById('btnEditarHorario'),
+        contenedorGestionHorario: document.getElementById('contenedorGestionHorario'),
+        btnCerrarGestionHorario: document.getElementById('btnCerrarGestionHorario')
     };
 
     // --- 5. FUNCIONES CORE ---
@@ -575,7 +583,8 @@
 
     function renderizarTareas() {
         ui.contenedorCategorias.innerHTML = '';
-        catalogoTareas.forEach(grupo => {
+        // *** CAMBIO: Usar estado.catalogo en lugar de la constante catalogoTareas ***
+        estado.catalogo.forEach(grupo => {
             const details = document.createElement('details');
             details.open = true;
             
@@ -612,6 +621,11 @@
             });
             ui.contenedorCategorias.appendChild(details);
         });
+        
+        // Asegura que se muestren las tareas y se oculte el gestor al renderizar
+        ui.contenedorGestionTareas.style.display = 'none';
+        ui.contenedorCategorias.style.display = 'block';
+        ui.btnEditarTareas.textContent = '⚙️ Administrar';
     }
 
     function renderizarTienda() {
@@ -691,7 +705,8 @@
 
     function renderizarHorario() {
         ui.contenedorHorario.innerHTML = '';
-        const dias = Object.keys(horarioSemanal);
+        // *** CAMBIO: Usar estado.horario en lugar de la constante horarioSemanal ***
+        const dias = Object.keys(estado.horario);
         
         dias.forEach(dia => {
             const diaDiv = document.createElement('div');
@@ -702,7 +717,8 @@
             titulo.textContent = dia;
             diaDiv.appendChild(titulo);
 
-            horarioSemanal[dia].forEach(asignatura => {
+            // *** CAMBIO: Usar estado.horario[dia] ***
+            estado.horario[dia].forEach(asignatura => {
                 const asigDiv = document.createElement('div');
                 // Añadimos una clase condicional para extraescolares
                 asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : ''}`;
@@ -715,9 +731,14 @@
 
             ui.contenedorHorario.appendChild(diaDiv);
         });
+        
+        // Asegura que se muestre el horario y se oculte el gestor al renderizar
+        ui.contenedorGestionHorario.style.display = 'none';
+        ui.contenedorHorario.style.display = 'block';
+        ui.btnEditarHorario.textContent = '⚙️ Administrar';
     }
 
-    // --- RENDERIZADO AGENDA ---
+    // --- RENDERIZADO AGENDA (MANTENIDA) ---
     function renderizarAgenda() {
         ui.listaEventos.innerHTML = '';
         
@@ -733,7 +754,6 @@
 
         eventosOrdenados.forEach(evento => {
             const card = document.createElement('div');
-            // Añade una clase para estilizar según el tipo (e.g., examen, cita)
             let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
             card.className = `agenda-card ${tipoClase}`;
 
@@ -763,7 +783,7 @@
         });
     }
 
-    // --- LÓGICA AGENDA CRUD ---
+    // --- LÓGICA AGENDA CRUD (MANTENIDA) ---
 
     function generarId() {
         return '_' + Math.random().toString(36).substr(2, 9);
@@ -835,7 +855,7 @@
         }
     }
 
-    // --- 7. ACCIONES DE TAREAS ---
+    // --- 7. ACCIONES DE TAREAS (MANTENIDA) ---
     function completarTarea(tarea, exito) {
         if (exito) {
             estado.puntos += tarea.pts;
@@ -850,7 +870,7 @@
         renderizarTareas();
     }
 
-    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN ---
+    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN Y GESTIÓN (ACTUALIZADO) ---
     ui.btnHome.addEventListener('click', () => {
         mostrarVista('vistaTareas', ui.btnHome);
         renderizarTareas();
@@ -872,8 +892,36 @@
     });
 
     ui.formAgenda.addEventListener('submit', guardarEvento); 
+    
+    // --- LÓGICA DE ACTIVACIÓN/DESACTIVACIÓN DEL MODO ADMINISTRACIÓN DE TAREAS ---
+    ui.btnEditarTareas.addEventListener('click', () => {
+        const isVisible = ui.contenedorGestionTareas.style.display !== 'none';
+        ui.contenedorGestionTareas.style.display = isVisible ? 'none' : 'block';
+        ui.contenedorCategorias.style.display = isVisible ? 'block' : 'none';
+        ui.btnEditarTareas.textContent = isVisible ? '⚙️ Administrar' : '✅ Modo Tareas';
+    });
 
-    // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET ---
+    ui.btnCerrarGestionTareas.addEventListener('click', () => {
+        ui.contenedorGestionTareas.style.display = 'none';
+        ui.contenedorCategorias.style.display = 'block';
+        ui.btnEditarTareas.textContent = '⚙️ Administrar';
+    });
+    
+    // --- LÓGICA DE ACTIVACIÓN/DESACTIVACIÓN DEL MODO ADMINISTRACIÓN DE HORARIO ---
+    ui.btnEditarHorario.addEventListener('click', () => {
+        const isVisible = ui.contenedorGestionHorario.style.display !== 'none';
+        ui.contenedorGestionHorario.style.display = isVisible ? 'none' : 'block';
+        ui.contenedorHorario.style.display = isVisible ? 'block' : 'none';
+        ui.btnEditarHorario.textContent = isVisible ? '⚙️ Administrar' : '✅ Modo Horario';
+    });
+
+    ui.btnCerrarGestionHorario.addEventListener('click', () => {
+        ui.contenedorGestionHorario.style.display = 'none';
+        ui.contenedorHorario.style.display = 'block';
+        ui.btnEditarHorario.textContent = '⚙️ Administrar';
+    });
+
+    // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET (MANTENIDA) ---
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
