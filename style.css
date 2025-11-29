@@ -1,10 +1,10 @@
 :root {
-  --primary: #6c5ce7;
-  --secondary: #00b894;
-  --accent: #fdcb6e;
-  --danger: #ff7675;
-  --bg: #f4f7f6;
-  --dark: #2d3436;
+  --primary: #6c5ce7; /* Morado/Violeta */
+  --secondary: #00b894; /* Turquesa */
+  --accent: #fdcb6e; /* Naranja/Amarillo */
+  --danger: #ff7675; /* Rojo */
+  --bg: #f4f7f6; /* Fondo gris claro */
+  --dark: #2d3436; /* Texto oscuro */
   --white: #ffffff;
   --dock-height: 70px;
 }
@@ -15,7 +15,13 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg);
   color: var(--dark);
-  padding-bottom: calc(var(--dock-height) + 20px); 
+  padding-bottom: calc(var(--dock-height) + 20px);  
+}
+
+/* LAYOUT PRINCIPAL */
+.app-container {
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 /* HEADER */
@@ -35,6 +41,8 @@ header p { opacity: 0.8; font-size: 0.9rem; }
 main { padding: 15px; max-width: 600px; margin: 0 auto; }
 
 h3 { color: var(--primary); margin: 20px 0 10px; border-left: 4px solid var(--secondary); padding-left: 10px; }
+h4 { color: var(--dark); font-size: 1.1rem; margin: 15px 0 10px; }
+
 
 section, details, .premio-card, .horario-card, .agenda-card, .form-card {
   background: var(--white);
@@ -49,12 +57,14 @@ section, details, .premio-card, .horario-card, .agenda-card, .form-card {
 .stats-row { display: flex; justify-content: space-around; text-align: center; }
 .label { display: block; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 .big-number { font-size: 2rem; font-weight: 800; color: var(--secondary); }
+.stat-box { margin: 0 5px; } /* Añadido para mejor espaciado */
+
 
 /* BOTONES */
 button { border: none; cursor: pointer; font-family: inherit; transition: transform 0.1s; }
 button:active { transform: scale(0.95); }
 
-#acciones { display: flex; gap: 10px; background: transparent; box-shadow: none; padding: 0; }
+#acciones { display: flex; gap: 10px; background: transparent; box-shadow: none; padding: 0; margin-top: 15px; }
 #acciones button {
   flex: 1; padding: 12px; border-radius: 12px;
   color: white; font-weight: bold; font-size: 0.9rem;
@@ -79,13 +89,15 @@ summary {
   background: #fff; list-style: none; display: flex; align-items: center; justify-content: space-between;
 }
 summary::-webkit-details-marker { display: none; }
-summary::after { content: '▼'; color: #b2bec3; font-size: 0.8em; }
+summary::after { content: '▼'; color: #b2bec3; font-size: 0.8em; margin-left: 10px; }
 details[open] summary::after { content: '▲'; }
 
 .task {
   padding: 12px 15px; border-top: 1px solid #f1f2f6;
   display: flex; justify-content: space-between; align-items: center;
 }
+.task:last-child { border-bottom: none; } /* Asegura que no haya borde extra */
+
 .task-info { display: flex; flex-direction: column; }
 .task-pts { font-size: 0.75rem; color: #b2bec3; }
 
@@ -98,12 +110,13 @@ details[open] summary::after { content: '▲'; }
 
 /* ESTADOS TAREA */
 .task.completed { background: #f0fff4; }
-.task.completed span { text-decoration: line-through; color: #aaa; }
+.task.completed .task-info span { text-decoration: line-through; color: #aaa; }
 .task.failed { background: #fff5f5; }
-.task.failed span { text-decoration: line-through; color: #aaa; }
+.task.failed .task-info span { text-decoration: line-through; color: #aaa; }
+
 
 /* TIENDA */
-.grid-tienda { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.grid-tienda { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; }
 .premio-card {
   padding: 15px; text-align: center; border: 2px solid transparent;
   display: flex; flex-direction: column; align-items: center; gap: 5px;
@@ -113,9 +126,9 @@ details[open] summary::after { content: '▲'; }
 .premio-icono { font-size: 3rem; margin-bottom: 5px; }
 
 /* HORARIO */
-#contenedorHorario { display: flex; flex-direction: column; gap: 15px; }
+#contenedorHorario { display: flex; flex-direction: column; gap: 0; }
 .horario-dia {
-  background: var(--white); border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  background: var(--white); border-radius: 0; overflow: hidden; box-shadow: none;
 }
 .dia-titulo {
   background: var(--primary); color: var(--white); padding: 10px 15px; font-weight: bold; font-size: 1.1rem;
@@ -147,8 +160,8 @@ details[open] summary::after { content: '▲'; }
     display: flex;
     flex-direction: column;
     gap: 5px;
-    position: relative;
-    overflow: visible; /* Necesario para que el botón de eliminar no se corte */
+    position: relative; 
+    overflow: visible;
 }
 .agenda-card.examen { border-left-color: var(--danger); }
 .agenda-card.cita { border-left-color: var(--accent); }
@@ -165,18 +178,19 @@ details[open] summary::after { content: '▲'; }
 .btn-edit { background: var(--accent); color: var(--dark); }
 .btn-delete { background: var(--danger); color: var(--white); }
 
-/* DOCK NAVEGACIÓN (Ajustado para 4 elementos) */
+/* DOCK NAVEGACIÓN */
 #dock {
   position: fixed; bottom: 0; left: 50%; 
   transform: translateX(-50%); 
-  width: 100%; /* Permite que el dock ocupe todo el ancho en móviles */
-  max-width: 600px; /* Ancho máximo en pantallas grandes */
+  width: 100%; 
+  max-width: 600px; 
   height: var(--dock-height);
   
-  background: rgba(255, 255, 255, 0.9); 
+  background: rgba(255, 255, 255, 0.95); 
   border-radius: 20px 20px 0 0; 
   box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
-  border-top: 1px solid rgba(255, 255, 255, 0.5); 
+  backdrop-filter: blur(5px);
+  border-top: 1px solid rgba(0, 0, 0, 0.05); 
 
   display: flex; 
   justify-content: space-around; 
@@ -192,11 +206,19 @@ details[open] summary::after { content: '▲'; }
   padding: 5px;
   border-radius: 10px;
   transition: all 0.2s ease-out;
-  flex: 1; /* Distribuye el espacio entre los 4 botones */
+  flex: 1; 
 }
 .dock-item span { font-size: 1.5rem; }
 .dock-label { font-size: 0.7rem; font-weight: bold; text-align: center; }
 .dock-item.active { 
   color: var(--primary); 
   transform: translateY(-5px); 
+}
+
+/* INFORME (Aprovechamos clases existentes) */
+.detalle-diario-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 0 15px;
 }
