@@ -15,11 +15,7 @@ body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: var(--bg);
   color: var(--dark);
-  
-  /* CORRECCIÓN CLAVE PARA MÓVILES */
-  padding-bottom: calc(var(--dock-height) + 20px); 
-  min-height: 100vh; 
-  position: relative;
+  padding-bottom: calc(var(--dock-height) + 20px);  
 }
 
 /* LAYOUT PRINCIPAL */
@@ -61,7 +57,7 @@ section, details, .premio-card, .horario-card, .agenda-card, .form-card {
 .stats-row { display: flex; justify-content: space-around; text-align: center; }
 .label { display: block; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 .big-number { font-size: 2rem; font-weight: 800; color: var(--secondary); }
-.stat-box { margin: 0 5px; } 
+.stat-box { margin: 0 5px; } /* Añadido para mejor espaciado */
 
 
 /* BOTONES */
@@ -100,7 +96,7 @@ details[open] summary::after { content: '▲'; }
   padding: 12px 15px; border-top: 1px solid #f1f2f6;
   display: flex; justify-content: space-between; align-items: center;
 }
-.task:last-child { border-bottom: none; } 
+.task:last-child { border-bottom: none; } /* Asegura que no haya borde extra */
 
 .task-info { display: flex; flex-direction: column; }
 .task-pts { font-size: 0.75rem; color: #b2bec3; }
@@ -144,7 +140,7 @@ details[open] summary::after { content: '▲'; }
 .asignatura-nombre { font-weight: 500; color: var(--dark); }
 .asignatura-hora { font-size: 0.9rem; color: #6c757d; }
 
-/* AGENDA */
+/* AGENDA (NUEVO) */
 .form-card { padding: 15px; display: flex; flex-direction: column; gap: 10px; }
 .input-field {
     padding: 10px;
@@ -200,32 +196,26 @@ details[open] summary::after { content: '▲'; }
   justify-content: space-around; 
   align-items: center;
   z-index: 1000; 
-  padding: 0 5px; 
+  padding: 0 10px;
 }
 .dock-item {
   background: none; 
   display: flex; flex-direction: column; align-items: center;
   color: #b2bec3; 
   gap: 4px;
-  padding: 5px 2px; 
+  padding: 5px;
   border-radius: 10px;
   transition: all 0.2s ease-out;
   flex: 1; 
 }
-.dock-item span { 
-  font-size: 1.2rem; 
-}
-.dock-label { 
-    font-size: 0.5rem; /* <--- MODIFICACIÓN: Texto de etiqueta más pequeño */
-    font-weight: bold; 
-    text-align: center; 
-}
+.dock-item span { font-size: 1.5rem; }
+.dock-label { font-size: 0.7rem; font-weight: bold; text-align: center; }
 .dock-item.active { 
   color: var(--primary); 
   transform: translateY(-5px); 
 }
 
-/* INFORME */
+/* INFORME (Aprovechamos clases existentes) */
 .detalle-diario-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
