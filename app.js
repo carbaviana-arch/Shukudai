@@ -218,21 +218,25 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedorCategorias: document.getElementById('categorias'),
         contenedorPremios: document.getElementById('contenedorPremios'),
         contenedorHorario: document.getElementById('contenedorHorario'),
-        listaEventos: document.getElementById('listaEventos'), 
-        formAgenda: document.getElementById('formAgenda'), 
+        listaEventos: document.getElementById('listaEventos'),
+        formAgenda: document.getElementById('formAgenda'),
+        
         vistaTareas: document.getElementById('vistaTareas'),
         vistaTienda: document.getElementById('vistaTienda'),
         vistaHorario: document.getElementById('vistaHorario'),
         vistaAgenda: document.getElementById('vistaAgenda'),
-        vistaInforme: document.getElementById('vistaInforme'), // NUEVO
+        vistaInforme: document.getElementById('vistaInforme'), // Referencia a la nueva vista
+        
         btnHome: document.getElementById('homeBtn'),
         btnShop: document.getElementById('shopBtn'),
         btnSchedule: document.getElementById('scheduleBtn'),
-        btnAgenda: document.getElementById('agendaBtn'), 
-        btnReport: document.getElementById('reportBtn'), // NUEVO
+        btnAgenda: document.getElementById('agendaBtn'),
+        btnReport: document.getElementById('reportBtn'), // Referencia al nuevo botón
+        
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
         btnSemanal: document.getElementById('btnPremioSemanal'),
+        
         // Referencias para el informe
         totalStats: document.getElementById('totalStats'),
         detalleSemanal: document.getElementById('detalleSemanal'),
@@ -241,24 +245,28 @@ document.addEventListener('DOMContentLoaded', () => {
         ptsTot: document.getElementById('ptsTot'),
         minTot: document.getElementById('minTot')
     };
-
-    // --- 5. FUNCIONES CORE ---
+    
+    // --- 5. FUNCIONES DE UTILIDAD ---
+    
     function guardar() {
         localStorage.setItem('shukudai_v3_data', JSON.stringify(estado));
-        actualizarUI();
+        actualizarUI(); // Asegura que la UI se refresque después de guardar
     }
-
+    
     function actualizarUI() {
-        // Textos
+        // Actualizar Marcador
         ui.puntos.textContent = estado.puntos;
         ui.minutos.textContent = estado.minutos;
+        
+        // Actualizar Nivel y XP
         ui.nivel.textContent = estado.nivel;
         
-        // Barra XP
-        const xpRestante = estado.puntos % META_XP;
-        ui.xpFill.style.width = `${(xpRestante / META_XP) * 100}%`;
-        ui.xpTexto.textContent = `${xpRestante} / ${META_XP} xp`;
-
+        const xpActual = estado.puntos % META_XP;
+        const porcentajeXP = (xpActual / META_XP) * 100;
+        
+        ui.xpFill.style.width = `${porcentajeXP}%`;
+        ui.xpTexto.textContent = `${xpActual} / ${META_XP} xp`;
+        
         // Verificar Nivel
         const nivelReal = Math.floor(estado.puntos / META_XP) + 1;
         if (nivelReal > estado.nivel) {
@@ -279,24 +287,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function lanzarConfeti() {
         if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
         }
     }
     
     // Función para gestionar la navegación entre las 5 vistas
     function mostrarVista(vistaId, btnActivo) {
-        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda, ui.vistaInforme];
-        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda, ui.btnReport];
-
+        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda, ui.vistaInforme]; // Las 5 vistas
+        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda, ui.btnReport]; // Los 5 botones
+        
         vistas.forEach(v => v.style.display = 'none');
         botones.forEach(b => b.classList.remove('active'));
-
+        
         document.getElementById(vistaId).style.display = 'block';
         btnActivo.classList.add('active');
     }
 
     // --- 6. RENDERIZADO DE VISTAS ---
-
+    
     function renderizarTareas() {
         ui.contenedorCategorias.innerHTML = '';
         catalogoTareas.forEach(grupo => {
@@ -306,14 +318,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const summary = document.createElement('summary');
             summary.textContent = grupo.categoria;
             details.appendChild(summary);
-
+            
             grupo.items.forEach(tarea => {
                 const div = document.createElement('div');
                 div.className = 'task';
+                
                 const estadoTarea = estado.tareasHoy[tarea.id];
                 if (estadoTarea === 'hecho') div.classList.add('completed');
                 if (estadoTarea === 'fail') div.classList.add('failed');
-
+                
                 div.innerHTML = `
                     <div class="task-info">
                         <span>${tarea.nombre}</span>
@@ -321,30 +334,33 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="task-buttons">
                         ${!estadoTarea ? `
-                        <button class="btn-circle check" title="Completar">✔</button>
-                        <button class="btn-circle cross" title="Fallar">✖</button>
+                            <button class="btn-circle check" title="Completar">✔</button>
+                            <button class="btn-circle cross" title="Fallar">✖</button>
                         ` : `
-                        <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
+                            <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
                         `}
                     </div>
                 `;
+                
                 if (!estadoTarea) {
                     div.querySelector('.check').addEventListener('click', () => completarTarea(tarea, true));
                     div.querySelector('.cross').addEventListener('click', () => completarTarea(tarea, false));
                 }
+                
                 details.appendChild(div);
             });
+            
             ui.contenedorCategorias.appendChild(details);
         });
     }
 
     function renderizarTienda() {
         ui.contenedorPremios.innerHTML = '';
-        
+
         // Lógica de verificación de fin de semana para el mensaje
         const today = new Date().getDay(); // 0 = Domingo, 6 = Sábado
         const isWeekend = today === 0 || today === 6;
-
+        
         const messageDiv = document.getElementById('storeMessage');
         const messageTitle = document.getElementById('storeMessageTitle');
         const messageBody = document.getElementById('storeMessageBody');
@@ -361,20 +377,18 @@ document.addEventListener('DOMContentLoaded', () => {
             messageDiv.style.borderColor = 'var(--accent)';
             messageDiv.style.backgroundColor = '#fff5e0'; // Yellow-like background
             messageTitle.style.color = 'var(--accent)';
-            messageTitle.textContent = 'Canje de Premios: ¡SÓLO FINES DE SEMANA! 📅';
-            messageBody.textContent = 'Aún no es momento de canjear. Sigue acumulando puntos y minutos para el Sábado y Domingo.';
+            messageTitle.textContent = 'Espera al Fin de Semana ⏳';
+            messageBody.textContent = '¡Sigue sumando puntos y minutos! Los premios se canjean Sábados y Domingos.';
         }
-
-
+        
         catalogoPremios.forEach(premio => {
-            
             const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
             const cantidadDisponible = premio.moneda === 'minutos' ? estado.minutos : estado.puntos;
-
             const puedeComprar = cantidadDisponible >= premio.coste;
-            
+
             const card = document.createElement('div');
             card.className = 'premio-card';
+            
             // Opacidad reducida si no puede comprar O si no es fin de semana.
             card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.5';
 
@@ -383,23 +397,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="font-weight:bold;">${premio.nombre}</div>
                 <div class="price-tag">${premio.coste} ${monedaSimbolo}</div>
             `;
-
+            
             card.addEventListener('click', () => {
                 // Verificar si es fin de semana y si puede comprar
                 if (!isWeekend) {
                     reproducir('error');
                     console.log("Solo se puede canjear premios los fines de semana.");
-                    alert("Solo se puede canjear premios los fines de semana. ¡Sigue esforzándote!");
-                    return;
-                }
-
-                if (!puedeComprar) {
-                    reproducir('error');
-                    const faltante = premio.coste - cantidadDisponible;
-                    alert(`Te faltan ${faltante} ${monedaSimbolo}. ¡Sigue acumulando!`); 
+                    alert("Solo se pueden canjear premios los Sábados y Domingos.");
                     return;
                 }
                 
+                if (!puedeComprar) {
+                    reproducir('error');
+                    const faltante = premio.coste - cantidadDisponible;
+                    alert(`Te faltan ${faltante} ${monedaSimbolo} para comprar "${premio.nombre}".`);
+                    return;
+                }
+
                 // Usamos confirm() para simular un modal
                 if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} ${monedaSimbolo}?`)) {
                     // Lógica de DEDUCCIÓN
@@ -408,14 +422,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         estado.puntos -= premio.coste;
                     }
-
                     reproducir('caja');
-                    lanzarConfeti(); 
+                    lanzarConfeti();
                     guardar();
-                    renderizarTienda(); 
+                    renderizarTienda();
                 }
             });
-
+            
             ui.contenedorPremios.appendChild(card);
         });
     }
@@ -427,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
         dias.forEach(dia => {
             const diaDiv = document.createElement('div');
             diaDiv.className = 'horario-dia';
-
+            
             const titulo = document.createElement('div');
             titulo.className = 'dia-titulo';
             titulo.textContent = dia;
@@ -437,60 +450,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 const asigDiv = document.createElement('div');
                 // Añadimos una clase condicional para extraescolares
                 asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : ''}`;
+
                 asigDiv.innerHTML = `
                     <span class="asignatura-nombre">${asignatura.nombre}</span>
                     <span class="asignatura-hora">${asignatura.hora}</span>
                 `;
                 
-                // Aplicamos estilo específico para extra-curricular, ya que el CSS no lo tenía.
-                if (asignatura.tipo === 'extra') {
-                    asigDiv.style.backgroundColor = '#e0f7fa'; // Light Cyan/Aqua for extras
-                    asigDiv.style.fontWeight = '600';
-                }
-                
                 diaDiv.appendChild(asigDiv);
             });
-
+            
             ui.contenedorHorario.appendChild(diaDiv);
         });
     }
-
+    
     // --- RENDERIZADO AGENDA ---
     function renderizarAgenda() {
         ui.listaEventos.innerHTML = '';
         
         // Ordenar eventos por fecha ascendente
-        const eventosOrdenados = [...estado.agendaEventos].sort((a, b) => 
-            new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00'))
-        );
+        const eventosOrdenados = [...estado.agendaEventos].sort((a, b) => new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00')) );
 
         if (eventosOrdenados.length === 0) {
-            ui.listaEventos.innerHTML = '<p style="color: #999; text-align: center; padding: 15px;">No hay eventos próximos en la agenda.</p>';
+            ui.listaEventos.innerHTML = '<p style="color: #999; text-align: center; padding: 15px;">No hay eventos programados.</p>';
             return;
         }
-
+        
         eventosOrdenados.forEach(evento => {
             const card = document.createElement('div');
-            // Añade una clase para estilizar según el tipo
-            let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
-            // Fallback si no coincide exactamente
-            if (!['examen', 'cita', 'entrega'].includes(tipoClase)) tipoClase = 'otro';
+            // La clase condicional maneja el borde de color
+            card.className = `agenda-card ${evento.tipo.toLowerCase()}`;
             
-            card.className = `agenda-card ${tipoClase}`;
-
+            // Determinar si el evento ya pasó
+            const eventDateTime = new Date(evento.fecha + ' ' + (evento.hora || '00:00'));
+            const isPast = eventDateTime < new Date();
+            const badge = isPast ? '<span style="color: #ef4444; font-weight: bold;">[PASADO]</span>' : '';
+            
+            // Formatear fecha para mostrar
+            const fechaFormateada = new Date(evento.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' });
+            
             card.innerHTML = `
-                <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
+                <div class="agenda-title">${evento.asignatura} ${badge}</div>
                 <div class="agenda-info-row">
-                    <span>${new Date(evento.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
-                    <span>${evento.hora || ''}</span>
+                    <span>${evento.tipo}</span>
+                    <span>${fechaFormateada} ${evento.hora ? ' • ' + evento.hora : ''}</span>
                 </div>
-                ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
+                ${evento.comentarios ? `<div class="agenda-comments">${evento.comentarios}</div>` : ''}
                 <div class="agenda-actions">
                     <button class="btn-edit" data-id="${evento.id}">📝 Editar</button>
                     <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
                 </div>
             `;
-
             ui.listaEventos.appendChild(card);
         });
 
@@ -498,43 +507,45 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.listaEventos.querySelectorAll('.btn-edit').forEach(btn => {
             btn.addEventListener('click', (e) => cargarEventoParaEdicion(e.target.dataset.id));
         });
-
         ui.listaEventos.querySelectorAll('.btn-delete').forEach(btn => {
             btn.addEventListener('click', (e) => eliminarEvento(e.target.dataset.id));
         });
     }
 
-    // --- RENDERIZADO INFORME SEMANAL (NUEVO) ---
+    // --- RENDERIZADO INFORME SEMANAL (AÑADIDO) ---
     function renderizarInforme() {
-        // 1. Calcular Totales
+        // 1. Obtener y agregar el resumen de HOY a la lista para el cálculo total
+        const hoyResumen = generarResumenDiario(estado.tareasHoy, 'Hoy');
+        
         let totalCompletadas = 0;
         let totalFallidas = 0;
         let totalPuntos = 0;
         let totalMinutos = 0;
 
+        // Sumar el historial archivado
         estado.historialSemanal.forEach(dia => {
             totalCompletadas += dia.completadas;
             totalFallidas += dia.fallidas;
             totalPuntos += dia.puntos;
             totalMinutos += dia.minutos;
         });
-        
-        // Incluir el resumen del día actual
-        const hoyResumen = generarResumenDiario(estado.tareasHoy, "Hoy");
+
+        // Sumar el resumen de hoy
         totalCompletadas += hoyResumen.completadas;
         totalFallidas += hoyResumen.fallidas;
         totalPuntos += hoyResumen.puntos;
         totalMinutos += hoyResumen.minutos;
-        
+
         // 2. Renderizar Totales
         ui.compTot.textContent = totalCompletadas;
         ui.failTot.textContent = totalFallidas;
         ui.ptsTot.textContent = totalPuntos;
         ui.minTot.textContent = totalMinutos;
-        
+
         // 3. Renderizar Detalle Diario
         ui.detalleSemanal.innerHTML = '';
         
+        // Incluir el resumen de hoy y el historial archivado (el historial ya se guarda de antiguo a reciente, por eso lo invierto)
         const historialCompleto = [hoyResumen, ...estado.historialSemanal].reverse(); // De más reciente a más antiguo
         
         const diasMostrados = historialCompleto.filter(dia => dia.completadas > 0 || dia.fallidas > 0);
@@ -546,31 +557,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
         diasMostrados.forEach(dia => {
             const card = document.createElement('div');
-            // Estilos adaptados al nuevo CSS
-            card.style.padding = '15px';
-            card.style.backgroundColor = 'var(--white)';
-            card.style.borderRadius = '10px';
-            card.style.boxShadow = '0 1px 5px rgba(0,0,0,0.05)';
-            card.style.borderLeft = '4px solid var(--secondary)';
+            card.className = 'day-summary'; 
             
-            const fechaFormateada = dia.fecha === 'Hoy' 
-                ? 'Hoy' 
-                : new Date(dia.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
-                
+            const fechaFormateada = dia.fecha === 'Hoy' ? 'Hoy' : new Date(dia.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
+            
             card.innerHTML = `
-                <div style="font-weight: bold; font-size: 1rem; color: var(--dark);">${fechaFormateada}</div>
-                <div style="font-size: 0.9rem; margin-top: 5px;">
-                    <p style="color: var(--secondary);">✅ Hechas: <strong>${dia.completadas}</strong></p>
-                    <p style="color: var(--danger);">❌ Falladas: <strong>${dia.fallidas}</strong></p>
-                    <p style="margin-top: 8px; color: var(--primary);">Recompensa: <strong>+${dia.puntos} Pts / +${dia.minutos} Min</strong></p>
+                <div class="summary-header">${fechaFormateada}</div>
+                <div class="summary-body">
+                    <div class="summary-stat">
+                        <span style="color: #10b981;">✅</span>
+                        <div>${dia.completadas}</div>
+                        <small>OK</small>
+                    </div>
+                    <div class="summary-stat">
+                        <span style="color: #ef4444;">❌</span>
+                        <div>${dia.fallidas}</div>
+                        <small>FAIL</small>
+                    </div>
+                    <div class="summary-stat">
+                        <span style="color: #4f46e5;">⭐</span>
+                        <div>${dia.puntos}</div>
+                        <small>Pts</small>
+                    </div>
+                    <div class="summary-stat">
+                        <span style="color: #f59e0b;">⏱️</span>
+                        <div>${dia.minutos}</div>
+                        <small>Min</small>
+                    </div>
                 </div>
             `;
             ui.detalleSemanal.appendChild(card);
         });
     }
 
-    // --- LÓGICA AGENDA CRUD ---
-
+    // --- 7. ACCIONES DE TAREAS --- 
+    function completarTarea(tarea, exito) {
+        if (exito) {
+            estado.puntos += tarea.pts;
+            estado.minutos += tarea.min;
+            estado.tareasHoy[tarea.id] = 'hecho';
+            reproducir('exito');
+        } else {
+            estado.tareasHoy[tarea.id] = 'fail';
+            reproducir('error');
+        }
+        guardar();
+        renderizarTareas();
+    }
+    
+    // --- LÓGICA AGENDA CRUD (sin cambios) ---
     function generarId() {
         return '_' + Math.random().toString(36).substr(2, 9);
     }
@@ -587,8 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('agendaTipo').value = evento.tipo;
         document.getElementById('agendaComentarios').value = evento.comentarios || '';
         
-        // Mover la vista a la Agenda y hacer scroll al formulario
-        mostrarVista('vistaAgenda', ui.btnAgenda);
+        // Enfocar en el formulario
         ui.formAgenda.scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -612,49 +646,40 @@ document.addEventListener('DOMContentLoaded', () => {
         };
 
         if (id) {
-            // Edición: Encontrar y reemplazar el evento existente
-            const index = estado.agendaEventos.findIndex(e => e.id === id);
+            // Edición
+            const index = estado.agendaEventos.findIndex(ev => ev.id === id);
             if (index !== -1) {
                 estado.agendaEventos[index] = nuevoEvento;
-                console.log('Evento actualizado con éxito. 🎉');
             }
+            console.log('Evento editado:', nuevoEvento.id);
         } else {
-            // Creación: Añadir nuevo evento
+            // Nuevo
             estado.agendaEventos.push(nuevoEvento);
-            console.log('Nuevo evento guardado. 🎉');
+            console.log('Nuevo evento guardado:', nuevoEvento.id);
         }
 
+        // Limpiar formulario y guardar
+        ui.formAgenda.reset();
+        document.getElementById('agendaId').value = '';
         guardar();
-        ui.formAgenda.reset(); // Limpiar formulario
-        document.getElementById('agendaId').value = ''; // Resetear ID oculto
         renderizarAgenda();
+        alert('Evento guardado con éxito.');
     }
 
     function eliminarEvento(id) {
-        if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
+        if (window.confirm('¿Estás seguro de que quieres eliminar este evento de la agenda?')) {
             estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
             guardar();
             renderizarAgenda();
-            console.log('Evento eliminado.'); 
+            console.log('Evento eliminado.');
         }
     }
-
-    // --- 7. ACCIONES DE TAREAS ---
-    function completarTarea(tarea, exito) {
-        if (exito) {
-            estado.puntos += tarea.pts;
-            estado.minutos += tarea.min;
-            estado.tareasHoy[tarea.id] = 'hecho';
-            reproducir('exito');
-        } else {
-            estado.tareasHoy[tarea.id] = 'fail';
-            reproducir('error');
-        }
-        guardar();
-        renderizarTareas();
-    }
-
-    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN ---
+    
+    // --- 8. GESTIÓN DE VISTAS (NAVEGACIÓN) ---
+    // Inicializar la UI al cargar
+    actualizarUI();
+    renderizarTareas(); // Mostrar la vista de Tareas por defecto
+    
     ui.btnHome.addEventListener('click', () => {
         mostrarVista('vistaTareas', ui.btnHome);
         renderizarTareas();
@@ -675,7 +700,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarAgenda();
     });
     
-    ui.btnReport.addEventListener('click', () => { // NUEVO
+    // Nuevo listener para la vista de Informe (AÑADIDO)
+    ui.btnReport.addEventListener('click', () => { 
         mostrarVista('vistaInforme', ui.btnReport);
         renderizarInforme(); 
     });
@@ -714,7 +740,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // INICIO: Mostrar la vista de tareas por defecto al cargar.
-    mostrarVista('vistaTareas', ui.btnHome);
-    actualizarUI();
 });
