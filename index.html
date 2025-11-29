@@ -51,7 +51,10 @@
         <main class="mb-20">
             
             <section id="vistaTareas" class="view">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Tareas de Hoy 📝</h2>
+                <div class="flex justify-between items-center mb-4">
+                     <h2 class="text-2xl font-bold text-gray-700">Tareas de Hoy 📝</h2>
+                     <button id="btnAdminTareas" class="btn-admin text-sm">⚙️ Administrar</button>
+                </div>
                 <div id="categorias" class="space-y-4">
                     </div>
             </section>
@@ -148,6 +151,49 @@
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Detalle Diario</h3>
                 <div id="detalleSemanal" class="space-y-3">
                     </div>
+            </section>
+            <section id="vistaAdminTareas" class="view form-card" style="display:none;">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">⚙️ Administración de Tareas</h2>
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Catálogo Actual</h3>
+                <div id="listaTareasAdmin" class="mb-6 space-y-2">
+                    </div>
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Tarea</h3>
+                <form id="formTarea" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
+                    <input type="hidden" id="tareaId" value="">
+                    <input type="hidden" id="tareaCategoriaOriginal" value="">
+                    
+                    <div class="flex space-x-3">
+                        <div class="flex-1">
+                            <label for="tareaNombre" class="block text-sm font-medium text-gray-700">Nombre de la Tarea</label>
+                            <input type="text" id="tareaNombre" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Fregar platos">
+                        </div>
+                        <div class="w-1/3">
+                            <label for="tareaCategoria" class="block text-sm font-medium text-gray-700">Categoría</label>
+                            <select id="tareaCategoria" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
+                                </select>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                         <div class="flex-1">
+                            <label for="tareaPts" class="block text-sm font-medium text-gray-700">Puntos (Pts)</label>
+                            <input type="number" id="tareaPts" required min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="1">
+                        </div>
+                        <div class="flex-1">
+                            <label for="tareaMin" class="block text-sm font-medium text-gray-700">Minutos (Min)</label>
+                            <input type="number" id="tareaMin" required min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="0">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
+                        Guardar Tarea
+                    </button>
+                    <button type="button" id="btnCancelarEdicion" class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition cursor-pointer" style="display:none;">
+                        Cancelar Edición
+                    </button>
+                </form>
             </section>
             <div class="text-center mt-6">
                 <button id="btnReset" class="danger-outline text-xs underline cursor-pointer">Reiniciar Todos los Datos (Borrar)</button>
