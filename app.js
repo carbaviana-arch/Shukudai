@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 2.6: Agenda y 4 Vistas en el Dock.
+    // SHUKUDAI 3.0: Agenda + 5 Vistas en el Dock + Historial Semanal.
     const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    // --- CATÁLOGO DE PREMIOS ACTUALIZADO: AÑADIMOS PROPIEDAD 'moneda' ---
+    // --- CATÁLOGO DE PREMIOS ---
     const catalogoPremios = [
         // Premios de Puntos
         { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
@@ -116,15 +116,14 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
         { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
         // Premios de Minutos (Tiempo de Pantalla)
-        // El coste ahora es en minutos, no en puntos.
         { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
         { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
         { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
         { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
     ];
 
-    // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE POR SIMPLICIDAD) ---
-    // Incluimos agendaEventos en el estado
+    // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE) ---
+    // Versión 3.0: Añadimos historialSemanal y fechaInicioSemana
     let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
         puntos: 0,
         minutos: 0,
@@ -133,15 +132,79 @@ document.addEventListener('DOMContentLoaded', () => {
         agendaEventos: [], 
         ultimaFecha: new Date().toDateString(),
         ultimoDiario: null,
+        historialSemanal: [], // NUEVO: Almacena resúmenes de días pasados
+        fechaInicioSemana: new Date().toDateString() // NUEVO: Para saber cuándo empezó el ciclo de informe
     };
 
-    // --- 3. LÓGICA DE NUEVO DÍA ---
+    // --- 3. LÓGICA DE NUEVO DÍA Y ARCHIVO SEMANAL ---
+    
+    // Función auxiliar para obtener los resultados de un día específico
+    function generarResumenDiario(tareas, fecha) {
+        let completadas = 0;
+        let fallidas = 0;
+        let puntosObtenidos = 0;
+        let minutosObtenidos = 0;
+        
+        const todasLasTareas = catalogoTareas.flatMap(c => c.items); 
+
+        for (const id in tareas) {
+            const estado = tareas[id];
+            const tareaData = todasLasTareas.find(t => t.id === id);
+            
+            if (estado === 'hecho' && tareaData) {
+                completadas++;
+                puntosObtenidos += tareaData.pts;
+                minutosObtenidos += tareaData.min;
+            } else if (estado === 'fail') {
+                fallidas++;
+            }
+        }
+
+        return {
+            fecha: fecha,
+            completadas: completadas,
+            fallidas: fallidas,
+            puntos: puntosObtenidos,
+            minutos: minutosObtenidos
+        };
+    }
+    
+    // Función para manejar el reinicio del ciclo semanal
+    function limpiarHistorialSiAplica() {
+        const inicio = new Date(estado.fechaInicioSemana);
+        const hoy = new Date();
+        const diffTime = Math.abs(hoy - inicio);
+        // Calcula días de diferencia.
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+
+        // Reinicia el historial y la fecha de inicio de semana si han pasado 7 días.
+        if (diffDays >= 7) { 
+            console.log("Reiniciando ciclo semanal de informe.");
+            estado.historialSemanal = []; 
+            estado.fechaInicioSemana = new Date().toDateString();
+        }
+    }
+
+
     const hoy = new Date().toDateString();
     if (estado.ultimaFecha !== hoy) {
-        console.log("¡Nuevo día detectado! Reseteando tareas.");
+        console.log("¡Nuevo día detectado! Archivando tareas de ayer...");
+        
+        // 1. Archivar el resumen del día anterior (ultimaFecha)
+        const ayer = estado.ultimaFecha;
+        const resumenAyer = generarResumenDiario(estado.tareasHoy, ayer);
+        
+        // Solo archivar si se realizaron tareas
+        if (resumenAyer.completadas > 0 || resumenAyer.fallidas > 0) {
+             estado.historialSemanal.push(resumenAyer);
+        }
+        
+        // 2. Limpiar el historial si ha pasado una semana
+        limpiarHistorialSiAplica(); 
+        
+        // 3. Resetear para el nuevo día
         estado.tareasHoy = {}; 
         estado.ultimaFecha = hoy;
-        // No reseteamos el 'ultimoDiario' aquí, se maneja en el botón de premio.
         guardar();
     }
 
@@ -160,14 +223,23 @@ document.addEventListener('DOMContentLoaded', () => {
         vistaTareas: document.getElementById('vistaTareas'),
         vistaTienda: document.getElementById('vistaTienda'),
         vistaHorario: document.getElementById('vistaHorario'),
-        vistaAgenda: document.getElementById('vistaAgenda'), 
+        vistaAgenda: document.getElementById('vistaAgenda'),
+        vistaInforme: document.getElementById('vistaInforme'), // NUEVO
         btnHome: document.getElementById('homeBtn'),
         btnShop: document.getElementById('shopBtn'),
         btnSchedule: document.getElementById('scheduleBtn'),
         btnAgenda: document.getElementById('agendaBtn'), 
+        btnReport: document.getElementById('reportBtn'), // NUEVO
         btnReset: document.getElementById('btnReset'),
         btnDiario: document.getElementById('btnPremioDiario'),
-        btnSemanal: document.getElementById('btnPremioSemanal')
+        btnSemanal: document.getElementById('btnPremioSemanal'),
+        // Referencias para el informe
+        totalStats: document.getElementById('totalStats'),
+        detalleSemanal: document.getElementById('detalleSemanal'),
+        compTot: document.getElementById('compTot'),
+        failTot: document.getElementById('failTot'),
+        ptsTot: document.getElementById('ptsTot'),
+        minTot: document.getElementById('minTot')
     };
 
     // --- 5. FUNCIONES CORE ---
@@ -211,10 +283,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Función para gestionar la navegación entre las 4 vistas
+    // Función para gestionar la navegación entre las 5 vistas
     function mostrarVista(vistaId, btnActivo) {
-        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda];
-        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda];
+        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda, ui.vistaInforme];
+        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda, ui.btnReport];
 
         vistas.forEach(v => v.style.display = 'none');
         botones.forEach(b => b.classList.remove('active'));
@@ -249,8 +321,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="task-buttons">
                         ${!estadoTarea ? `
-                        <button class="btn-circle check">✔</button>
-                        <button class="btn-circle cross">✖</button>
+                        <button class="btn-circle check" title="Completar">✔</button>
+                        <button class="btn-circle cross" title="Fallar">✖</button>
                         ` : `
                         <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
                         `}
@@ -268,6 +340,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderizarTienda() {
         ui.contenedorPremios.innerHTML = '';
+        
+        // Lógica de verificación de fin de semana para el mensaje
+        const today = new Date().getDay(); // 0 = Domingo, 6 = Sábado
+        const isWeekend = today === 0 || today === 6;
+
+        const messageDiv = document.getElementById('storeMessage');
+        const messageTitle = document.getElementById('storeMessageTitle');
+        const messageBody = document.getElementById('storeMessageBody');
+
+        if (isWeekend) {
+            messageDiv.className = 'mb-4 p-3 bg-green-100 text-green-800 border border-green-300 rounded-lg text-center';
+            messageTitle.textContent = '¡HOY ES FIN DE SEMANA! 🎉';
+            messageBody.textContent = '¡Ya puedes canjear tus premios! ¡Felicidades por tu esfuerzo!';
+        } else {
+            messageDiv.className = 'mb-4 p-3 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg text-center';
+            messageTitle.textContent = 'Canje de Premios: ¡SÓLO FINES DE SEMANA! 📅';
+            messageBody.textContent = 'Aún no es momento de canjear. Sigue acumulando puntos y minutos para el Sábado y Domingo.';
+        }
+
+
         catalogoPremios.forEach(premio => {
             
             const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
@@ -277,7 +369,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const card = document.createElement('div');
             card.className = 'premio-card';
-            card.style.opacity = puedeComprar ? '1' : '0.5';
+            // Opacidad reducida si no puede comprar O si no es fin de semana.
+            card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.5';
 
             card.innerHTML = `
                 <div class="premio-icono">${premio.icono}</div>
@@ -286,16 +379,24 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
 
             card.addEventListener('click', () => {
+                // Verificar si es fin de semana y si puede comprar
+                if (!isWeekend) {
+                    reproducir('error');
+                    console.log("Solo se puede canjear premios los fines de semana.");
+                    alert("Solo se puede canjear premios los fines de semana. ¡Sigue esforzándote!");
+                    return;
+                }
+
                 if (!puedeComprar) {
                     reproducir('error');
                     const faltante = premio.coste - cantidadDisponible;
-                    console.log(`Te faltan ${faltante} ${monedaSimbolo}.`); 
+                    alert(`Te faltan ${faltante} ${monedaSimbolo}. ¡Sigue acumulando!`); 
                     return;
                 }
                 
-                // Usamos confirm() temporalmente para simular un modal
+                // Usamos confirm() para simular un modal
                 if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} ${monedaSimbolo}?`)) {
-                    // Lógica de DEDUCCIÓN ACTUALIZADA
+                    // Lógica de DEDUCCIÓN
                     if (premio.moneda === 'minutos') {
                         estado.minutos -= premio.coste;
                     } else {
@@ -341,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- RENDERIZADO AGENDA (NUEVO) ---
+    // --- RENDERIZADO AGENDA ---
     function renderizarAgenda() {
         ui.listaEventos.innerHTML = '';
         
@@ -351,25 +452,28 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         if (eventosOrdenados.length === 0) {
-            ui.listaEventos.innerHTML = '<p class="text-gray-500">No hay eventos próximos en la agenda.</p>';
+            ui.listaEventos.innerHTML = '<p class="text-gray-500 text-center py-4">No hay eventos próximos en la agenda.</p>';
             return;
         }
 
         eventosOrdenados.forEach(evento => {
             const card = document.createElement('div');
-            // Añade una clase para estilizar según el tipo (e.g., examen, cita)
+            // Añade una clase para estilizar según el tipo
             let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
+            // Fallback si no coincide exactamente
+            if (!['examen', 'cita', 'entrega'].includes(tipoClase)) tipoClase = 'otro';
+            
             card.className = `agenda-card ${tipoClase}`;
 
             card.innerHTML = `
                 <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
                 <div class="agenda-info-row">
-                    <span>Fecha: ${new Date(evento.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                    <span>Hora: ${evento.hora || 'No especificada'}</span>
+                    <span>${new Date(evento.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
+                    <span>${evento.hora || ''}</span>
                 </div>
                 ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
                 <div class="agenda-actions">
-                    <button class="btn-edit btn-secondary" data-id="${evento.id}">📝 Editar</button>
+                    <button class="btn-edit" data-id="${evento.id}">📝 Editar</button>
                     <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
                 </div>
             `;
@@ -387,7 +491,67 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- LÓGICA AGENDA CRUD (NUEVO) ---
+    // --- RENDERIZADO INFORME SEMANAL (NUEVO) ---
+    function renderizarInforme() {
+        // 1. Calcular Totales
+        let totalCompletadas = 0;
+        let totalFallidas = 0;
+        let totalPuntos = 0;
+        let totalMinutos = 0;
+
+        estado.historialSemanal.forEach(dia => {
+            totalCompletadas += dia.completadas;
+            totalFallidas += dia.fallidas;
+            totalPuntos += dia.puntos;
+            totalMinutos += dia.minutos;
+        });
+        
+        // Incluir el resumen del día actual
+        const hoyResumen = generarResumenDiario(estado.tareasHoy, "Hoy");
+        totalCompletadas += hoyResumen.completadas;
+        totalFallidas += hoyResumen.fallidas;
+        totalPuntos += hoyResumen.puntos;
+        totalMinutos += hoyResumen.minutos;
+        
+        // 2. Renderizar Totales
+        ui.compTot.textContent = totalCompletadas;
+        ui.failTot.textContent = totalFallidas;
+        ui.ptsTot.textContent = totalPuntos;
+        ui.minTot.textContent = totalMinutos;
+        
+        // 3. Renderizar Detalle Diario
+        ui.detalleSemanal.innerHTML = '';
+        
+        const historialCompleto = [hoyResumen, ...estado.historialSemanal].reverse(); // De más reciente a más antiguo
+        
+        const diasMostrados = historialCompleto.filter(dia => dia.completadas > 0 || dia.fallidas > 0);
+
+        if (diasMostrados.length === 0) {
+            ui.detalleSemanal.innerHTML = '<p class="text-gray-500 text-center py-4">Aún no hay días archivados o con tareas realizadas en este ciclo semanal.</p>';
+            return;
+        }
+
+        diasMostrados.forEach(dia => {
+            const card = document.createElement('div');
+            card.className = 'p-3 bg-white border border-gray-200 rounded-lg shadow-sm';
+            
+            const fechaFormateada = dia.fecha === 'Hoy' 
+                ? 'Hoy' 
+                : new Date(dia.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
+                
+            card.innerHTML = `
+                <div class="font-bold text-lg text-gray-800">${fechaFormateada}</div>
+                <div class="text-sm mt-1">
+                    <p class="text-green-700">✅ Hechas: **${dia.completadas}**</p>
+                    <p class="text-red-700">❌ Falladas: **${dia.fallidas}**</p>
+                    <p class="mt-2 text-indigo-600">Recompensa: **+${dia.puntos} Pts / +${dia.minutos} Min**</p>
+                </div>
+            `;
+            ui.detalleSemanal.appendChild(card);
+        });
+    }
+
+    // --- LÓGICA AGENDA CRUD ---
 
     function generarId() {
         return '_' + Math.random().toString(36).substr(2, 9);
@@ -405,7 +569,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('agendaTipo').value = evento.tipo;
         document.getElementById('agendaComentarios').value = evento.comentarios || '';
         
-        // Mover la vista a la Agenda y hacer scroll al formulario (opcional pero útil)
+        // Mover la vista a la Agenda y hacer scroll al formulario
         mostrarVista('vistaAgenda', ui.btnAgenda);
         ui.formAgenda.scrollIntoView({ behavior: 'smooth' });
     }
@@ -449,13 +613,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function eliminarEvento(id) {
-        // Usamos confirm() temporalmente para simular un modal
         if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
             estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
             guardar();
             renderizarAgenda();
-            reproducir('error');
-            console.log('Evento eliminado.');
+            console.log('Evento eliminado.'); // **DEPURADO: Ya no reproduce el audio de error**
         }
     }
 
@@ -494,6 +656,11 @@ document.addEventListener('DOMContentLoaded', () => {
         mostrarVista('vistaAgenda', ui.btnAgenda);
         renderizarAgenda();
     });
+    
+    ui.btnReport.addEventListener('click', () => { // NUEVO
+        mostrarVista('vistaInforme', ui.btnReport);
+        renderizarInforme(); 
+    });
 
     ui.formAgenda.addEventListener('submit', guardarEvento); 
 
@@ -503,6 +670,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (estado.ultimoDiario === hoy) {
             console.log("Ya has recogido el premio diario de hoy. Vuelve mañana.");
             reproducir('error');
+            alert("Ya has recogido tu regalo de hoy. ¡Vuelve mañana!");
             return;
         }
 
@@ -510,11 +678,10 @@ document.addEventListener('DOMContentLoaded', () => {
         estado.ultimoDiario = hoy; 
         reproducir('exito');
         guardar();
-        console.log("+10 Puntos recibidos 🎁");
+        alert("¡+10 Puntos recibidos! 🎁");
     });
 
     ui.btnSemanal.addEventListener('click', () => {
-        // Usamos confirm() temporalmente para simular un modal
         if(window.confirm("¿Reclamar premio semanal (+70)?")) {
             estado.puntos += 70;
             reproducir('nivel');
@@ -523,8 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ui.btnReset.addEventListener('click', () => {
-        // Usamos confirm() temporalmente para simular un modal
-        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos y nivel.")) {
+        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos, nivel, agenda e historial.")) {
             localStorage.removeItem('shukudai_v3_data');
             location.reload();
         }
