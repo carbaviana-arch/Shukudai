@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 3.0: Agenda + 5 Vistas en el Dock + Historial Semanal.
+    // --- 1. CONFIGURACIÓN ---\
+    const VERSION = "v4.0";
     const META_XP = 125; 
     
     // Sonidos (URLs estables de Google CDN)
@@ -12,638 +12,681 @@ document.addEventListener('DOMContentLoaded', () => {
         caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
     };
 
-    // --- HORARIO SEMANAL COMPLETO ---
-    const horarioSemanal = {
+    // --- ESTRUCTURA DE DATOS INICIALES ---\
+    const tareasIniciales = {
+        // Tareas por defecto
+        Aseo: [
+            { nombre: "Hacer la cama", pts: 5, min: 0, completado: false, fallido: false },
+            { nombre: "Cepillarse los dientes (x3)", pts: 10, min: 0, completado: false, fallido: false },
+        ],
+        Académico: [
+            { nombre: "Hacer deberes", pts: 20, min: 10, completado: false, fallido: false },
+            { nombre: "Leer 15 minutos", pts: 10, min: 5, completado: false, fallido: false },
+        ],
+        Hogar: [
+            { nombre: "Recoger juguetes", pts: 5, min: 0, completado: false, fallido: false },
+            { nombre: "Poner la mesa", pts: 5, min: 0, completado: false, fallido: false },
+        ],
+        General: [
+            { nombre: "Ser amable", pts: 10, min: 0, completado: false, fallido: false },
+        ],
+    };
+
+    const premiosIniciales = [
+        { nombre: "Ver la TV", pts: 0, min: 30, icono: "📺" },
+        { nombre: "Tableta", pts: 0, min: 60, icono: "📱" },
+        { nombre: "Jugar Consola", pts: 0, min: 45, icono: "🎮" },
+        { nombre: "Cine/Pelicula", pts: 100, min: 0, icono: "🎬" },
+        { nombre: "Juguete Pequeño", pts: 50, min: 0, icono: "🧸" },
+        { nombre: "Salir al Parque", pts: 25, min: 0, icono: "🌳" }
+    ];
+
+    const horarioInicial = {
         Lunes: [
-            { nombre: "P.E. (Educación Física)", hora: "09:00 - 09:45" },
-            { nombre: "Religión", hora: "09:45 - 10:30" },
             { nombre: "Lengua", hora: "10:30 - 11:15" },
             { nombre: "Matemáticas", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Values / Ética", hora: "12:30 - 13:15" },
-            { nombre: "English (Inglés)", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
         ],
         Martes: [
-            { nombre: "Religión", hora: "09:00 - 09:45" },
-            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
-            { nombre: "Inglés", hora: "10:30 - 11:15" },
-            { nombre: "Lengua", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Ciencias Naturales", hora: "12:30 - 13:15" },
-            { nombre: "P.E. (Educación Física)", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" }, 
-            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 19:00", tipo: "extra" },
-            { nombre: "Programación 💻 (Extraescolar)", hora: "19:00 - 20:00", tipo: "extra" }
+            { nombre: "Sociales", hora: "10:30 - 11:15" },
         ],
-        Miercoles: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Values / Ética", hora: "09:45 - 10:30" },
-            { nombre: "Inglés", hora: "10:30 - 11:15" },
-            { nombre: "Arts / Plástica", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Ciencias Sociales", hora: "12:30 - 13:15" },
-            { nombre: "Lengua", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
-        ],
-        Jueves: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Ciencias Naturales", hora: "09:45 - 10:30" },
-            { nombre: "Ciencias Sociales", hora: "10:30 - 11:15" },
-            { nombre: "Lengua", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Lengua", hora: "12:30 - 13:15" },
-            { nombre: "Inglés", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" },
-            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 17:45", tipo: "extra" },
-            { nombre: "Inglés 🇬🇧 (Extraescolar)", hora: "17:45 - 19:00", tipo: "extra" }
-        ],
-        Viernes: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
-            { nombre: "P.E. (Educación Física)", hora: "10:30 - 11:15" },
-            { nombre: "Música", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "English (Inglés)", hora: "12:30 - 13:15" },
-            { nombre: "Lengua", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
-        ]
+        Miércoles: [],
+        Jueves: [],
+        Viernes: [],
+        Sábado: [],
+        Domingo: [],
     };
     
-    // --- LISTADO DE TAREAS ---
-    const catalogoTareas = [
-        {
-            categoria: "Aseo e Higiene Personal 🧴",
-            items: [
-                { id: "dientes", nombre: "Lavarse bien los dientes", pts: 2, min: 5 },
-                { id: "ducha", nombre: "Ducharse bien", pts: 2, min: 10 },
-                { id: "desodorante", nombre: "Usar desodorante", pts: 1, min: 1 }
-            ]
-        },
-        {
-            categoria: "Académico 📚",
-            items: [
-                { id: "deberes", nombre: "Hacer deberes", pts: 1, min: 30 },
-                { id: "estudiar", nombre: "Estudiar para controles", pts: 2, min: 45 },
-                { id: "leer", nombre: "Leer 15 Min", pts: 5, min: 15 },
-                { id: "repaso", nombre: "Repaso Contenidos", pts: 3, min: 20 }
-            ]
-        },
-        {
-            categoria: "Hogar 🏠",
-            items: [
-                { id: "ordenar", nombre: "Ordenar habitación", pts: 1, min: 10 },
-                { id: "limpiar", nombre: "Limpiar habitación", pts: 2, min: 20 },
-                { id: "lavavajillas", nombre: "Sacar lavavajillas", pts: 1, min: 5 },
-                { id: "bano", nombre: "Limpiar baño", pts: 2, min: 15 }
-            ]
-        },
-        {
-            categoria: "General ⭐",
-            items: [
-                { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
-                { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
-                { id: "colaborar", nombre: "Colabora en Labores Hogar", pts: 1, min: 15 }
-            ]
-        }
-    ];
-
-    // --- CATÁLOGO DE PREMIOS ---
-    const catalogoPremios = [
-        // Premios de Puntos
-        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
-        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120, moneda: 'puntos' },
-        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
-        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
-        // Premios de Minutos (Tiempo de Pantalla)
-        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
-        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
-    ];
-
-    // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE) ---
-    // Versión 3.0: Añadimos historialSemanal y fechaInicioSemana
-    let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
+    // Estado global de la aplicación
+    let estado = {
         puntos: 0,
         minutos: 0,
         nivel: 1,
-        tareasHoy: {},
-        agendaEventos: [], 
-        ultimaFecha: new Date().toDateString(),
+        xp: 0,
+        ultimaFechaReset: new Date().toDateString(),
         ultimoDiario: null,
-        historialSemanal: [], // NUEVO: Almacena resúmenes de días pasados
-        fechaInicioSemana: new Date().toDateString() // NUEVO: Para saber cuándo empezó el ciclo de informe
+        tareas: tareasIniciales,
+        premios: premiosIniciales,
+        horario: horarioInicial,
+        agenda: [],
+        historial: [] // Para guardar eventos canjeados
     };
 
-    // --- 3. LÓGICA DE NUEVO DÍA Y ARCHIVO SEMANAL ---
-    
-    // Función auxiliar para obtener los resultados de un día específico
-    function generarResumenDiario(tareas, fecha) {
-        let completadas = 0;
-        let fallidas = 0;
-        let puntosObtenidos = 0;
-        let minutosObtenidos = 0;
-        
-        const todasLasTareas = catalogoTareas.flatMap(c => c.items); 
-
-        for (const id in tareas) {
-            const estado = tareas[id];
-            const tareaData = todasLasTareas.find(t => t.id === id);
-            
-            if (estado === 'hecho' && tareaData) {
-                completadas++;
-                puntosObtenidos += tareaData.pts;
-                minutosObtenidos += tareaData.min;
-            } else if (estado === 'fail') {
-                fallidas++;
-            }
-        }
-
-        return {
-            fecha: fecha,
-            completadas: completadas,
-            fallidas: fallidas,
-            puntos: puntosObtenidos,
-            minutos: minutosObtenidos
-        };
-    }
-    
-    // Función para manejar el reinicio del ciclo semanal
-    function limpiarHistorialSiAplica() {
-        const inicio = new Date(estado.fechaInicioSemana);
-        const hoy = new Date();
-        const diffTime = Math.abs(hoy - inicio);
-        // Calcula días de diferencia.
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
-        // Reinicia el historial y la fecha de inicio de semana si han pasado 7 días.
-        if (diffDays >= 7) { 
-            console.log("Reiniciando ciclo semanal de informe.");
-            estado.historialSemanal = []; 
-            estado.fechaInicioSemana = new Date().toDateString();
-        }
-    }
-
-
-    const hoy = new Date().toDateString();
-    if (estado.ultimaFecha !== hoy) {
-        console.log("¡Nuevo día detectado! Archivando tareas de ayer...");
-        
-        // 1. Archivar el resumen del día anterior (ultimaFecha)
-        const ayer = estado.ultimaFecha;
-        const resumenAyer = generarResumenDiario(estado.tareasHoy, ayer);
-        
-        // Solo archivar si se realizaron tareas
-        if (resumenAyer.completadas > 0 || resumenAyer.fallidas > 0) {
-             estado.historialSemanal.push(resumenAyer);
-        }
-        
-        // 2. Limpiar el historial si ha pasado una semana
-        limpiarHistorialSiAplica(); 
-        
-        // 3. Resetear para el nuevo día
-        estado.tareasHoy = {}; 
-        estado.ultimaFecha = hoy;
-        guardar();
-    }
-
-    // --- 4. REFERENCIAS DOM ---
+    // --- 2. REFERENCIAS A ELEMENTOS DEL DOM ---\
     const ui = {
-        puntos: document.getElementById('puntosTotales'),
-        minutos: document.getElementById('minutosTotales'),
-        nivel: document.getElementById('nivelActual'),
+        // Displays
+        puntosDisplay: document.getElementById('puntosDisplay'),
+        minutosDisplay: document.getElementById('minutosDisplay'),
+        nivelDisplay: document.getElementById('nivelDisplay'),
+        xpDisplay: document.getElementById('xpDisplay'),
+        metaDisplay: document.getElementById('metaDisplay'),
         xpFill: document.getElementById('xpFill'),
-        xpTexto: document.getElementById('xpTexto'),
-        contenedorCategorias: document.getElementById('categorias'),
-        contenedorPremios: document.getElementById('contenedorPremios'),
-        contenedorHorario: document.getElementById('contenedorHorario'),
-        listaEventos: document.getElementById('listaEventos'), 
-        formAgenda: document.getElementById('formAgenda'), 
+        
+        // Vistas
+        vistas: document.querySelectorAll('.view'),
         vistaTareas: document.getElementById('vistaTareas'),
-        vistaTienda: document.getElementById('vistaTienda'),
+        vistaShop: document.getElementById('vistaShop'),
         vistaHorario: document.getElementById('vistaHorario'),
         vistaAgenda: document.getElementById('vistaAgenda'),
-        vistaInforme: document.getElementById('vistaInforme'), // NUEVO
-        btnHome: document.getElementById('homeBtn'),
-        btnShop: document.getElementById('shopBtn'),
-        btnSchedule: document.getElementById('scheduleBtn'),
-        btnAgenda: document.getElementById('agendaBtn'), 
-        btnReport: document.getElementById('reportBtn'), // NUEVO
-        btnReset: document.getElementById('btnReset'),
-        btnDiario: document.getElementById('btnPremioDiario'),
-        btnSemanal: document.getElementById('btnPremioSemanal'),
-        // Referencias para el informe
-        totalStats: document.getElementById('totalStats'),
-        detalleSemanal: document.getElementById('detalleSemanal'),
-        compTot: document.getElementById('compTot'),
-        failTot: document.getElementById('failTot'),
-        ptsTot: document.getElementById('ptsTot'),
-        minTot: document.getElementById('minTot')
-    };
+        vistaInforme: document.getElementById('vistaInforme'),
 
-    // --- 5. FUNCIONES CORE ---
+        // Dock
+        dock: document.getElementById('dock'),
+        btnTareas: document.getElementById('btnTareas'),
+        btnShop: document.getElementById('btnShop'),
+        btnSchedule: document.getElementById('btnSchedule'),
+        btnAgenda: document.getElementById('btnAgenda'),
+        btnReport: document.getElementById('btnReport'), // CORREGIDO: Usando ID correcto
+
+        // Botones rápidos y Reset
+        btnDiario: document.getElementById('btnDiario'),
+        btnSemanal: document.getElementById('btnSemanal'),
+        btnReset: document.getElementById('btnReset'),
+        
+        // Tareas
+        listaTareas: document.getElementById('listaTareas'),
+
+        // Tienda
+        gridTienda: document.getElementById('gridTienda'),
+        
+        // Horario
+        contenedorHorario: document.getElementById('contenedorHorario'),
+        btnToggleHorarioForm: document.getElementById('btnToggleHorarioForm'),
+        formHorario: document.getElementById('formHorario'),
+        horarioNombre: document.getElementById('horarioNombre'),
+        horarioHora: document.getElementById('horarioHora'),
+        horarioDiaSelect: document.getElementById('horarioDiaSelect'),
+        horarioIndex: document.getElementById('horarioIndex'),
+        horarioDia: document.getElementById('horarioDia'),
+        btnGuardarHorario: document.getElementById('btnGuardarHorario'),
+        btnCancelarHorario: document.getElementById('btnCancelarHorario'),
+
+        // Agenda
+        contenedorAgenda: document.getElementById('contenedorAgenda'),
+        formAgenda: document.getElementById('formAgenda'),
+        eventoTitulo: document.getElementById('eventoTitulo'),
+        eventoFecha: document.getElementById('eventoFecha'),
+        eventoTipo: document.getElementById('eventoTipo'),
+        eventoComentarios: document.getElementById('eventoComentarios'),
+        btnGuardarEvento: document.getElementById('btnGuardarEvento'),
+        
+        // Informe
+        detalleDiarioGrid: document.querySelector('.detalle-diario-grid')
+    };
+    
+    // --- 3. FUNCIONES DE UTILIDAD ---\
+
     function guardar() {
+        // Asegura que solo guardamos datos esenciales, no las funciones Audio.
         localStorage.setItem('shukudai_v3_data', JSON.stringify(estado));
         actualizarUI();
     }
 
-    function actualizarUI() {
-        // Textos
-        ui.puntos.textContent = estado.puntos;
-        ui.minutos.textContent = estado.minutos;
-        ui.nivel.textContent = estado.nivel;
-        
-        // Barra XP
-        const xpRestante = estado.puntos % META_XP;
-        ui.xpFill.style.width = `${(xpRestante / META_XP) * 100}%`;
-        ui.xpTexto.textContent = `${xpRestante} / ${META_XP} xp`;
-
-        // Verificar Nivel
-        const nivelReal = Math.floor(estado.puntos / META_XP) + 1;
-        if (nivelReal > estado.nivel) {
-            estado.nivel = nivelReal;
-            lanzarConfeti();
-            reproducir('nivel');
-            console.log(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`);
+    function cargar() {
+        const data = localStorage.getItem('shukudai_v3_data');
+        if (data) {
+            // Carga el estado guardado, sobrescribiendo el estado inicial.
+            Object.assign(estado, JSON.parse(data));
+        }
+        // Verificar y resetear tareas si es un nuevo día
+        if (estado.ultimaFechaReset !== new Date().toDateString()) {
+            resetearTareasDiarias();
+            estado.ultimaFechaReset = new Date().toDateString();
             guardar();
         }
     }
 
-    function reproducir(tipo) {
-        if (SONIDOS[tipo]) {
-            SONIDOS[tipo].currentTime = 0;
-            SONIDOS[tipo].play().catch(err => console.log("Audio bloqueado:", err));
+    function reproducir(sonido) {
+        if (SONIDOS[sonido]) {
+            SONIDOS[sonido].play().catch(e => console.log("Error al reproducir sonido:", e));
         }
     }
 
-    function lanzarConfeti() {
-        if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    function actualizarUI() {
+        // Marcador
+        ui.puntosDisplay.textContent = `${estado.puntos} Pts`;
+        ui.minutosDisplay.textContent = `${estado.minutos} Min`;
+        
+        // Nivel y XP
+        const xpAcumulado = estado.puntos % META_XP;
+        const nuevoNivel = 1 + Math.floor(estado.puntos / META_XP);
+
+        ui.xpDisplay.textContent = xpAcumulado;
+        ui.metaDisplay.textContent = META_XP;
+        ui.xpFill.style.width = `${(xpAcumulado / META_XP) * 100}%`;
+        
+        if (nuevoNivel > estado.nivel) {
+            estado.nivel = nuevoNivel;
+            reproducir('nivel');
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            alert(`¡Nivel Subido! Ahora eres Nivel ${estado.nivel}! 🎉`);
+        }
+        ui.nivelDisplay.textContent = estado.nivel;
+
+        // Renderizar vistas actuales
+        // Se llama solo a las funciones de la vista activa para evitar carga innecesaria
+    }
+
+    function mostrarVista(idVista, btnActivo) {
+        // Ocultar todas las vistas
+        ui.vistas.forEach(view => view.classList.add('hidden'));
+
+        // Mostrar la vista seleccionada
+        document.getElementById(idVista).classList.remove('hidden');
+
+        // Actualizar el dock (clase active)
+        ui.dock.querySelectorAll('.dock-item').forEach(btn => btn.classList.remove('active'));
+        if (btnActivo) {
+            btnActivo.classList.add('active');
         }
     }
     
-    // Función para gestionar la navegación entre las 5 vistas
-    function mostrarVista(vistaId, btnActivo) {
-        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda, ui.vistaInforme];
-        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda, ui.btnReport];
+    // --- 4. GESTIÓN DE TAREAS Y RESET ---\
 
-        vistas.forEach(v => v.style.display = 'none');
-        botones.forEach(b => b.classList.remove('active'));
-
-        document.getElementById(vistaId).style.display = 'block';
-        btnActivo.classList.add('active');
+    function resetearTareasDiarias() {
+        // Recorrer todas las tareas y restaurar el estado
+        for (const categoria in estado.tareas) {
+            estado.tareas[categoria].forEach(tarea => {
+                tarea.completado = false;
+                tarea.fallido = false;
+            });
+        }
+        console.log("Tareas reseteadas para el nuevo día.");
+        guardar();
     }
-
-    // --- 6. RENDERIZADO DE VISTAS ---
 
     function renderizarTareas() {
-        ui.contenedorCategorias.innerHTML = '';
-        catalogoTareas.forEach(grupo => {
-            const details = document.createElement('details');
-            details.open = true;
-            
-            const summary = document.createElement('summary');
-            summary.textContent = grupo.categoria;
-            details.appendChild(summary);
-
-            grupo.items.forEach(tarea => {
-                const div = document.createElement('div');
-                div.className = 'task';
-                const estadoTarea = estado.tareasHoy[tarea.id];
-                if (estadoTarea === 'hecho') div.classList.add('completed');
-                if (estadoTarea === 'fail') div.classList.add('failed');
-
-                div.innerHTML = `
-                    <div class="task-info">
-                        <span>${tarea.nombre}</span>
-                        <span class="task-pts">+${tarea.pts} pts ${tarea.min > 0 ? '• ' + tarea.min + ' min' : ''}</span>
-                    </div>
-                    <div class="task-buttons">
-                        ${!estadoTarea ? `
-                        <button class="btn-circle check" title="Completar">✔</button>
-                        <button class="btn-circle cross" title="Fallar">✖</button>
-                        ` : `
-                        <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
-                        `}
+        let html = '';
+        for (const categoria in estado.tareas) {
+            html += `
+                <details open>
+                    <summary>${categoria}</summary>
+                    <div class="task-list">
+            `;
+            estado.tareas[categoria].forEach((tarea, index) => {
+                const estadoClase = tarea.completado ? 'completed' : (tarea.fallido ? 'failed' : '');
+                const disableButtons = tarea.completado || tarea.fallido ? 'disabled' : '';
+                
+                html += `
+                    <div class="task ${estadoClase}" data-categoria="${categoria}" data-index="${index}">
+                        <div class="task-info">
+                            <span>${tarea.nombre}</span>
+                            <span class="task-pts">${tarea.pts} Pts / ${tarea.min} Min</span>
+                        </div>
+                        <div class="task-buttons">
+                            <button class="btn-circle check" data-action="complete" ${disableButtons}>✅</button>
+                            <button class="btn-circle cross" data-action="fail" ${disableButtons}>❌</button>
+                        </div>
                     </div>
                 `;
-                if (!estadoTarea) {
-                    div.querySelector('.check').addEventListener('click', () => completarTarea(tarea, true));
-                    div.querySelector('.cross').addEventListener('click', () => completarTarea(tarea, false));
-                }
-                details.appendChild(div);
             });
-            ui.contenedorCategorias.appendChild(details);
+            html += '</div></details>';
+        }
+        ui.listaTareas.innerHTML = html;
+
+        // Adjuntar listeners de eventos a los botones de tarea
+        ui.listaTareas.querySelectorAll('.btn-circle').forEach(button => {
+            button.addEventListener('click', manejarTareaClick);
         });
     }
+
+    function manejarTareaClick(event) {
+        const button = event.currentTarget;
+        const taskDiv = button.closest('.task');
+        const categoria = taskDiv.dataset.categoria;
+        const index = parseInt(taskDiv.dataset.index);
+        const action = button.dataset.action;
+
+        const tarea = estado.tareas[categoria][index];
+        
+        if (tarea.completado || tarea.fallido) return; 
+
+        if (action === 'complete') {
+            tarea.completado = true;
+            estado.puntos += tarea.pts;
+            estado.minutos += tarea.min;
+            reproducir('exito');
+        } else if (action === 'fail') {
+            tarea.fallido = true;
+            reproducir('error');
+        }
+        
+        guardar();
+        renderizarTareas(); // Re-renderizar la lista para actualizar el estado visual
+    }
+
+
+    // --- 5. GESTIÓN DE TIENDA ---\
 
     function renderizarTienda() {
-        ui.contenedorPremios.innerHTML = '';
+        const hoy = new Date();
+        const esFinDeSemana = hoy.getDay() === 0 || hoy.getDay() === 6; // Domingo=0, Sábado=6
         
-        // Lógica de verificación de fin de semana para el mensaje
-        const today = new Date().getDay(); // 0 = Domingo, 6 = Sábado
-        const isWeekend = today === 0 || today === 6;
+        let html = '';
+        estado.premios.forEach((premio, index) => {
+            let precioTexto;
+            let precioValor;
+            let esMinutos = premio.min > 0;
 
-        const messageDiv = document.getElementById('storeMessage');
-        const messageTitle = document.getElementById('storeMessageTitle');
-        const messageBody = document.getElementById('storeMessageBody');
+            if (esMinutos) {
+                precioTexto = `${premio.min} Min`;
+                precioValor = premio.min;
+            } else {
+                precioTexto = `${premio.pts} Pts`;
+                precioValor = premio.pts;
+            }
+            
+            const puedeCanjear = esFinDeSemana && (
+                (esMinutos && estado.minutos >= precioValor) || 
+                (!esMinutos && estado.puntos >= precioValor)
+            );
+            const disabled = puedeCanjear ? '' : 'disabled';
+            const hoverClass = puedeCanjear ? 'hover:scale-105' : 'opacity-50 cursor-not-allowed';
 
-        if (isWeekend) {
-            messageDiv.className = 'mb-4 p-3 bg-green-100 text-green-800 border border-green-300 rounded-lg text-center';
-            messageTitle.textContent = '¡HOY ES FIN DE SEMANA! 🎉';
-            messageBody.textContent = '¡Ya puedes canjear tus premios! ¡Felicidades por tu esfuerzo!';
+            html += `
+                <div class="premio-card flex flex-col items-center p-4 border rounded-xl shadow-md ${hoverClass}">
+                    <span class="premio-icono">${premio.icono}</span>
+                    <h4 class="font-bold text-lg">${premio.nombre}</h4>
+                    <div class="price-tag">${precioTexto}</div>
+                    <button class="blue mt-3 px-3 py-1 text-sm rounded-lg font-bold" data-index="${index}" ${disabled}>
+                        Canjear
+                    </button>
+                </div>
+            `;
+        });
+
+        ui.gridTienda.innerHTML = html;
+        
+        // Adjuntar listeners de eventos a los botones de canje
+        ui.gridTienda.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', manejarCanje);
+        });
+
+        // Mostrar un mensaje si no es fin de semana
+        if (!esFinDeSemana) {
+             ui.gridTienda.insertAdjacentHTML('beforebegin', '<p class="text-center text-red-500 font-semibold p-4">¡Espera al fin de semana para canjear!</p>');
+        }
+    }
+
+    function manejarCanje(event) {
+        const index = parseInt(event.currentTarget.dataset.index);
+        const premio = estado.premios[index];
+
+        let costo;
+        let tipoCosto;
+
+        if (premio.min > 0) {
+            costo = premio.min;
+            tipoCosto = 'Minutos';
         } else {
-            messageDiv.className = 'mb-4 p-3 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg text-center';
-            messageTitle.textContent = 'Canje de Premios: ¡SÓLO FINES DE SEMANA! 📅';
-            messageBody.textContent = 'Aún no es momento de canjear. Sigue acumulando puntos y minutos para el Sábado y Domingo.';
+            costo = premio.pts;
+            tipoCosto = 'Puntos';
         }
 
+        if (window.confirm(`¿Quieres canjear ${premio.nombre} por ${costo} ${tipoCosto}?`)) {
+            let suficiente = false;
 
-        catalogoPremios.forEach(premio => {
-            
-            const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
-            const cantidadDisponible = premio.moneda === 'minutos' ? estado.minutos : estado.puntos;
+            if (tipoCosto === 'Minutos' && estado.minutos >= costo) {
+                estado.minutos -= costo;
+                suficiente = true;
+            } else if (tipoCosto === 'Puntos' && estado.puntos >= costo) {
+                estado.puntos -= costo;
+                suficiente = true;
+            }
 
-            const puedeComprar = cantidadDisponible >= premio.coste;
-            
-            const card = document.createElement('div');
-            card.className = 'premio-card';
-            // Opacidad reducida si no puede comprar O si no es fin de semana.
-            card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.5';
-
-            card.innerHTML = `
-                <div class="premio-icono">${premio.icono}</div>
-                <div style="font-weight:bold;">${premio.nombre}</div>
-                <div class="price-tag">${premio.coste} ${monedaSimbolo}</div>
-            `;
-
-            card.addEventListener('click', () => {
-                // Verificar si es fin de semana y si puede comprar
-                if (!isWeekend) {
-                    reproducir('error');
-                    console.log("Solo se puede canjear premios los fines de semana.");
-                    alert("Solo se puede canjear premios los fines de semana. ¡Sigue esforzándote!");
-                    return;
-                }
-
-                if (!puedeComprar) {
-                    reproducir('error');
-                    const faltante = premio.coste - cantidadDisponible;
-                    alert(`Te faltan ${faltante} ${monedaSimbolo}. ¡Sigue acumulando!`); 
-                    return;
-                }
-                
-                // Usamos confirm() para simular un modal
-                if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} ${monedaSimbolo}?`)) {
-                    // Lógica de DEDUCCIÓN
-                    if (premio.moneda === 'minutos') {
-                        estado.minutos -= premio.coste;
-                    } else {
-                        estado.puntos -= premio.coste;
-                    }
-
-                    reproducir('caja');
-                    lanzarConfeti(); 
-                    guardar();
-                    renderizarTienda(); 
-                }
-            });
-
-            ui.contenedorPremios.appendChild(card);
-        });
+            if (suficiente) {
+                reproducir('caja');
+                // Agregar al historial (para el informe)
+                estado.historial.unshift({
+                    tipo: "Canje",
+                    detalle: premio.nombre,
+                    fecha: new Date().toLocaleDateString(),
+                    costo: `${costo} ${tipoCosto}`
+                });
+                guardar();
+                alert(`¡${premio.nombre} canjeado con éxito!`);
+            } else {
+                reproducir('error');
+                alert(`No tienes suficientes ${tipoCosto}. Necesitas ${costo}.`);
+            }
+        }
+        renderizarTienda(); // Actualiza la tienda para reflejar el nuevo saldo
     }
+
+
+    // --- 6. GESTIÓN DE HORARIO (CRUD) ---\
 
     function renderizarHorario() {
-        ui.contenedorHorario.innerHTML = '';
-        const dias = Object.keys(horarioSemanal);
+        let html = '';
+        const diasSemana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+        diasSemana.forEach(dia => {
+            const actividades = estado.horario[dia] || [];
+            
+            html += `
+                <div class="horario-dia">
+                    <div class="dia-titulo">${dia}</div>
+                    <div class="actividades">
+            `;
+            
+            if (actividades.length === 0) {
+                html += '<div class="asignatura text-sm text-gray-500">No hay actividades.</div>';
+            } else {
+                actividades.forEach((actividad, index) => {
+                    html += `
+                        <div class="asignatura" data-dia="${dia}" data-index="${index}">
+                            <div class="asignatura-nombre">${actividad.nombre}</div>
+                            <div class="asignatura-hora flex items-center gap-2">
+                                <span>${actividad.hora}</span>
+                                <button class="text-sm text-blue-500 hover:text-blue-700 ml-2 btn-editar-horario" style="display:none;">📝</button>
+                                <button class="text-sm text-red-500 hover:text-red-700 btn-eliminar-horario" style="display:none;">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
         
-        dias.forEach(dia => {
-            const diaDiv = document.createElement('div');
-            diaDiv.className = 'horario-dia';
+        ui.contenedorHorario.innerHTML = html;
 
-            const titulo = document.createElement('div');
-            titulo.className = 'dia-titulo';
-            titulo.textContent = dia;
-            diaDiv.appendChild(titulo);
+        // Añadir listeners de CRUD si el formulario está visible (Modo Admin)
+        if (!ui.formHorario.classList.contains('hidden')) {
+            activarModoAdminHorario();
+        }
+    }
 
-            horarioSemanal[dia].forEach(asignatura => {
-                const asigDiv = document.createElement('div');
-                // Añadimos una clase condicional para extraescolares
-                asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : ''}`;
-                asigDiv.innerHTML = `
-                    <span class="asignatura-nombre">${asignatura.nombre}</span>
-                    <span class="asignatura-hora">${asignatura.hora}</span>
-                `;
-                diaDiv.appendChild(asigDiv);
-            });
+    function activarModoAdminHorario() {
+        // Mostrar botones de Editar/Eliminar
+        ui.contenedorHorario.querySelectorAll('.btn-editar-horario, .btn-eliminar-horario').forEach(btn => {
+            btn.style.display = 'inline';
+        });
 
-            ui.contenedorHorario.appendChild(diaDiv);
+        // Adjuntar listeners si no lo están
+        ui.contenedorHorario.querySelectorAll('.btn-editar-horario').forEach(btn => {
+            btn.onclick = (e) => editarActividad(e.currentTarget.closest('.asignatura'));
+        });
+        ui.contenedorHorario.querySelectorAll('.btn-eliminar-horario').forEach(btn => {
+            btn.onclick = (e) => eliminarActividad(e.currentTarget.closest('.asignatura'));
         });
     }
 
-    // --- RENDERIZADO AGENDA ---
+    function editarActividad(element) {
+        const dia = element.dataset.dia;
+        const index = parseInt(element.dataset.index);
+        const actividad = estado.horario[dia][index];
+
+        // Rellenar el formulario
+        ui.horarioIndex.value = index;
+        ui.horarioDia.value = dia; 
+        ui.horarioNombre.value = actividad.nombre;
+        ui.horarioHora.value = actividad.hora;
+        ui.horarioDiaSelect.value = dia; // Si se permite cambiar el día, seleccionar el día actual
+
+        // Mostrar formulario (si estuviera oculto)
+        ui.formHorario.classList.remove('hidden');
+    }
+
+    function eliminarActividad(element) {
+        if (!confirm("¿Estás seguro de que quieres eliminar esta actividad?")) return;
+
+        const dia = element.dataset.dia;
+        const index = parseInt(element.dataset.index);
+        
+        estado.horario[dia].splice(index, 1);
+        guardar();
+        renderizarHorario();
+    }
+
+    function guardarActividad(event) {
+        event.preventDefault();
+
+        const index = ui.horarioIndex.value;
+        const nombre = ui.horarioNombre.value.trim();
+        const hora = ui.horarioHora.value.trim();
+        const diaNuevo = ui.horarioDiaSelect.value;
+        const diaAnterior = ui.horarioDia.value;
+
+        if (!nombre || !hora || !diaNuevo) {
+            alert("Por favor, rellena el nombre, hora y selecciona el día.");
+            return;
+        }
+
+        const nuevaActividad = { nombre, hora };
+
+        if (index !== "" && diaAnterior === diaNuevo) {
+            // Modo Edición (mismo día)
+            estado.horario[diaNuevo][parseInt(index)] = nuevaActividad;
+        } else if (index !== "" && diaAnterior !== diaNuevo) {
+            // Modo Edición (cambio de día)
+            estado.horario[diaAnterior].splice(parseInt(index), 1); // Eliminar del día anterior
+            estado.horario[diaNuevo].push(nuevaActividad); // Añadir al nuevo día
+        } else {
+            // Modo Creación
+            estado.horario[diaNuevo] = estado.horario[diaNuevo] || []; // Asegurar que existe el array
+            estado.horario[diaNuevo].push(nuevaActividad);
+        }
+
+        // Limpiar y ocultar formulario
+        limpiarFormularioHorario();
+        ui.formHorario.classList.add('hidden');
+        guardar();
+        renderizarHorario(); // Re-renderizar para ver los cambios
+    }
+
+    function limpiarFormularioHorario() {
+        ui.horarioIndex.value = "";
+        ui.horarioDia.value = "";
+        ui.horarioNombre.value = "";
+        ui.horarioHora.value = "";
+        ui.horarioDiaSelect.value = "";
+    }
+
+
+    // --- 7. GESTIÓN DE AGENDA (CRUD) ---\
+
     function renderizarAgenda() {
-        ui.listaEventos.innerHTML = '';
-        
-        // Ordenar eventos por fecha ascendente
-        const eventosOrdenados = [...estado.agendaEventos].sort((a, b) => 
-            new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00'))
-        );
+        // Ordenar por fecha: Eventos más cercanos primero
+        estado.agenda.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
-        if (eventosOrdenados.length === 0) {
-            ui.listaEventos.innerHTML = '<p class="text-gray-500 text-center py-4">No hay eventos próximos en la agenda.</p>';
-            return;
+        let html = '';
+        
+        if (estado.agenda.length === 0) {
+             html += '<p class="text-center text-gray-500 p-4">No hay eventos ni citas agendadas.</p>';
         }
 
-        eventosOrdenados.forEach(evento => {
-            const card = document.createElement('div');
-            // Añade una clase para estilizar según el tipo
-            let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
-            // Fallback si no coincide exactamente
-            if (!['examen', 'cita', 'entrega'].includes(tipoClase)) tipoClase = 'otro';
-            
-            card.className = `agenda-card ${tipoClase}`;
+        estado.agenda.forEach((evento, index) => {
+            const tipoClase = evento.tipo === 'Examen' ? 'examen' : (evento.tipo === 'Cita' ? 'cita' : 'general');
 
-            card.innerHTML = `
-                <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
-                <div class="agenda-info-row">
-                    <span>${new Date(evento.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
-                    <span>${evento.hora || ''}</span>
-                </div>
-                ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
-                <div class="agenda-actions">
-                    <button class="btn-edit" data-id="${evento.id}">📝 Editar</button>
-                    <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
+            html += `
+                <div class="agenda-card ${tipoClase}" data-index="${index}">
+                    <div class="agenda-info-row">
+                        <span>🗓️ ${evento.fecha}</span>
+                        <span class="font-bold">${evento.tipo}</span>
+                    </div>
+                    <div class="agenda-title">${evento.titulo}</div>
+                    ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
+                    <div class="agenda-actions">
+                        <button class="btn-edit" data-action="edit">Editar</button>
+                        <button class="btn-delete" data-action="delete">Eliminar</button>
+                    </div>
                 </div>
             `;
-
-            ui.listaEventos.appendChild(card);
         });
 
-        // Añadir listeners para editar y eliminar
-        ui.listaEventos.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', (e) => cargarEventoParaEdicion(e.target.dataset.id));
+        ui.contenedorAgenda.innerHTML = html;
+        
+        // Adjuntar listeners de CRUD
+        ui.contenedorAgenda.querySelectorAll('.agenda-card').forEach(card => {
+            card.querySelector('.btn-edit').addEventListener('click', (e) => {
+                const index = e.currentTarget.closest('.agenda-card').dataset.index;
+                editarEvento(index);
+            });
+            card.querySelector('.btn-delete').addEventListener('click', (e) => {
+                const index = e.currentTarget.closest('.agenda-card').dataset.index;
+                eliminarEvento(index);
+            });
         });
 
-        ui.listaEventos.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => eliminarEvento(e.target.dataset.id));
-        });
+        // Asegurar que el formulario esté limpio y visible para añadir
+        limpiarFormularioAgenda();
     }
 
-    // --- RENDERIZADO INFORME SEMANAL (NUEVO) ---
-    function renderizarInforme() {
-        // 1. Calcular Totales
-        let totalCompletadas = 0;
-        let totalFallidas = 0;
-        let totalPuntos = 0;
-        let totalMinutos = 0;
+    function limpiarFormularioAgenda() {
+        ui.eventoId.value = '';
+        ui.eventoTitulo.value = '';
+        ui.eventoFecha.value = '';
+        ui.eventoTipo.value = 'General';
+        ui.eventoComentarios.value = '';
+        ui.btnGuardarEvento.textContent = 'Guardar Evento';
+    }
 
-        estado.historialSemanal.forEach(dia => {
-            totalCompletadas += dia.completadas;
-            totalFallidas += dia.fallidas;
-            totalPuntos += dia.puntos;
-            totalMinutos += dia.minutos;
-        });
-        
-        // Incluir el resumen del día actual
-        const hoyResumen = generarResumenDiario(estado.tareasHoy, "Hoy");
-        totalCompletadas += hoyResumen.completadas;
-        totalFallidas += hoyResumen.fallidas;
-        totalPuntos += hoyResumen.puntos;
-        totalMinutos += hoyResumen.minutos;
-        
-        // 2. Renderizar Totales
-        ui.compTot.textContent = totalCompletadas;
-        ui.failTot.textContent = totalFallidas;
-        ui.ptsTot.textContent = totalPuntos;
-        ui.minTot.textContent = totalMinutos;
-        
-        // 3. Renderizar Detalle Diario
-        ui.detalleSemanal.innerHTML = '';
-        
-        const historialCompleto = [hoyResumen, ...estado.historialSemanal].reverse(); // De más reciente a más antiguo
-        
-        const diasMostrados = historialCompleto.filter(dia => dia.completadas > 0 || dia.fallidas > 0);
+    function guardarEvento(event) {
+        event.preventDefault();
 
-        if (diasMostrados.length === 0) {
-            ui.detalleSemanal.innerHTML = '<p class="text-gray-500 text-center py-4">Aún no hay días archivados o con tareas realizadas en este ciclo semanal.</p>';
+        const id = ui.eventoId.value;
+        const titulo = ui.eventoTitulo.value.trim();
+        const fecha = ui.eventoFecha.value; // Formato YYYY-MM-DD
+        const tipo = ui.eventoTipo.value;
+        const comentarios = ui.eventoComentarios.value.trim();
+
+        if (!titulo || !fecha) {
+            alert("El título y la fecha son obligatorios.");
             return;
         }
-
-        diasMostrados.forEach(dia => {
-            const card = document.createElement('div');
-            card.className = 'p-3 bg-white border border-gray-200 rounded-lg shadow-sm';
-            
-            const fechaFormateada = dia.fecha === 'Hoy' 
-                ? 'Hoy' 
-                : new Date(dia.fecha).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
-                
-            card.innerHTML = `
-                <div class="font-bold text-lg text-gray-800">${fechaFormateada}</div>
-                <div class="text-sm mt-1">
-                    <p class="text-green-700">✅ Hechas: **${dia.completadas}**</p>
-                    <p class="text-red-700">❌ Falladas: **${dia.fallidas}**</p>
-                    <p class="mt-2 text-indigo-600">Recompensa: **+${dia.puntos} Pts / +${dia.minutos} Min**</p>
-                </div>
-            `;
-            ui.detalleSemanal.appendChild(card);
-        });
-    }
-
-    // --- LÓGICA AGENDA CRUD ---
-
-    function generarId() {
-        return '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    function cargarEventoParaEdicion(id) {
-        const evento = estado.agendaEventos.find(e => e.id === id);
-        if (!evento) return;
-
-        // Cargar datos en el formulario
-        document.getElementById('agendaId').value = evento.id;
-        document.getElementById('agendaFecha').value = evento.fecha;
-        document.getElementById('agendaHora').value = evento.hora || '';
-        document.getElementById('agendaAsignatura').value = evento.asignatura;
-        document.getElementById('agendaTipo').value = evento.tipo;
-        document.getElementById('agendaComentarios').value = evento.comentarios || '';
         
-        // Mover la vista a la Agenda y hacer scroll al formulario
-        mostrarVista('vistaAgenda', ui.btnAgenda);
+        const nuevoEvento = { titulo, fecha, tipo, comentarios };
+
+        if (id !== '') {
+            // Modo Edición: 'id' contiene el índice
+            estado.agenda[parseInt(id)] = nuevoEvento;
+        } else {
+            // Modo Creación: Añadir nuevo evento
+            estado.agenda.push(nuevoEvento);
+        }
+
+        guardar();
+        renderizarAgenda();
+        limpiarFormularioAgenda();
+    }
+
+    function editarEvento(index) {
+        const evento = estado.agenda[index];
+        
+        ui.eventoId.value = index; // Usamos el índice como ID temporal para editar
+        ui.eventoTitulo.value = evento.titulo;
+        ui.eventoFecha.value = evento.fecha; 
+        ui.eventoTipo.value = evento.tipo;
+        ui.eventoComentarios.value = evento.comentarios;
+        ui.btnGuardarEvento.textContent = 'Actualizar Evento';
+        
+        // Desplazarse al formulario para el usuario
         ui.formAgenda.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function guardarEvento(e) {
-        e.preventDefault();
-
-        const id = document.getElementById('agendaId').value;
-        const fecha = document.getElementById('agendaFecha').value;
-        const hora = document.getElementById('agendaHora').value;
-        const asignatura = document.getElementById('agendaAsignatura').value;
-        const tipo = document.getElementById('agendaTipo').value;
-        const comentarios = document.getElementById('agendaComentarios').value;
-
-        const nuevoEvento = {
-            id: id || generarId(),
-            fecha,
-            hora,
-            asignatura,
-            tipo,
-            comentarios
-        };
-
-        if (id) {
-            // Edición: Encontrar y reemplazar el evento existente
-            const index = estado.agendaEventos.findIndex(e => e.id === id);
-            if (index !== -1) {
-                estado.agendaEventos[index] = nuevoEvento;
-                console.log('Evento actualizado con éxito. 🎉');
-            }
-        } else {
-            // Creación: Añadir nuevo evento
-            estado.agendaEventos.push(nuevoEvento);
-            console.log('Nuevo evento guardado. 🎉');
-        }
-
-        guardar();
-        ui.formAgenda.reset(); // Limpiar formulario
-        document.getElementById('agendaId').value = ''; // Resetear ID oculto
-        renderizarAgenda();
-    }
-
-    function eliminarEvento(id) {
-        if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
-            estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
+    function eliminarEvento(index) {
+        if(window.confirm("¿Estás seguro de que quieres eliminar este evento?")) {
+            estado.agenda.splice(index, 1);
             guardar();
             renderizarAgenda();
-            console.log('Evento eliminado.'); // **DEPURADO: Ya no reproduce el audio de error**
         }
     }
 
-    // --- 7. ACCIONES DE TAREAS ---
-    function completarTarea(tarea, exito) {
-        if (exito) {
-            estado.puntos += tarea.pts;
-            estado.minutos += tarea.min;
-            estado.tareasHoy[tarea.id] = 'hecho';
-            reproducir('exito');
+    // --- 8. GESTIÓN DE INFORME ---\
+    
+    function renderizarInforme() {
+        // Ejemplo de cálculo para el informe
+        const tareasCompletadasTotal = Object.values(estado.tareas).flat().filter(t => t.completado).length;
+        const tareasFallidasTotal = Object.values(estado.tareas).flat().filter(t => t.fallido).length;
+        
+        const html = `
+            <div class="detalle-diario-card">
+                <h4>Puntos Totales</h4>
+                <p class="big-number primary-text">${estado.puntos}</p>
+            </div>
+            <div class="detalle-diario-card">
+                <h4>Minutos Restantes</h4>
+                <p class="big-number secondary-text">${estado.minutos}</p>
+            </div>
+            <div class="detalle-diario-card">
+                <h4>Tareas Hechas Hoy</h4>
+                <p class="big-number accent-text">${tareasCompletadasTotal}</p>
+            </div>
+            <div class="detalle-diario-card">
+                <h4>Tareas Fallidas Hoy</h4>
+                <p class="big-number danger-text">${tareasFallidasTotal}</p>
+            </div>
+        `;
+        ui.detalleDiarioGrid.innerHTML = html; // Usando el ID correcto
+
+        // Puedes añadir más detalles del historial aquí, como una lista de canjes
+        const historialHtml = estado.historial.map(item => 
+            `<p class="text-sm border-t pt-2">${item.fecha} - **${item.tipo}** de ${item.detalle} (${item.costo})</p>`
+        ).join('');
+
+        if (estado.historial.length > 0) {
+            ui.detalleDiarioGrid.insertAdjacentHTML('afterend', `
+                <h4 class="mt-4">Historial de Canjes</h4>
+                <div class="form-card p-4">${historialHtml}</div>
+            `);
+        }
+    }
+
+    // --- 9. INICIALIZACIÓN Y EVENT LISTENERS ---\
+
+    cargar();
+    actualizarUI();
+    renderizarTareas(); // Renderiza la vista inicial por defecto
+    
+    // Toggle del formulario de Horario
+    ui.btnToggleHorarioForm.addEventListener('click', () => {
+        ui.formHorario.classList.toggle('hidden');
+        if (!ui.formHorario.classList.contains('hidden')) {
+            activarModoAdminHorario();
+            limpiarFormularioHorario();
         } else {
-            estado.tareasHoy[tarea.id] = 'fail';
-            reproducir('error');
+            // Desactivar modo admin si se oculta
+            ui.contenedorHorario.querySelectorAll('.btn-editar-horario, .btn-eliminar-horario').forEach(btn => {
+                btn.style.display = 'none';
+            });
         }
-        guardar();
-        renderizarTareas();
-    }
+    });
 
-    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN ---
-    ui.btnHome.addEventListener('click', () => {
-        mostrarVista('vistaTareas', ui.btnHome);
+    // Eventos de Navegación del Dock
+    ui.btnTareas.addEventListener('click', () => {
+        mostrarVista('vistaTareas', ui.btnTareas);
         renderizarTareas();
     });
 
     ui.btnShop.addEventListener('click', () => {
-        mostrarVista('vistaTienda', ui.btnShop);
+        mostrarVista('vistaShop', ui.btnShop);
         renderizarTienda();
     });
 
@@ -657,18 +700,28 @@ document.addEventListener('DOMContentLoaded', () => {
         renderizarAgenda();
     });
     
-    ui.btnReport.addEventListener('click', () => { // NUEVO
+    ui.btnReport.addEventListener('click', () => { // CORREGIDO: Usando ui.btnReport
         mostrarVista('vistaInforme', ui.btnReport);
         renderizarInforme(); 
     });
 
-    ui.formAgenda.addEventListener('submit', guardarEvento); 
+    // Eventos de Forms y Acciones
+    ui.btnGuardarHorario.addEventListener('click', guardarActividad);
+    ui.btnCancelarHorario.addEventListener('click', (e) => {
+        e.preventDefault();
+        ui.formHorario.classList.add('hidden');
+        limpiarFormularioHorario();
+        // Ocultar botones de admin al cancelar
+        ui.contenedorHorario.querySelectorAll('.btn-editar-horario, .btn-eliminar-horario').forEach(btn => {
+            btn.style.display = 'none';
+        });
+    });
 
-    // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET ---
+    ui.formAgenda.addEventListener('submit', guardarEvento); 
+    
     ui.btnDiario.addEventListener('click', () => {
         const hoy = new Date().toDateString();
         if (estado.ultimoDiario === hoy) {
-            console.log("Ya has recogido el premio diario de hoy. Vuelve mañana.");
             reproducir('error');
             alert("Ya has recogido tu regalo de hoy. ¡Vuelve mañana!");
             return;
@@ -696,7 +749,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // INICIO: Mostrar la vista de tareas por defecto al cargar.
-    mostrarVista('vistaTareas', ui.btnHome);
-    actualizarUI();
-});
+}); // Fin DOMContentLoaded
