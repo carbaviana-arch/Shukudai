@@ -200,19 +200,21 @@ details[open] summary::after { content: '▲'; }
   justify-content: space-around; 
   align-items: center;
   z-index: 1000; 
-  padding: 0 10px;
+  padding: 0 5px; /* <--- AJUSTE 1: Reducción de padding horizontal */
 }
 .dock-item {
   background: none; 
   display: flex; flex-direction: column; align-items: center;
   color: #b2bec3; 
   gap: 4px;
-  padding: 5px;
+  padding: 5px 2px; /* <--- AJUSTE 2: Reducción de padding interno */
   border-radius: 10px;
   transition: all 0.2s ease-out;
   flex: 1; 
 }
-.dock-item span { font-size: 1.5rem; }
+.dock-item span { 
+  font-size: 1.2rem; /* <--- AJUSTE 3: Reducción del tamaño del icono */
+}
 .dock-label { font-size: 0.7rem; font-weight: bold; text-align: center; }
 .dock-item.active { 
   color: var(--primary); 
