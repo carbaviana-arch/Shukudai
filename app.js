@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nivel: document.getElementById('nivelActual'),
         btnDiario: document.getElementById('btnDiario'),
         btnSemanal: document.getElementById('btnSemanal'),
-        btnReset: document.getElementById('btnReset'),
+        btnReset: document.getElementById('btnReset'), // Ahora este elemento existe en el HTML
 
         // Vistas
         vistaTareas: document.getElementById('vistaTareas'),
@@ -749,6 +749,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ESTA LÍNEA ERA LA CAUSANTE DEL ERROR AL NO EXISTIR #btnReset
     ui.btnReset.addEventListener('click', () => {
         if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos, nivel, agenda e historial.")) {
             localStorage.removeItem('shukudai_v3_data');
