@@ -76,6 +76,15 @@ button:active { transform: scale(0.95); }
   background: transparent; border: 2px solid var(--danger); color: var(--danger); 
   padding: 10px 20px; border-radius: 20px; font-weight: bold;
 }
+/* NUEVO BOTÓN ADMIN TAREAS */
+.btn-admin {
+    background: transparent; 
+    border: 1px solid var(--primary); 
+    color: var(--primary);
+    padding: 6px 12px; 
+    border-radius: 8px; 
+    font-weight: bold;
+}
 
 /* PROGRESO */
 #progreso { padding: 15px; text-align: center; }
@@ -134,6 +143,39 @@ details[open] summary::after { content: '▲'; }
     background-color: var(--accent); 
     color: white;
 }
+
+/* ADMIN TAREAS */
+.task-admin-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f7f9fc; /* Light blue/gray */
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+}
+.task-admin-info {
+    flex-grow: 1;
+}
+.task-admin-name {
+    font-weight: bold;
+    font-size: 1rem;
+    color: var(--dark);
+}
+.task-admin-meta {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+.task-admin-actions button {
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+.task-admin-actions .btn-edit { background: var(--accent); color: var(--dark); }
+.task-admin-actions .btn-delete { background: var(--danger); color: var(--white); }
+
 
 /* TIENDA */
 .premio-card {
