@@ -13,19 +13,19 @@
     <div class="app-container">
         
         <header>
-            <div id="marcador" class="bg-white rounded-xl p-4 shadow-lg">
+            <div id="marcador">
                 <div class="stats-row">
                     <div class="stat-box">
                         <span class="label">Puntos</span>
-                        <span class="big-number primary-text" id="puntosDisplay">0 Pts</span>
+                        <span class="big-number" id="puntosDisplay">0 Pts</span>
                     </div>
                     <div class="stat-box">
                         <span class="label">Minutos</span>
-                        <span class="big-number secondary-text" id="minutosDisplay">0 Min</span>
+                        <span class="big-number" id="minutosDisplay">0 Min</span>
                     </div>
                     <div class="stat-box">
                         <span class="label">Nivel</span>
-                        <span class="big-number accent-text" id="nivelDisplay">1</span>
+                        <span class="big-number" id="nivelDisplay">1</span>
                     </div>
                 </div>
             </div>
@@ -45,7 +45,7 @@
                     <button id="btnSemanal" class="blue">⭐ Semanal (+70 Pts)</button>
                 </div>
 
-                <div id="listaTareas" class="mt-4">
+                <div id="listaTareas">
                     </div>
 
                 <button id="btnAdminTareas" class="danger-outline w-full mt-4">⚙️ Administrar Tareas (CRUD)</button>
@@ -62,7 +62,7 @@
             <section id="vistaHorario" class="view hidden">
                 <h3>Horario Escolar <span class="material-symbols-outlined icon-small">calendar_month</span></h3>
                 
-                <div id="formHorario" class="form-card hidden mb-4">
+                <div id="formHorario" class="form-card hidden">
                     <h4>Gestión de Horario</h4>
                     <input type="hidden" id="horarioIndex">
                     <input type="hidden" id="horarioDia">
@@ -70,7 +70,14 @@
                     <input type="text" id="horarioHora" placeholder="Hora (Ej: 09:00 - 10:00)" class="input-field">
                     <select id="horarioDiaSelect" class="input-field">
                         <option value="">Seleccionar Día</option>
-                        </select>
+                        <option value="Lunes">Lunes</option>
+                        <option value="Martes">Martes</option>
+                        <option value="Miércoles">Miércoles</option>
+                        <option value="Jueves">Jueves</option>
+                        <option value="Viernes">Viernes</option>
+                        <option value="Sábado">Sábado</option>
+                        <option value="Domingo">Domingo</option>
+                    </select>
                     <button id="btnGuardarHorario" class="blue">Guardar Actividad</button>
                     <button id="btnCancelarHorario" class="danger-outline">Cancelar</button>
                 </div>
