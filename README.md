@@ -1,10 +1,10 @@
-# Shukudai: Misión Recompensa - v4.0 ⭐️
+# Shukudai: Misión Recompensa - v4.1 ⭐️
 
 **Shukudai** (宿題, "deberes" en japonés) es un sistema gamificado simple, implementado en un único archivo HTML/JavaScript, diseñado para ayudar a gestionar y motivar la realización de tareas y la buena conducta a través de puntos y recompensas.
 
-## 🚀 Novedades de la Versión 4.0: Gestión Total de Tareas Diarias (CRUD)
+## 🚀 Novedades de la Versión 4.1: Gestión Total de Tareas y Horario (CRUD)
 
-La característica principal de esta versión es la implementación completa del **CRUD (Crear, Leer, Actualizar, Eliminar)** de las Tareas Diarias y sus categorías en la sección "Tareas". Esto permite una personalización total del sistema de gamificación: puedes añadir o modificar cualquier tarea (y sus recompensas de Puntos/Minutos) sin editar el código fuente.
+La característica principal de esta versión es la implementación completa del **CRUD (Crear, Leer, Actualizar, Eliminar)** de las Tareas Diarias y sus categorías, **junto con la implementación CRUD completa del Horario Escolar**. Esto permite una personalización total del sistema: puedes añadir o modificar cualquier tarea y gestionar tu horario sin editar el código fuente.
 
 ---
 
@@ -31,7 +31,7 @@ La característica principal de esta versión es la implementación completa del
 * Sección para planificar eventos importantes como **Exámenes, Entregas de Trabajo o Citas**.
 * **Creación, Edición y Eliminación** de eventos persistentes.
 
-### 5. Horario Escolar (Gestión CRUD Total - v3.1)
+### 5. Horario Escolar (Gestión CRUD Total - v4.1)
 * **Botón ⚙️ Administrar:** Activa el "Modo Gestión" y muestra el formulario CRUD.
 * **Crear, Editar y Eliminar** clases o actividades extraescolares a cualquier día de la semana.
 * **Persistencia:** Todos los cambios realizados en el horario se guardan automáticamente.
@@ -47,3 +47,12 @@ La característica principal de esta versión es la implementación completa del
 3.  **Persistencia:** Todos los datos (puntos, tareas, agenda y el horario personalizado) se guardan automáticamente en la memoria local de tu navegador (`localStorage`).
 
 **⚠️ Advertencia:** Para evitar la pérdida de datos, utiliza siempre el mismo navegador y dispositivo. Si borras el caché/datos del sitio, los datos se perderán (a menos que uses el botón de **Resetear** intencionadamente).
+
+---
+
+## 💡 Créditos
+
+* **Concepto y Desarrollo:** Asistente de IA (Modelo Gemini).
+* **Tecnologías:** HTML, Tailwind CSS (CDN), JavaScript (ES6), y `localStorage` para persistencia de datos.
+* **Iconografía:** Emoji Set Unicode.
+* **Efectos de Sonido:** Google Actions Sound Library.
