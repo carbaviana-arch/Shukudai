@@ -5,290 +5,365 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shukudai: Misión Recompensa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css"> 
-</head>
-<body class="min-h-screen">
-    <div class="app-container p-4 sm:rounded-xl min-h-screen sm:min-h-0 sm:my-4">
+    <style>
+        :root {
+            --primary: #4f46e5; /* Indigo 600 */
+            --secondary: #facc15; /* Yellow 400 */
+            --danger: #ef4444; /* Red 500 */
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            padding-bottom: 80px; /* Espacio para el dock */
+        }
+        .dock-btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+        }
+        .dock-btn.active .icon {
+            filter: brightness(0) invert(1);
+        }
         
-        <header>
-            <h1 class="text-3xl font-extrabold mb-2">Shukudai GO! ⭐</h1>
-            <div id="marcador" class="stats-row mb-4">
-                <div class="stat-box">
-                    <div class="label">Puntos (Pts)</div>
-                    <div id="puntosTotales" class="big-number">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="label">Minutos (Min)</div>
-                    <div id="minutosTotales" class="big-number">0</div>
-                </div>
-                <div class="stat-box">
-                    <div class="label">Nivel</div>
-                    <div id="nivelActual" class="big-number">1</div>
-                </div>
-            </div>
+        /* Tareas */
+        .task {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+        .task.completed {
+            background-color: #d1fae5; /* Green 100 */
+        }
+        .task.failed {
+            background-color: #fee2e2; /* Red 100 */
+        }
+        .btn-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s ease;
+            cursor: pointer;
+        }
+        .btn-circle:active {
+            transform: scale(0.95);
+        }
+        .check {
+            background-color: #10b981; /* Emerald 500 */
+            color: white;
+            margin-right: 8px;
+        }
+        .cross {
+            background-color: #f59e0b; /* Amber 500 */
+            color: white;
+        }
+        
+        /* Tienda */
+        .premio-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .premio-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+        }
+        .premio-icono {
+            font-size: 3rem;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        .price-tag {
+            background-color: var(--secondary);
+            color: #1f2937;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            display: inline-block;
+        }
+        
+        /* Horario */
+        .horario-dia {
+            margin-bottom: 1.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .dia-titulo {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .asignatura {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0.75rem;
+            border-bottom: 1px solid #f3f4f6;
+            background-color: white;
+        }
+        .asignatura:last-child {
+            border-bottom: none;
+        }
+        .extra-curricular {
+            background-color: #fef3c7; /* Yellow 100 */
+            font-weight: 600;
+        }
+        
+        /* Agenda */
+        .agenda-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        }
+        .agenda-card.examen { border-left: 6px solid #ef4444; } /* Red */
+        .agenda-card.cita { border-left: 6px solid #3b82f6; } /* Blue */
+        .agenda-card.entrega { border-left: 6px solid #22c55e; } /* Green */
+        .agenda-card.otro { border-left: 6px solid #9ca3af; } /* Gray */
+        
+        .agenda-title {
+            font-weight: 800;
+            font-size: 1.125rem;
+            color: var(--primary);
+        }
+        .agenda-info-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+        .agenda-comments {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            background-color: #f9fafb;
+            font-style: italic;
+            border-radius: 4px;
+            color: #4b5563;
+            font-size: 0.9rem;
+        }
+        .agenda-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .agenda-actions button {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .btn-edit { background: #facc15; color: #1f2937; } /* Yellow */
+        .btn-delete { background: #ef4444; color: white; } /* Red */
+
+        /* Reporte */
+        .report-summary-card {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .report-summary-card strong {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 0.25rem;
+        }
+        .day-report {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+            background-color: white;
+        }
+        .day-report:last-child {
+            border-bottom: none;
+        }
+
+        /* Utilidades */
+        .view {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .dock-btn i {
+             /* Asegura que el color de la clase activa afecte al icono */
+            color: inherit;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="bg-indigo-600 text-white p-5 text-center shadow-lg">
+            <h1 class="text-3xl font-extrabold mb-1">Shukudai: Misión Recompensa <i class="fa-solid fa-star text-yellow-400 ml-1"></i></h1>
+            <p class="text-sm">Sistema Gamificado de Gestión de Tareas</p>
             
-            <div id="progreso">
-                <div id="xpBar">
-                    <div id="xpFill" style="width: 0%;"></div>
-                </div>
-                <div id="xpTexto" class="text-xs mt-1 font-medium">0 / 125 xp</div>
-            </div>
-            
-            <div id="acciones" class="flex justify-center space-x-2 mt-4">
-                <button id="btnPremioDiario" class="gold shadow-sm">
-                    🎁 Diario (+10)
-                </button>
-                <button id="btnPremioSemanal" class="blue shadow-sm">
-                    🏆 Semanal (+70)
-                </button>
+            <div class="flex justify-around items-center mt-4 text-sm font-semibold">
+                <span>Nivel: <strong id="nivelActual">1</strong></span>
+                <span>Puntos: <strong id="puntosTotales">0</strong> <i class="fa-solid fa-star text-yellow-400"></i></span>
+                <span>Minutos: <strong id="minutosTotales">0</strong> <i class="fa-solid fa-clock text-blue-400"></i></span>
             </div>
         </header>
 
-        <main class="mb-20">
+        <main class="py-4">
+            <section class="max-w-md mx-auto p-4 flex justify-center gap-4">
+                <button id="btnDiario" class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-2 px-4 rounded-full transition duration-300 shadow-md">
+                    <i class="fa-solid fa-gift mr-2"></i> Diario (+10 Pts)
+                </button>
+                <button id="btnSemanal" class="bg-indigo-400 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-full transition duration-300 shadow-md">
+                    <i class="fa-solid fa-trophy mr-2"></i> Semanal (+70 Pts)
+                </button>
+            </section>
             
             <section id="vistaTareas" class="view">
                 <div class="flex justify-between items-center mb-4">
-                     <h2 class="text-2xl font-bold text-gray-700">Tareas de Hoy 📝</h2>
-                     <button id="btnAdminTareas" class="btn-admin text-sm">⚙️ Administrar</button>
+                    <h2 class="text-2xl font-bold text-gray-700">Tareas de Hoy <i class="fa-solid fa-clipboard-list text-indigo-500 ml-1"></i></h2>
+                    <button id="btnAdminTareas" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition duration-150 text-sm">
+                        Admin <i class="fa-solid fa-gear ml-1"></i>
+                    </button>
                 </div>
+                <div id="adminTareasContainer" style="display:none;" class="mb-4 p-4 bg-white rounded-xl shadow-md">
+                    </div>
                 <div id="categorias" class="space-y-4">
                     </div>
             </section>
 
             <section id="vistaTienda" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Tienda de Premios ✨</h2>
-                
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Tienda de Premios <i class="fa-solid fa-store text-yellow-500 ml-1"></i></h2>
                 <div id="storeMessage" class="mb-4 p-3 rounded-lg text-center transition-colors duration-300">
-                    <h3 id="storeMessageTitle" class="font-extrabold text-lg"></h3>
-                    <p id="storeMessageBody" class="text-sm"></p>
-                </div>
-                
-                <div id="contenedorPremios" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    </div>
+                <div id="contenedorPremios" class="grid grid-cols-2 gap-4">
                     </div>
             </section>
 
             <section id="vistaHorario" class="view" style="display:none;">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-gray-700">Horario Escolar 🏫</h2>
-                    <button id="btnAdminHorario" class="btn-admin text-sm">⚙️ Administrar</button>
+                    <h2 class="text-2xl font-bold text-gray-700">Horario Semanal <i class="fa-solid fa-school text-indigo-500 ml-1"></i></h2>
+                    <button id="btnAdminHorario" class="bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium py-1 px-3 rounded-lg transition duration-150 text-sm">
+                        Admin <i class="fa-solid fa-gear ml-1"></i>
+                    </button>
                 </div>
-                <div id="contenedorHorario" class="space-y-4">
+                <div id="adminHorarioContainer" style="display:none;" class="mb-4 p-4 bg-white rounded-xl shadow-md">
+                    </div>
+                <div id="contenedorHorario">
                     </div>
             </section>
-            
-            <section id="vistaAgenda" class="view form-card" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Agenda y Eventos 🗓️</h2>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Próximos Eventos</h3>
-                <div id="listaEventos" class="mb-6">
-                    </div>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Evento</h3>
-                <form id="formAgenda" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
-                    <input type="hidden" id="agendaId" value="">
-                    
-                    <div>
-                        <label for="agendaFecha" class="block text-sm font-medium text-gray-700">Fecha</label>
-                        <input type="date" id="agendaFecha" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                    </div>
-                    
-                    <div>
-                        <label for="agendaHora" class="block text-sm font-medium text-gray-700">Hora (Opcional)</label>
-                        <input type="time" id="agendaHora" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                        <div class="flex-1">
-                            <label for="agendaAsignatura" class="block text-sm font-medium text-gray-700">Asignatura/Tema</label>
-                            <input type="text" id="agendaAsignatura" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Matemáticas">
+
+            <section id="vistaAgenda" class="view" style="display:none;">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Agenda y Eventos <i class="fa-solid fa-calendar-days text-indigo-500 ml-1"></i></h2>
+
+                <div id="formAgendaContainer" class="mb-6 p-4 bg-white rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold mb-3 text-indigo-600" id="agendaFormTitle">Añadir Nuevo Evento</h3>
+                    <form id="formAgenda" class="space-y-3">
+                        <input type="hidden" id="agendaId">
+                        <input type="text" id="agendaTitulo" placeholder="Título (Ej: Examen Mates)" required class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <input type="date" id="agendaFecha" required class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <select id="agendaTipo" required class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                            <option value="examen">Examen</option>
+                            <option value="entrega">Entrega de Trabajo</option>
+                            <option value="cita">Cita / Evento</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <textarea id="agendaComentarios" placeholder="Comentarios (opcional)" rows="2" class="w-full p-2 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                        <div class="flex space-x-3">
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg flex-grow transition duration-150" id="agendaSubmitBtn">
+                                Guardar Evento
+                            </button>
+                            <button type="button" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg transition duration-150" id="agendaCancelBtn" style="display:none;">
+                                Cancelar
+                            </button>
                         </div>
-                        <div class="flex-1">
-                            <label for="agendaTipo" class="block text-sm font-medium text-gray-700">Tipo de Evento</label>
-                            <select id="agendaTipo" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                                <option value="Examen">Examen</option>
-                                <option value="Cita">Cita / Médico</option>
-                                <option value="Entrega">Entrega de Trabajo</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
+                    </form>
+                </div>
+
+                <div id="listaEventos" class="space-y-4">
                     </div>
-                    
-                    <div>
-                        <label for="agendaComentarios" class="block text-sm font-medium text-gray-700">Comentarios</label>
-                        <textarea id="agendaComentarios" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Detalles..."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
-                        Guardar Evento
-                    </button>
-                </form>
             </section>
             
             <section id="vistaInforme" class="view" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">Informe Semanal 📊</h2>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Resumen Total (Últimos 7 Días)</h3>
-                <div id="totalStats" class="grid grid-cols-2 gap-3 mb-6">
-                    <div class="stat-card p-3 bg-white rounded-lg text-center">
-                        <div class="text-xl font-extrabold text-green-600" id="compTot">0</div>
-                        <div class="text-xs text-gray-500 font-medium">Tareas OK</div>
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Informe Semanal <i class="fa-solid fa-chart-line text-indigo-500 ml-1"></i></h2>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="report-summary-card bg-green-100 border-l-4 border-green-600">
+                        <p class="text-sm text-gray-500">Completadas</p>
+                        <strong id="compTot" class="text-green-800">0</strong>
                     </div>
-                    <div class="stat-card p-3 bg-white rounded-lg text-center">
-                        <div class="text-xl font-extrabold text-red-600" id="failTot">0</div>
-                        <div class="text-xs text-gray-500 font-medium">Tareas Fallidas</div>
+                    <div class="report-summary-card bg-red-100 border-l-4 border-red-600">
+                        <p class="text-sm text-gray-500">Fallidas</p>
+                        <strong id="failTot" class="text-red-800">0</strong>
                     </div>
-                    <div class="stat-card p-3 bg-white rounded-lg text-center">
-                        <div class="text-xl font-extrabold text-indigo-600" id="ptsTot">0</div>
-                        <div class="text-xs text-gray-500 font-medium">Puntos Ganados</div>
+                    <div class="report-summary-card bg-yellow-100 border-l-4 border-yellow-600">
+                        <p class="text-sm text-gray-500">Puntos Totales</p>
+                        <strong id="ptsTot" class="text-yellow-800">0</strong>
                     </div>
-                    <div class="stat-card p-3 bg-white rounded-lg text-center">
-                        <div class="text-xl font-extrabold text-amber-500" id="minTot">0</div>
-                        <div class="text-xs text-gray-500 font-medium">Minutos Ganados</div>
+                    <div class="report-summary-card bg-blue-100 border-l-4 border-blue-600">
+                        <p class="text-sm text-gray-500">Minutos Totales</p>
+                        <strong id="minTot" class="text-blue-800">0</strong>
                     </div>
                 </div>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Detalle Diario</h3>
-                <div id="detalleSemanal" class="space-y-3">
+
+                <h3 class="text-xl font-semibold text-gray-700 mb-3">Historial Diario</h3>
+                <div id="detalleSemanal" class="space-y-2 bg-white rounded-xl shadow-md overflow-hidden">
                     </div>
             </section>
-            <section id="vistaAdminTareas" class="view form-card" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">⚙️ Administración de Tareas</h2>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Catálogo Actual</h3>
-                <div id="listaTareasAdmin" class="mb-6 space-y-2">
-                    </div>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Tarea</h3>
-                <form id="formTarea" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
-                    <input type="hidden" id="tareaId" value="">
-                    <input type="hidden" id="tareaCategoriaOriginal" value="">
-                    
-                    <div class="flex space-x-3">
-                        <div class="flex-1">
-                            <label for="tareaNombre" class="block text-sm font-medium text-gray-700">Nombre de la Tarea</label>
-                            <input type="text" id="tareaNombre" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Fregar platos">
-                        </div>
-                        <div class="w-1/3">
-                            <label for="tareaCategoria" class="block text-sm font-medium text-gray-700">Categoría</label>
-                            <select id="tareaCategoria" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                                </select>
-                        </div>
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                         <div class="flex-1">
-                            <label for="tareaPts" class="block text-sm font-medium text-gray-700">Puntos (Pts)</label>
-                            <input type="number" id="tareaPts" required min="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="1">
-                        </div>
-                        <div class="flex-1">
-                            <label for="tareaMin" class="block text-sm font-medium text-gray-700">Minutos (Min)</label>
-                            <input type="number" id="tareaMin" required min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" value="0">
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
-                        Guardar Tarea
-                    </button>
-                    <button type="button" id="btnCancelarEdicion" class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition cursor-pointer" style="display:none;">
-                        Cancelar Edición
-                    </button>
-                </form>
-            </section>
-            <section id="vistaAdminHorario" class="view form-card" style="display:none;">
-                <h2 class="text-2xl font-bold text-gray-700 mb-4">⚙️ Administración de Horario</h2>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Horario Actual</h3>
-                <div id="listaHorarioAdmin" class="mb-6 space-y-2">
-                    </div>
-                
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Clase</h3>
-                <form id="formHorario" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
-                    <input type="hidden" id="claseId" value="">
-                    
-                    <div class="flex space-x-3">
-                        <div class="w-1/3">
-                            <label for="claseDia" class="block text-sm font-medium text-gray-700">Día</label>
-                            <select id="claseDia" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                                <option value="Lunes">Lunes</option>
-                                <option value="Martes">Martes</option>
-                                <option value="Miercoles">Miércoles</option>
-                                <option value="Jueves">Jueves</option>
-                                <option value="Viernes">Viernes</option>
-                                <option value="Sabado">Sábado</option>
-                                <option value="Domingo">Domingo</option>
-                            </select>
-                        </div>
-                        <div class="flex-1">
-                            <label for="claseNombre" class="block text-sm font-medium text-gray-700">Asignatura/Actividad</label>
-                            <input type="text" id="claseNombre" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" placeholder="Ej: Matemáticas o Natación">
-                        </div>
-                    </div>
-                    
-                    <div class="flex space-x-3">
-                         <div class="flex-1">
-                            <label for="claseInicio" class="block text-sm font-medium text-gray-700">Hora Inicio</label>
-                            <input type="time" id="claseInicio" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
-                        </div>
-                        <div class="flex-1">
-                            <label for="claseFin" class="block text-sm font-medium text-gray-700">Hora Fin</label>
-                            <input type="time" id="claseFin" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2">
-                        </div>
-                    </div>
-                    
-                    <div>
-                        <label for="claseTipo" class="block text-sm font-medium text-gray-700">Tipo de Clase (Opcional)</label>
-                        <select id="claseTipo" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 bg-white">
-                            <option value="">Clase Normal (Escolar)</option>
-                            <option value="extra">Extraescolar / Comedor</option>
-                        </select>
-                    </div>
-                    
-                    <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 transition cursor-pointer">
-                        Guardar Clase
-                    </button>
-                    <button type="button" id="btnCancelarEdicionHorario" class="w-full py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition cursor-pointer" style="display:none;">
-                        Cancelar Edición
-                    </button>
-                </form>
-            </section>
-            <div class="text-center mt-6">
-                <button id="btnReset" class="danger-outline text-xs underline cursor-pointer">Reiniciar Todos los Datos (Borrar)</button>
-            </div>
             
         </main>
 
-        <div id="dock">
-            <div class="flex justify-around items-center w-full">
-                
-                <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 active w-1/5">
-                    <span class="text-2xl">📋</span>
+        <nav id="dock" class="fixed bottom-0 left-0 right-0 max-w-md mx-auto h-20 bg-white/95 backdrop-blur-sm rounded-t-3xl shadow-2xl border-t border-gray-100 z-50">
+            <div class="flex justify-around items-center p-2">
+                <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 active w-1/5">
+                    <i class="fa-solid fa-list-check text-2xl"></i>
                     <span class="text-xs font-medium mt-1">Tareas</span>
                 </button>
-                
-                <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
-                    <span class="text-2xl">🎁</span>
+                <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/5">
+                    <i class="fa-solid fa-store text-2xl"></i>
                     <span class="text-xs font-medium mt-1">Tienda</span>
                 </button>
-                
-                <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
-                    <span class="text-2xl">⏰</span>
+                <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/5">
+                    <i class="fa-solid fa-calendar-week text-2xl"></i>
                     <span class="text-xs font-medium mt-1">Horario</span>
                 </button>
-                
-                <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
-                    <span class="text-2xl">📅</span>
+                <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/5">
+                    <i class="fa-solid fa-calendar-days text-2xl"></i>
                     <span class="text-xs font-medium mt-1">Agenda</span>
                 </button>
-                
-                <button id="reportBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
-                    <span class="text-2xl">📊</span>
+                <button id="reportBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/5">
+                    <i class="fa-solid fa-chart-line text-2xl"></i>
                     <span class="text-xs font-medium mt-1">Informe</span>
                 </button>
-            </div> 
-        </div> </div>
+            </div>
+        </nav>
+    </div>
+
     <script src="app.js"></script>
+
 </body>
 </html>
