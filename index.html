@@ -3,142 +3,189 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shukudai: Misión Recompensa v4.0</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-    <link rel="stylesheet" href="style.css">
+    <title>Shukudai: Misión Recompensa</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
     <div class="app-container">
         
         <header>
+            <h1>Shukudai GO! ⭐</h1>
+            <p>Gamificación de Hábitos y Responsabilidades</p>
+
             <div id="marcador">
                 <div class="stats-row">
                     <div class="stat-box">
-                        <span class="label">Puntos</span>
-                        <span class="big-number" id="puntosDisplay">0 Pts</span>
+                        <span class="big-number" id="puntosTotales">0</span>
+                        <span class="label">Puntos (Pts)</span>
                     </div>
                     <div class="stat-box">
-                        <span class="label">Minutos</span>
-                        <span class="big-number" id="minutosDisplay">0 Min</span>
+                        <span class="big-number" id="minutosTotales">0</span>
+                        <span class="label">Minutos (Min)</span>
                     </div>
                     <div class="stat-box">
+                        <span class="big-number" id="nivelActual">1</span>
                         <span class="label">Nivel</span>
-                        <span class="big-number" id="nivelDisplay">1</span>
                     </div>
                 </div>
             </div>
-        </header>
-        
-        <main>
-            <section id="vistaTareas" class="view">
-                <h3>Tareas Diarias <span class="material-symbols-outlined icon-small">checklist</span></h3>
-                
-                <div id="progreso">
-                    <h4>Progreso de Nivel (<span id="xpDisplay">0</span>/<span id="metaDisplay">125</span> Pts)</h4>
-                    <div id="xpBar"><div id="xpFill"></div></div>
-                </div>
 
+            <div id="progreso">
+                <div id="xpBar">
+                    <div id="xpFill"></div>
+                </div>
+                <div id="xpTexto">0 / 125 xp</div>
+                
                 <div id="acciones">
-                    <button id="btnDiario" class="gold">🎁 Diario (+10 Pts)</button>
-                    <button id="btnSemanal" class="blue">⭐ Semanal (+70 Pts)</button>
+                    <button id="btnPremioDiario" class="gold">
+                        🎁 Diario (+10)
+                    </button>
+                    <button id="btnPremioSemanal" class="blue">
+                        🏆 Semanal (+70)
+                    </button>
                 </div>
+            </div>
+        </header>
 
-                <div id="listaTareas">
+        <main>
+            
+            <section id="vistaTareas" class="view">
+                <h3>Tareas de Hoy 📝</h3>
+                <div id="categorias">
                     </div>
-
-                <button id="btnAdminTareas" class="danger-outline w-full mt-4">⚙️ Administrar Tareas (CRUD)</button>
             </section>
 
-            <section id="vistaShop" class="view hidden">
-                <h3>Tienda de Recompensas <span class="material-symbols-outlined icon-small">redeem</span></h3>
-                <p class="p-4 text-center text-sm text-gray-500">Solo puedes canjear premios los sábados y domingos.</p>
+            <section id="vistaTienda" class="view" style="display:none;">
+                <h3>Tienda de Premios ✨</h3>
                 
-                <div id="gridTienda" class="grid-tienda">
-                    </div>
-            </section>
-
-            <section id="vistaHorario" class="view hidden">
-                <h3>Horario Escolar <span class="material-symbols-outlined icon-small">calendar_month</span></h3>
+                <div id="storeMessage" class="premio-card" style="margin-bottom: 15px; padding: 15px;">
+                    <h4 id="storeMessageTitle"></h4>
+                    <p id="storeMessageBody" style="font-size: 0.9rem; color: #666;"></p>
+                </div>
                 
-                <div id="formHorario" class="form-card hidden">
-                    <h4>Gestión de Horario</h4>
-                    <input type="hidden" id="horarioIndex">
-                    <input type="hidden" id="horarioDia">
-                    <input type="text" id="horarioNombre" placeholder="Nombre (Ej: Matemáticas)" class="input-field">
-                    <input type="text" id="horarioHora" placeholder="Hora (Ej: 09:00 - 10:00)" class="input-field">
-                    <select id="horarioDiaSelect" class="input-field">
-                        <option value="">Seleccionar Día</option>
-                        <option value="Lunes">Lunes</option>
-                        <option value="Martes">Martes</option>
-                        <option value="Miércoles">Miércoles</option>
-                        <option value="Jueves">Jueves</option>
-                        <option value="Viernes">Viernes</option>
-                        <option value="Sábado">Sábado</option>
-                        <option value="Domingo">Domingo</option>
-                    </select>
-                    <button id="btnGuardarHorario" class="blue">Guardar Actividad</button>
-                    <button id="btnCancelarHorario" class="danger-outline">Cancelar</button>
-                </div>
-
-                <div id="contenedorHorario">
-                    </div>
-
-                <button id="btnToggleHorarioForm" class="blue w-full mt-4">➕ Añadir / ⚙️ Administrar</button>
-            </section>
-
-            <section id="vistaAgenda" class="view hidden">
-                <h3>Agenda y Eventos <span class="material-symbols-outlined icon-small">event_note</span></h3>
-
-                <div id="formAgenda" class="form-card">
-                    <h4>Añadir Nuevo Evento</h4>
-                    <input type="hidden" id="eventoId">
-                    <input type="text" id="eventoTitulo" placeholder="Título (Ej: Examen de Inglés)" class="input-field" required>
-                    <input type="date" id="eventoFecha" class="input-field" required>
-                    <select id="eventoTipo" class="input-field">
-                        <option value="General">General</option>
-                        <option value="Examen">Examen</option>
-                        <option value="Cita">Cita</option>
-                    </select>
-                    <textarea id="eventoComentarios" placeholder="Notas/Comentarios (Opcional)" class="input-field"></textarea>
-                    <button type="submit" id="btnGuardarEvento" class="blue">Guardar Evento</button>
-                </div>
-
-                <div id="contenedorAgenda">
+                <div id="contenedorPremios" class="grid-tienda">
                     </div>
             </section>
 
-            <section id="vistaInforme" class="view hidden">
-                <h3>Informe de Progreso <span class="material-symbols-outlined icon-small">leaderboard</span></h3>
-                <div class="detalle-diario-grid">
+            <section id="vistaHorario" class="view" style="display:none;">
+                <h3>Horario Escolar 🏫</h3>
+                <div id="contenedorHorario" class="horario-card">
+                    </div>
+            </section>
+            
+            <section id="vistaAgenda" class="view" style="display:none;">
+                <h3>Agenda y Eventos 🗓️</h3>
+                
+                <h4 class="h4-sub">Próximos Eventos</h4>
+                <div id="listaEventos">
                     </div>
                 
-                <button id="btnReset" class="danger-outline w-full mt-4">⚠️ Resetear TODOS los Datos</button>
+                <h4 class="h4-sub">Añadir/Editar Evento</h4>
+                <form id="formAgenda" class="form-card">
+                    <input type="hidden" id="agendaId" value="">
+                    
+                    <div>
+                        <label for="agendaFecha">Fecha</label>
+                        <input type="date" id="agendaFecha" required class="input-field">
+                    </div>
+                    
+                    <div>
+                        <label for="agendaHora">Hora (Opcional)</label>
+                        <input type="time" id="agendaHora" class="input-field">
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label for="agendaAsignatura">Asignatura/Tema</label>
+                            <input type="text" id="agendaAsignatura" required class="input-field" placeholder="Ej: Matemáticas">
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="agendaTipo">Tipo de Evento</label>
+                            <select id="agendaTipo" required class="input-field">
+                                <option value="Examen">Examen</option>
+                                <option value="Cita">Cita / Médico</option>
+                                <option value="Entrega">Entrega de Trabajo</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="agendaComentarios">Comentarios</label>
+                        <textarea id="agendaComentarios" rows="2" class="input-field" placeholder="Detalles..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="blue" style="padding: 12px; margin-top: 10px;">
+                        Guardar Evento
+                    </button>
+                </form>
             </section>
+            
+            <section id="vistaInforme" class="view" style="display:none;">
+                <h3>Informe Semanal 📈</h3>
+                <div id="resumenSemanal" class="form-card">
+                    <h4 class="agenda-title" style="color: var(--primary); margin-top: 0;">Resumen Total (Ciclo Actual)</h4>
+                    <div id="totalStats" class="stats-row">
+                        <div class="stat-box">
+                            <div id="compTot" class="big-number" style="color: var(--secondary);">0</div>
+                            <div class="label">Completadas ✅</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="failTot" class="big-number" style="color: var(--danger);">0</div>
+                            <div class="label">Incumplidas ❌</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="ptsTot" class="big-number" style="color: var(--primary);">0</div>
+                            <div class="label">Puntos G. ⭐</div>
+                        </div>
+                        <div class="stat-box">
+                            <div id="minTot" class="big-number" style="color: var(--accent);">0</div>
+                            <div class="label">Minutos G. ⏳</div>
+                        </div>
+                    </div>
+                </div>
+                <h4>Detalle por Día</h4>
+                <div id="detalleSemanal" class="detalle-diario-grid">
+                    </div>
+            </section>
+
+            <div style="text-align: center; padding: 20px 0;">
+                <button id="btnReset" class="danger-outline">Reiniciar Todos los Datos (Borrar)</button>
+            </div>
+            
         </main>
 
-        <div id="dock">
-            <button class="dock-item active" id="btnTareas" data-view="vistaTareas">
-                <span class="material-symbols-outlined">home</span>
+        <footer id="dock">
+            
+            <button id="homeBtn" class="dock-item active">
+                <span>📋</span>
+                <span class="dock-label">Tareas</span>
             </button>
-            <button class="dock-item" id="btnShop" data-view="vistaShop">
-                <span class="material-symbols-outlined">redeem</span>
+            
+            <button id="shopBtn" class="dock-item">
+                <span>🎁</span>
+                <span class="dock-label">Tienda</span>
             </button>
-            <button class="dock-item" id="btnSchedule" data-view="vistaHorario">
-                <span class="material-symbols-outlined">calendar_month</span>
-            </button>
-            <button class="dock-item" id="btnAgenda" data-view="vistaAgenda">
-                <span class="material-symbols-outlined">event_note</span>
-            </button>
-            <button class="dock-item" id="btnReport" data-view="vistaInforme">
-                <span class="material-symbols-outlined">leaderboard</span>
-            </button>
-        </div>
 
+            <button id="scheduleBtn" class="dock-item">
+                <span>⏰</span>
+                <span class="dock-label">Horario</span>
+            </button>
+
+            <button id="agendaBtn" class="dock-item">
+                <span>📅</span>
+                <span class="dock-label">Agenda</span>
+            </button>
+            
+            <button id="reportBtn" class="dock-item">
+                <span>📈</span>
+                <span class="dock-label">Informe</span>
+            </button>
+        </footer>
     </div>
-    
-    <script src="app.js"></script>
 
+    <script src="app.js"></script>
 </body>
 </html>
