@@ -216,7 +216,7 @@ details[open] summary::after { content: '▲'; }
   font-size: 1.2rem; 
 }
 .dock-label { 
-    font-size: 0.6rem; /* <--- MODIFICACIÓN: Texto de etiqueta más pequeño */
+    font-size: 0.5rem; /* <--- MODIFICACIÓN: Texto de etiqueta más pequeño */
     font-weight: bold; 
     text-align: center; 
 }
