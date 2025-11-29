@@ -4,290 +4,82 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shukudai: Misión Recompensa</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Confetti CDN (para efectos visuales) -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
-    <style>
-        :root {
-            --primary: #4f46e5; /* Indigo 600 */
-            --secondary: #facc15; /* Yellow 400 */
-            --danger: #ef4444; /* Red 500 */
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            padding-bottom: 80px; /* Espacio para el dock */
-        }
-        .dock-btn.active {
-            background-color: var(--primary);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
-        }
-        .dock-btn.active .icon {
-            filter: brightness(0) invert(1);
-        }
-        
-        /* Tareas */
-        .task {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background-color: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
-        }
-        .task.completed {
-            background-color: #d1fae5; /* Green 100 */
-        }
-        .task.failed {
-            background-color: #fee2e2; /* Red 100 */
-        }
-        .btn-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.1s ease;
-            cursor: pointer;
-        }
-        .btn-circle:active {
-            transform: scale(0.95);
-        }
-        .check {
-            background-color: #10b981; /* Emerald 500 */
-            color: white;
-            margin-right: 8px;
-        }
-        .cross {
-            background-color: #f59e0b; /* Amber 500 */
-            color: white;
-        }
-        
-        /* Tienda */
-        .premio-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        .premio-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-        }
-        .premio-icono {
-            font-size: 3rem;
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-        .price-tag {
-            background-color: var(--secondary);
-            color: #1f2937;
-            padding: 0.25rem 0.5rem;
-            border-radius: 9999px;
-            font-weight: bold;
-            margin-top: 0.5rem;
-            display: inline-block;
-        }
-        
-        /* Horario */
-        .horario-dia {
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        .dia-titulo {
-            background-color: var(--primary);
-            color: white;
-            padding: 0.75rem;
-            font-weight: bold;
-            text-align: center;
-        }
-        .asignatura {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid #f3f4f6;
-            background-color: white;
-        }
-        .asignatura:last-child {
-            border-bottom: none;
-        }
-        .extra-curricular {
-            background-color: #fef3c7; /* Yellow 100 */
-            font-weight: 600;
-        }
-        
-        /* Agenda */
-        .agenda-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-        .agenda-card.examen { border-left: 6px solid #ef4444; } /* Red */
-        .agenda-card.cita { border-left: 6px solid #3b82f6; } /* Blue */
-        .agenda-card.entrega { border-left: 6px solid #22c55e; } /* Green */
-        .agenda-card.otro { border-left: 6px solid #9ca3af; } /* Gray */
-        
-        .agenda-title {
-            font-weight: 800;
-            font-size: 1.125rem;
-            color: var(--primary);
-        }
-        .agenda-info-row {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-            color: #6b7280;
-            margin-top: 0.25rem;
-        }
-        .agenda-comments {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            background-color: #f9fafb;
-            border-radius: 6px;
-            font-style: italic;
-            font-size: 0.9rem;
-        }
-        .agenda-actions {
-            margin-top: 0.75rem;
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
-        }
-        .agenda-actions button {
-            padding: 0.25rem 0.75rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .btn-edit { background-color: #e5e7eb; color: #1f2937; }
-        .btn-delete { background-color: #fecaca; color: #dc2626; }
-        
-        details > summary {
-            list-style: none;
-            cursor: pointer;
-            font-size: 1.125rem;
-            font-weight: bold;
-            padding: 0.75rem;
-            background-color: #e0e7ff; /* Indigo 100 */
-            border-radius: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-        details > summary::-webkit-details-marker {
-            display: none;
-        }
-        
-        /* Fallback for details marker in some browsers */
-        details > summary::after {
-            content: '+'; 
-            float: right;
-            font-weight: bold;
-        }
-        details[open] > summary::after {
-            content: '-';
-        }
-    </style>
-</head>
+    <link rel="stylesheet" href="style.css"> 
+    
+    </head>
 <body class="min-h-screen">
-    <div class="max-w-xl mx-auto p-4 bg-white shadow-lg sm:rounded-xl min-h-screen sm:min-h-0 sm:my-4">
+    <div class="app-container p-4 sm:rounded-xl min-h-screen sm:min-h-0 sm:my-4">
         
-        <!-- HEADER / RESUMEN DE PUNTOS -->
-        <header class="text-center mb-6 p-4 bg-indigo-50 rounded-lg shadow-md">
-            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Shukudai GO! ⭐</h1>
-            <div class="flex justify-around items-center mb-4">
+        <header>
+            <h1 class="text-3xl font-extrabold mb-2">Shukudai GO! ⭐</h1>
+            <div id="marcador" class="stats-row mb-4">
                 <div class="stat-box">
-                    <div class="text-xs font-medium text-gray-500">Puntos (Pts)</div>
-                    <div id="puntosTotales" class="text-3xl font-extrabold text-indigo-600">0</div>
+                    <div class="label">Puntos (Pts)</div>
+                    <div id="puntosTotales" class="big-number">0</div>
                 </div>
                 <div class="stat-box">
-                    <div class="text-xs font-medium text-gray-500">Minutos (Min)</div>
-                    <div id="minutosTotales" class="text-3xl font-extrabold text-amber-500">0</div>
+                    <div class="label">Minutos (Min)</div>
+                    <div id="minutosTotales" class="big-number">0</div>
                 </div>
                 <div class="stat-box">
-                    <div class="text-xs font-medium text-gray-500">Nivel</div>
-                    <div id="nivelActual" class="text-3xl font-extrabold text-red-500">1</div>
+                    <div class="label">Nivel</div>
+                    <div id="nivelActual" class="big-number">1</div>
                 </div>
             </div>
             
-            <!-- Barra de XP -->
-            <div class="w-full bg-gray-200 rounded-full h-3">
-                <div id="xpFill" class="bg-indigo-500 h-3 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            <div id="progreso">
+                <div id="xpBar">
+                    <div id="xpFill" style="width: 0%;"></div>
+                </div>
+                <div id="xpTexto" class="text-xs mt-1 font-medium">0 / 125 xp</div>
             </div>
-            <div id="xpTexto" class="text-xs text-gray-600 mt-1 font-medium">0 / 125 xp</div>
             
-            <!-- Botones Rápidos -->
-            <div class="flex justify-center space-x-2 mt-4">
-                <button id="btnPremioDiario" class="px-3 py-1 bg-yellow-500 text-white text-sm font-bold rounded-full hover:bg-yellow-600 transition shadow-sm">
+            <div id="acciones" class="flex justify-center space-x-2 mt-4">
+                <button id="btnPremioDiario" class="gold shadow-sm">
                     🎁 Diario (+10)
                 </button>
-                <button id="btnPremioSemanal" class="px-3 py-1 bg-green-500 text-white text-sm font-bold rounded-full hover:bg-green-600 transition shadow-sm">
+                <button id="btnPremioSemanal" class="blue shadow-sm">
                     🏆 Semanal (+70)
                 </button>
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL (VISTAS) -->
         <main class="mb-20">
             
-            <!-- VISTA 1: TAREAS (HOME) -->
             <section id="vistaTareas" class="view">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Tareas de Hoy 📝</h2>
                 <div id="categorias" class="space-y-4">
-                    <!-- Las categorías de tareas se renderizan aquí -->
-                </div>
+                    </div>
             </section>
 
-            <!-- VISTA 2: TIENDA DE RECOMPENSAS -->
             <section id="vistaTienda" class="view" style="display:none;">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Tienda de Premios ✨</h2>
                 
-                <!-- MENSAJE DE REGLA DEL FIN DE SEMANA -->
                 <div id="storeMessage" class="mb-4 p-3 rounded-lg text-center transition-colors duration-300">
                     <h3 id="storeMessageTitle" class="font-extrabold text-lg"></h3>
                     <p id="storeMessageBody" class="text-sm"></p>
                 </div>
                 
                 <div id="contenedorPremios" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <!-- Las tarjetas de premios se renderizan aquí -->
-                </div>
+                    </div>
             </section>
 
-            <!-- VISTA 3: HORARIO ESCOLAR -->
             <section id="vistaHorario" class="view" style="display:none;">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Horario Escolar 🏫</h2>
                 <div id="contenedorHorario" class="space-y-4">
-                    <!-- El horario se renderiza aquí -->
-                </div>
+                    </div>
             </section>
             
-            <!-- VISTA 4: AGENDA Y EVENTOS -->
-            <section id="vistaAgenda" class="view" style="display:none;">
+            <section id="vistaAgenda" class="view form-card" style="display:none;">
                 <h2 class="text-2xl font-bold text-gray-700 mb-4">Agenda y Eventos 🗓️</h2>
                 
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Próximos Eventos</h3>
                 <div id="listaEventos" class="mb-6">
-                    <!-- Los eventos de la agenda se renderizan aquí -->
-                </div>
+                    </div>
                 
                 <h3 class="text-xl font-semibold text-gray-700 mb-2">Añadir/Editar Evento</h3>
                 <form id="formAgenda" class="space-y-3 p-4 bg-indigo-50 rounded-lg shadow-inner">
@@ -329,603 +121,69 @@
                     </button>
                 </form>
             </section>
-
-            <!-- Botón de Reset -->
+            
+            <section id="vistaInforme" class="view" style="display:none;">
+                <h2 class="text-2xl font-bold text-gray-700 mb-4">Informe Semanal 📊</h2>
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Resumen Total (Últimos 7 Días)</h3>
+                <div id="totalStats" class="grid grid-cols-2 gap-3 mb-6">
+                    <div class="stat-card p-3 bg-white rounded-lg text-center">
+                        <div class="text-xl font-extrabold text-green-600" id="compTot">0</div>
+                        <div class="text-xs text-gray-500 font-medium">Tareas OK</div>
+                    </div>
+                    <div class="stat-card p-3 bg-white rounded-lg text-center">
+                        <div class="text-xl font-extrabold text-red-600" id="failTot">0</div>
+                        <div class="text-xs text-gray-500 font-medium">Tareas Fallidas</div>
+                    </div>
+                    <div class="stat-card p-3 bg-white rounded-lg text-center">
+                        <div class="text-xl font-extrabold text-indigo-600" id="ptsTot">0</div>
+                        <div class="text-xs text-gray-500 font-medium">Puntos Ganados</div>
+                    </div>
+                    <div class="stat-card p-3 bg-white rounded-lg text-center">
+                        <div class="text-xl font-extrabold text-amber-500" id="minTot">0</div>
+                        <div class="text-xs text-gray-500 font-medium">Minutos Ganados</div>
+                    </div>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">Detalle Diario</h3>
+                <div id="detalleSemanal" class="space-y-3">
+                    </div>
+            </section>
             <div class="text-center mt-6">
-                <button id="btnReset" class="text-xs text-gray-400 hover:text-red-500 transition underline cursor-pointer">Reiniciar Todos los Datos (Borrar)</button>
+                <button id="btnReset" class="danger-outline text-xs underline cursor-pointer">Reiniciar Todos los Datos (Borrar)</button>
             </div>
             
         </main>
 
-        <!-- DOCK DE NAVEGACIÓN (Fijo en el fondo) -->
-        <footer class="fixed inset-x-0 bottom-0 max-w-xl mx-auto bg-white border-t border-gray-200 shadow-[0_-5px_20px_rgba(0,0,0,0.1)] rounded-t-xl z-50">
-            <div class="flex justify-around items-center p-2">
+        <div id="dock">
+            <div class="flex justify-around items-center w-full">
                 
-                <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 active w-1/4">
+                <button id="homeBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 active w-1/5">
                     <span class="text-2xl">📋</span>
                     <span class="text-xs font-medium mt-1">Tareas</span>
                 </button>
                 
-                <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/4">
+                <button id="shopBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
                     <span class="text-2xl">🎁</span>
                     <span class="text-xs font-medium mt-1">Tienda</span>
                 </button>
-
-                <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/4">
+                
+                <button id="scheduleBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
                     <span class="text-2xl">⏰</span>
                     <span class="text-xs font-medium mt-1">Horario</span>
                 </button>
-
-                <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 hover:text-indigo-600 w-1/4">
+                
+                <button id="agendaBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
                     <span class="text-2xl">📅</span>
                     <span class="text-xs font-medium mt-1">Agenda</span>
                 </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- CÓDIGO JAVASCRIPT -->
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 1. CONFIGURACIÓN ---
-    // SHUKUDAI 2.6: Agenda y 4 Vistas en el Dock.
-    const META_XP = 125; 
-    
-    // Sonidos (URLs estables de Google CDN)
-    const SONIDOS = {
-        exito: new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg'),
-        nivel: new Audio('https://actions.google.com/sounds/v1/cartoon/clown_horn.ogg'),
-        error: new Audio('https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg'),
-        caja: new Audio('https://actions.google.com/sounds/v1/cartoon/pop.ogg')
-    };
-
-    // --- HORARIO SEMANAL COMPLETO ---
-    const horarioSemanal = {
-        Lunes: [
-            { nombre: "P.E. (Educación Física)", hora: "09:00 - 09:45" },
-            { nombre: "Religión", hora: "09:45 - 10:30" },
-            { nombre: "Lengua", hora: "10:30 - 11:15" },
-            { nombre: "Matemáticas", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Values / Ética", hora: "12:30 - 13:15" },
-            { nombre: "English (Inglés)", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
-        ],
-        Martes: [
-            { nombre: "Religión", hora: "09:00 - 09:45" },
-            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
-            { nombre: "Inglés", hora: "10:30 - 11:15" },
-            { nombre: "Lengua", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Ciencias Naturales", hora: "12:30 - 13:15" },
-            { nombre: "P.E. (Educación Física)", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" }, 
-            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 19:00", tipo: "extra" },
-            { nombre: "Programación 💻 (Extraescolar)", hora: "19:00 - 20:00", tipo: "extra" }
-        ],
-        Miercoles: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Values / Ética", hora: "09:45 - 10:30" },
-            { nombre: "Inglés", hora: "10:30 - 11:15" },
-            { nombre: "Arts / Plástica", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Ciencias Sociales", hora: "12:30 - 13:15" },
-            { nombre: "Lengua", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
-        ],
-        Jueves: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Ciencias Naturales", hora: "09:45 - 10:30" },
-            { nombre: "Ciencias Sociales", hora: "10:30 - 11:15" },
-            { nombre: "Lengua", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "Lengua", hora: "12:30 - 13:15" },
-            { nombre: "Inglés", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 16:00", tipo: "extra" },
-            { nombre: "Karate 🥋 (Extraescolar)", hora: "16:00 - 17:45", tipo: "extra" },
-            { nombre: "Inglés 🇬🇧 (Extraescolar)", hora: "17:45 - 19:00", tipo: "extra" }
-        ],
-        Viernes: [
-            { nombre: "Matemáticas", hora: "09:00 - 09:45" },
-            { nombre: "Matemáticas", hora: "09:45 - 10:30" },
-            { nombre: "P.E. (Educación Física)", hora: "10:30 - 11:15" },
-            { nombre: "Música", hora: "11:15 - 12:00" },
-            { nombre: "Patio / Recreo", hora: "12:00 - 12:30" },
-            { nombre: "English (Inglés)", hora: "12:30 - 13:15" },
-            { nombre: "Lengua", hora: "13:15 - 14:00" },
-            { nombre: "Comedor", hora: "14:00 - 15:00", tipo: "extra" }
-        ]
-    };
-    
-    // --- LISTADO DE TAREAS ---
-    const catalogoTareas = [
-        {
-            categoria: "Aseo e Higiene Personal 🧴",
-            items: [
-                { id: "dientes", nombre: "Lavarse bien los dientes", pts: 2, min: 5 },
-                { id: "ducha", nombre: "Ducharse bien", pts: 2, min: 10 },
-                { id: "desodorante", nombre: "Usar desodorante", pts: 1, min: 1 }
-            ]
-        },
-        {
-            categoria: "Académico 📚",
-            items: [
-                { id: "deberes", nombre: "Hacer deberes", pts: 1, min: 30 },
-                { id: "estudiar", nombre: "Estudiar para controles", pts: 2, min: 45 },
-                { id: "leer", nombre: "Leer 15 Min", pts: 5, min: 15 },
-                { id: "repaso", nombre: "Repaso Contenidos", pts: 3, min: 20 }
-            ]
-        },
-        {
-            categoria: "Hogar 🏠",
-            items: [
-                { id: "ordenar", nombre: "Ordenar habitación", pts: 1, min: 10 },
-                { id: "limpiar", nombre: "Limpiar habitación", pts: 2, min: 20 },
-                { id: "lavavajillas", nombre: "Sacar lavavajillas", pts: 1, min: 5 },
-                { id: "bano", nombre: "Limpiar baño", pts: 2, min: 15 }
-            ]
-        },
-        {
-            categoria: "General ⭐",
-            items: [
-                { id: "lenguaje", nombre: "Lenguaje Respetuoso", pts: 1, min: 0 },
-                { id: "actitud", nombre: "Buena Actitud", pts: 1, min: 0 },
-                { id: "colaborar", nombre: "Colabora en Labores Hogar", pts: 1, min: 15 }
-            ]
-        }
-    ];
-
-    // --- CATÁLOGO DE PREMIOS ---
-    const catalogoPremios = [
-        // Premios de Puntos
-        { id: 'peli', nombre: 'Noche de Cine', icono: '🎬', coste: 250, moneda: 'puntos' },
-        { id: 'helado', nombre: 'Comer Helado', icono: '🍦', coste: 120, moneda: 'puntos' },
-        { id: 'parque', nombre: 'Ir al Parque', icono: '🛝', coste: 200, moneda: 'puntos' },
-        { id: 'pizza', nombre: 'Cena Pizza', icono: '🍕', coste: 200, moneda: 'puntos' },
-        // Premios de Minutos (Tiempo de Pantalla)
-        { id: 'tablet', nombre: '30 min Tablet', icono: '📱', coste: 30, moneda: 'minutos' }, // 30 minutos
-        { id: 'consola', nombre: '1 Hora Consola', icono: '🎮', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'movil', nombre: '1 Hora Móvil', icono: '🤳', coste: 60, moneda: 'minutos' }, // 60 minutos
-        { id: 'ordenador', nombre: '1 Hora Ordenador', icono: '💻', coste: 60, moneda: 'minutos' }, // 60 minutos
-    ];
-
-    // --- 2. ESTADO Y PERSISTENCIA (USANDO LOCALSTORAGE) ---
-    let estado = JSON.parse(localStorage.getItem('shukudai_v3_data')) || {
-        puntos: 0,
-        minutos: 0,
-        nivel: 1,
-        tareasHoy: {},
-        agendaEventos: [], 
-        ultimaFecha: new Date().toDateString(),
-        ultimoDiario: null,
-    };
-
-    // --- 3. LÓGICA DE NUEVO DÍA ---
-    const hoy = new Date().toDateString();
-    if (estado.ultimaFecha !== hoy) {
-        console.log("¡Nuevo día detectado! Reseteando tareas.");
-        estado.tareasHoy = {}; 
-        estado.ultimaFecha = hoy;
-        guardar();
-    }
-
-    // --- 4. REFERENCIAS DOM ---
-    const ui = {
-        puntos: document.getElementById('puntosTotales'),
-        minutos: document.getElementById('minutosTotales'),
-        nivel: document.getElementById('nivelActual'),
-        xpFill: document.getElementById('xpFill'),
-        xpTexto: document.getElementById('xpTexto'),
-        contenedorCategorias: document.getElementById('categorias'),
-        contenedorPremios: document.getElementById('contenedorPremios'),
-        contenedorHorario: document.getElementById('contenedorHorario'),
-        listaEventos: document.getElementById('listaEventos'), 
-        formAgenda: document.getElementById('formAgenda'), 
-        vistaTareas: document.getElementById('vistaTareas'),
-        vistaTienda: document.getElementById('vistaTienda'),
-        vistaHorario: document.getElementById('vistaHorario'),
-        vistaAgenda: document.getElementById('vistaAgenda'), 
-        btnHome: document.getElementById('homeBtn'),
-        btnShop: document.getElementById('shopBtn'),
-        btnSchedule: document.getElementById('scheduleBtn'),
-        btnAgenda: document.getElementById('agendaBtn'), 
-        btnReset: document.getElementById('btnReset'),
-        btnDiario: document.getElementById('btnPremioDiario'),
-        btnSemanal: document.getElementById('btnPremioSemanal')
-    };
-
-    // --- 5. FUNCIONES CORE ---
-    function guardar() {
-        localStorage.setItem('shukudai_v3_data', JSON.stringify(estado));
-        actualizarUI();
-    }
-
-    function actualizarUI() {
-        // Textos
-        ui.puntos.textContent = estado.puntos;
-        ui.minutos.textContent = estado.minutos;
-        ui.nivel.textContent = estado.nivel;
-        
-        // Barra XP
-        const xpRestante = estado.puntos % META_XP;
-        ui.xpFill.style.width = `${(xpRestante / META_XP) * 100}%`;
-        ui.xpTexto.textContent = `${xpRestante} / ${META_XP} xp`;
-
-        // Verificar Nivel
-        const nivelReal = Math.floor(estado.puntos / META_XP) + 1;
-        if (nivelReal > estado.nivel) {
-            estado.nivel = nivelReal;
-            lanzarConfeti();
-            reproducir('nivel');
-            console.log(`🎉 ¡INCREÍBLE! ¡Has subido al NIVEL ${estado.nivel}! 🎉`);
-            guardar();
-        }
-    }
-
-    function reproducir(tipo) {
-        if (SONIDOS[tipo]) {
-            SONIDOS[tipo].currentTime = 0;
-            SONIDOS[tipo].play().catch(err => console.log("Audio bloqueado:", err));
-        }
-    }
-
-    function lanzarConfeti() {
-        if (typeof confetti === 'function') {
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        }
-    }
-    
-    // Función para gestionar la navegación entre las 4 vistas
-    function mostrarVista(vistaId, btnActivo) {
-        const vistas = [ui.vistaTareas, ui.vistaTienda, ui.vistaHorario, ui.vistaAgenda];
-        const botones = [ui.btnHome, ui.btnShop, ui.btnSchedule, ui.btnAgenda];
-
-        vistas.forEach(v => v.style.display = 'none');
-        botones.forEach(b => b.classList.remove('active'));
-
-        document.getElementById(vistaId).style.display = 'block';
-        btnActivo.classList.add('active');
-    }
-
-    // --- 6. RENDERIZADO DE VISTAS ---
-
-    function renderizarTareas() {
-        ui.contenedorCategorias.innerHTML = '';
-        catalogoTareas.forEach(grupo => {
-            const details = document.createElement('details');
-            details.open = true;
-            
-            const summary = document.createElement('summary');
-            summary.textContent = grupo.categoria;
-            details.appendChild(summary);
-
-            grupo.items.forEach(tarea => {
-                const div = document.createElement('div');
-                div.className = 'task';
-                const estadoTarea = estado.tareasHoy[tarea.id];
-                if (estadoTarea === 'hecho') div.classList.add('completed');
-                if (estadoTarea === 'fail') div.classList.add('failed');
-
-                div.innerHTML = `
-                    <div class="task-info">
-                        <span>${tarea.nombre}</span>
-                        <span class="task-pts">+${tarea.pts} pts ${tarea.min > 0 ? '• ' + tarea.min + ' min' : ''}</span>
-                    </div>
-                    <div class="task-buttons">
-                        ${!estadoTarea ? `
-                        <button class="btn-circle check" title="Completar">✔</button>
-                        <button class="btn-circle cross" title="Fallar">✖</button>
-                        ` : `
-                        <span>${estadoTarea === 'hecho' ? '🌟' : '❌'}</span>
-                        `}
-                    </div>
-                `;
-                if (!estadoTarea) {
-                    div.querySelector('.check').addEventListener('click', () => completarTarea(tarea, true));
-                    div.querySelector('.cross').addEventListener('click', () => completarTarea(tarea, false));
-                }
-                details.appendChild(div);
-            });
-            ui.contenedorCategorias.appendChild(details);
-        });
-    }
-
-    function renderizarTienda() {
-        ui.contenedorPremios.innerHTML = '';
-        
-        // Lógica de verificación de fin de semana para el mensaje
-        const today = new Date().getDay(); // 0 = Domingo, 6 = Sábado
-        const isWeekend = today === 0 || today === 6;
-
-        const messageDiv = document.getElementById('storeMessage');
-        const messageTitle = document.getElementById('storeMessageTitle');
-        const messageBody = document.getElementById('storeMessageBody');
-
-        if (isWeekend) {
-            messageDiv.className = 'mb-4 p-3 bg-green-100 text-green-800 border border-green-300 rounded-lg text-center';
-            messageTitle.textContent = '¡HOY ES FIN DE SEMANA! 🎉';
-            messageBody.textContent = '¡Ya puedes canjear tus premios! ¡Felicidades por tu esfuerzo!';
-        } else {
-            messageDiv.className = 'mb-4 p-3 bg-yellow-100 text-yellow-800 border border-yellow-300 rounded-lg text-center';
-            messageTitle.textContent = 'Canje de Premios: ¡SÓLO FINES DE SEMANA! 📅';
-            messageBody.textContent = 'Aún no es momento de canjear. Sigue acumulando puntos y minutos para el Sábado y Domingo.';
-        }
-
-
-        catalogoPremios.forEach(premio => {
-            
-            const monedaSimbolo = premio.moneda === 'minutos' ? 'min' : 'pts';
-            const cantidadDisponible = premio.moneda === 'minutos' ? estado.minutos : estado.puntos;
-
-            const puedeComprar = cantidadDisponible >= premio.coste;
-            
-            const card = document.createElement('div');
-            card.className = 'premio-card';
-            // Opacidad reducida si no puede comprar O si no es fin de semana.
-            card.style.opacity = (puedeComprar && isWeekend) ? '1' : '0.5';
-
-            card.innerHTML = `
-                <div class="premio-icono">${premio.icono}</div>
-                <div style="font-weight:bold;">${premio.nombre}</div>
-                <div class="price-tag">${premio.coste} ${monedaSimbolo}</div>
-            `;
-
-            card.addEventListener('click', () => {
-                // Verificar si es fin de semana y si puede comprar
-                if (!isWeekend) {
-                    reproducir('error');
-                    console.log("Solo se puede canjear premios los fines de semana.");
-                    // Si tienes modal o toast, mostrar mensaje
-                    return;
-                }
-
-                if (!puedeComprar) {
-                    reproducir('error');
-                    const faltante = premio.coste - cantidadDisponible;
-                    console.log(`Te faltan ${faltante} ${monedaSimbolo}.`); 
-                    return;
-                }
                 
-                // Usamos confirm() para simular un modal
-                if (window.confirm(`¿Comprar "${premio.nombre}" por ${premio.coste} ${monedaSimbolo}?`)) {
-                    // Lógica de DEDUCCIÓN
-                    if (premio.moneda === 'minutos') {
-                        estado.minutos -= premio.coste;
-                    } else {
-                        estado.puntos -= premio.coste;
-                    }
-
-                    reproducir('caja');
-                    lanzarConfeti(); 
-                    guardar();
-                    renderizarTienda(); 
-                }
-            });
-
-            ui.contenedorPremios.appendChild(card);
-        });
-    }
-
-    function renderizarHorario() {
-        ui.contenedorHorario.innerHTML = '';
-        const dias = Object.keys(horarioSemanal);
-        
-        dias.forEach(dia => {
-            const diaDiv = document.createElement('div');
-            diaDiv.className = 'horario-dia';
-
-            const titulo = document.createElement('div');
-            titulo.className = 'dia-titulo';
-            titulo.textContent = dia;
-            diaDiv.appendChild(titulo);
-
-            horarioSemanal[dia].forEach(asignatura => {
-                const asigDiv = document.createElement('div');
-                // Añadimos una clase condicional para extraescolares
-                asigDiv.className = `asignatura ${asignatura.tipo === 'extra' ? 'extra-curricular' : ''}`;
-                asigDiv.innerHTML = `
-                    <span class="asignatura-nombre">${asignatura.nombre}</span>
-                    <span class="asignatura-hora">${asignatura.hora}</span>
-                `;
-                diaDiv.appendChild(asigDiv);
-            });
-
-            ui.contenedorHorario.appendChild(diaDiv);
-        });
-    }
-
-    // --- RENDERIZADO AGENDA ---
-    function renderizarAgenda() {
-        ui.listaEventos.innerHTML = '';
-        
-        // Ordenar eventos por fecha ascendente
-        const eventosOrdenados = [...estado.agendaEventos].sort((a, b) => 
-            new Date(a.fecha + ' ' + (a.hora || '00:00')) - new Date(b.fecha + ' ' + (b.hora || '00:00'))
-        );
-
-        if (eventosOrdenados.length === 0) {
-            ui.listaEventos.innerHTML = '<p class="text-gray-500 text-center py-4">No hay eventos próximos en la agenda.</p>';
-            return;
-        }
-
-        eventosOrdenados.forEach(evento => {
-            const card = document.createElement('div');
-            // Añade una clase para estilizar según el tipo
-            let tipoClase = evento.tipo.toLowerCase().replace(/\s/g, ''); 
-            // Fallback si no coincide exactamente
-            if (!['examen', 'cita', 'entrega'].includes(tipoClase)) tipoClase = 'otro';
-            
-            card.className = `agenda-card ${tipoClase}`;
-
-            card.innerHTML = `
-                <div class="agenda-title">${evento.tipo} de ${evento.asignatura}</div>
-                <div class="agenda-info-row">
-                    <span>${new Date(evento.fecha).toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric', month: 'short' })}</span>
-                    <span>${evento.hora || ''}</span>
-                </div>
-                ${evento.comentarios ? `<p class="agenda-comments">${evento.comentarios}</p>` : ''}
-                <div class="agenda-actions">
-                    <button class="btn-edit" data-id="${evento.id}">📝 Editar</button>
-                    <button class="btn-delete" data-id="${evento.id}">🗑️ Eliminar</button>
-                </div>
-            `;
-
-            ui.listaEventos.appendChild(card);
-        });
-
-        // Añadir listeners para editar y eliminar
-        ui.listaEventos.querySelectorAll('.btn-edit').forEach(btn => {
-            btn.addEventListener('click', (e) => cargarEventoParaEdicion(e.target.dataset.id));
-        });
-
-        ui.listaEventos.querySelectorAll('.btn-delete').forEach(btn => {
-            btn.addEventListener('click', (e) => eliminarEvento(e.target.dataset.id));
-        });
-    }
-
-    // --- LÓGICA AGENDA CRUD ---
-
-    function generarId() {
-        return '_' + Math.random().toString(36).substr(2, 9);
-    }
-
-    function cargarEventoParaEdicion(id) {
-        const evento = estado.agendaEventos.find(e => e.id === id);
-        if (!evento) return;
-
-        // Cargar datos en el formulario
-        document.getElementById('agendaId').value = evento.id;
-        document.getElementById('agendaFecha').value = evento.fecha;
-        document.getElementById('agendaHora').value = evento.hora || '';
-        document.getElementById('agendaAsignatura').value = evento.asignatura;
-        document.getElementById('agendaTipo').value = evento.tipo;
-        document.getElementById('agendaComentarios').value = evento.comentarios || '';
-        
-        // Mover la vista a la Agenda y hacer scroll al formulario
-        mostrarVista('vistaAgenda', ui.btnAgenda);
-        ui.formAgenda.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function guardarEvento(e) {
-        e.preventDefault();
-
-        const id = document.getElementById('agendaId').value;
-        const fecha = document.getElementById('agendaFecha').value;
-        const hora = document.getElementById('agendaHora').value;
-        const asignatura = document.getElementById('agendaAsignatura').value;
-        const tipo = document.getElementById('agendaTipo').value;
-        const comentarios = document.getElementById('agendaComentarios').value;
-
-        const nuevoEvento = {
-            id: id || generarId(),
-            fecha,
-            hora,
-            asignatura,
-            tipo,
-            comentarios
-        };
-
-        if (id) {
-            // Edición: Encontrar y reemplazar el evento existente
-            const index = estado.agendaEventos.findIndex(e => e.id === id);
-            if (index !== -1) {
-                estado.agendaEventos[index] = nuevoEvento;
-                console.log('Evento actualizado con éxito. 🎉');
-            }
-        } else {
-            // Creación: Añadir nuevo evento
-            estado.agendaEventos.push(nuevoEvento);
-            console.log('Nuevo evento guardado. 🎉');
-        }
-
-        guardar();
-        ui.formAgenda.reset(); // Limpiar formulario
-        document.getElementById('agendaId').value = ''; // Resetear ID oculto
-        renderizarAgenda();
-    }
-
-    function eliminarEvento(id) {
-        if (window.confirm('¿Seguro que quieres eliminar este evento de la agenda?')) {
-            estado.agendaEventos = estado.agendaEventos.filter(e => e.id !== id);
-            guardar();
-            renderizarAgenda();
-            reproducir('error');
-            console.log('Evento eliminado.');
-        }
-    }
-
-    // --- 7. ACCIONES DE TAREAS ---
-    function completarTarea(tarea, exito) {
-        if (exito) {
-            estado.puntos += tarea.pts;
-            estado.minutos += tarea.min;
-            estado.tareasHoy[tarea.id] = 'hecho';
-            reproducir('exito');
-        } else {
-            estado.tareasHoy[tarea.id] = 'fail';
-            reproducir('error');
-        }
-        guardar();
-        renderizarTareas();
-    }
-
-    // --- 8. EVENTOS GLOBALES DE NAVEGACIÓN ---
-    ui.btnHome.addEventListener('click', () => {
-        mostrarVista('vistaTareas', ui.btnHome);
-        renderizarTareas();
-    });
-
-    ui.btnShop.addEventListener('click', () => {
-        mostrarVista('vistaTienda', ui.btnShop);
-        renderizarTienda();
-    });
-
-    ui.btnSchedule.addEventListener('click', () => {
-        mostrarVista('vistaHorario', ui.btnSchedule);
-        renderizarHorario();
-    });
-
-    ui.btnAgenda.addEventListener('click', () => { 
-        mostrarVista('vistaAgenda', ui.btnAgenda);
-        renderizarAgenda();
-    });
-
-    ui.formAgenda.addEventListener('submit', guardarEvento); 
-
-    // --- 9. EVENTOS DE ACCIONES RÁPIDAS Y RESET ---
-    ui.btnDiario.addEventListener('click', () => {
-        const hoy = new Date().toDateString();
-        if (estado.ultimoDiario === hoy) {
-            console.log("Ya has recogido el premio diario de hoy. Vuelve mañana.");
-            reproducir('error');
-            alert("Ya has recogido tu regalo de hoy. ¡Vuelve mañana!");
-            return;
-        }
-
-        estado.puntos += 10;
-        estado.ultimoDiario = hoy; 
-        reproducir('exito');
-        guardar();
-        alert("¡+10 Puntos recibidos! 🎁");
-    });
-
-    ui.btnSemanal.addEventListener('click', () => {
-        if(window.confirm("¿Reclamar premio semanal (+70)?")) {
-            estado.puntos += 70;
-            reproducir('nivel');
-            guardar();
-        }
-    });
-
-    ui.btnReset.addEventListener('click', () => {
-        if(window.confirm("⚠️ ¿BORRAR TODO? Se perderán puntos y nivel.")) {
-            localStorage.removeItem('shukudai_v3_data');
-            location.reload();
-        }
-    });
-
-    // INICIO: Mostrar la vista de tareas por defecto al cargar.
-    mostrarVista('vistaTareas', ui.btnHome);
-    actualizarUI();
-});
+                <button id="reportBtn" class="dock-btn p-3 rounded-xl flex flex-col items-center text-gray-500 w-1/5">
+                    <span class="text-2xl">📊</span>
+                    <span class="text-xs font-medium mt-1">Informe</span>
+                </button>
+            </div> 
+        </div> </div>
+    <script src="app.js"></script>
+</body>
+</html>
